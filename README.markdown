@@ -1,28 +1,9 @@
-_spray-json_ is a lightweight, clean and efficient [JSON] implementation in Scala.
+sjson-new
+=========
 
-It sports the following features:
-
-* A simple immutable model of the JSON language elements
-* An efficient JSON parser
-* Choice of either compact or pretty JSON-to-string printing
-* Type-class based (de)serialization of custom objects (no reflection, no intrusion)
-* No external dependencies
-
-_spray-json_ allows you to convert between
- * String JSON documents
- * JSON Abstract Syntax Trees (ASTs) with base type JsValue
- * instances of arbitrary Scala types
-
-as depicted in this diagram:
-
-![Spray-JSON conversions](images/Conversions.png "Conversions possible with Spray-JSON")
+sjson-new is a typeclass based JSON (de)serialization library.
 
 ### Installation
-
-_spray-json_ is available from the [repo.spray.io] repository.
-The latest release is `1.3.2` and is built against Scala 2.10.5 and Scala 2.11.6.
-
-If you use SBT you can include _spray-json_ in your project with
 
 ```scala
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
@@ -30,41 +11,39 @@ libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 
 ### Usage
 
-_spray-json_ is really easy to use.
 Just bring all relevant elements in scope with
 
 ```scala
-import spray.json._
+import sjsonnew._
 import DefaultJsonProtocol._ // if you don't supply your own Protocol (see below)
 ```
 
 and do one or more of the following:
 
 * Parse a JSON string into its Abstract Syntax Tree (AST) representation
-    
+
     ```scala
     val source = """{ "some": "JSON source" }"""
     val jsonAst = source.parseJson // or JsonParser(source)
     ```
-    
+
 * Print a JSON AST back to a String using either the `CompactPrinter` or the `PrettyPrinter`
-    
+
     ```scala
     val json = jsonAst.prettyPrint // or .compactPrint
     ```
-    
+
 * Convert any Scala object to a JSON AST using the pimped `toJson` method
-    
+
     ```scala
     val jsonAst = List(1, 2, 3).toJson
     ```
-    
+
 * Convert a JSON AST to a Scala object with the `convertTo` method
-    
+
     ```scala
     val myObject = jsonAst.convertTo[MyObjectType]
     ```
-
 In order to make steps 3 and 4 work for an object of type `T` you need to bring implicit values in scope that
 provide `JsonFormat[T]` instances for `T` and all types used by `T` (directly or indirectly).
 The way you normally do this is via a "JsonProtocol".
@@ -72,16 +51,16 @@ The way you normally do this is via a "JsonProtocol".
 
 ### JsonProtocol
 
-_spray-json_ uses [SJSON]s Scala-idiomatic type-class-based approach to connect an existing type `T` with the logic how
-to (de)serialize its instances to and from JSON. (In fact _spray-json_ even reuses some of [SJSON]s code, see the
+sjson-new uses [sjson]'s Scala-idiomatic typeclass-based approach to connect an existing type `T` with the logic how
+to (de)serialize its instances to and from JSON. (In fact sjson-new reuses some of [sjson]s code, see the
 'Credits' section below).
 
 This approach has the advantage of not requiring any change (or even access) to `T`s source code. All (de)serialization
-logic is attached 'from the outside'. There is no reflection involved, so the resulting conversions are fast. Scalas
+logic is attached *from the outside*. There is no reflection involved, so the resulting conversions are fast. Scalas
 excellent type inference reduces verbosity and boilerplate to a minimum, while the Scala compiler will make sure at
 compile time that you provided all required (de)serialization logic.
 
-In _spray-jsons_ terminology a 'JsonProtocol' is nothing but a bunch of implicit values of type `JsonFormat[T]`, whereby
+In sjson-new's terminology a 'JsonProtocol' is nothing but a bunch of implicit values of type `JsonFormat[T]`, whereby
 each `JsonFormat[T]` contains the logic of how to convert instance of `T` to and from JSON. All `JsonFormat[T]`s of a
 protocol need to be "mece" (mutually exclusive, collectively exhaustive), i.e. they are not allowed to overlap and
 together need to span all types required by the application.
@@ -259,22 +238,15 @@ wrapper). Note, that `lazyFormat` returns a `JsonFormat` even if it was given a 
 picked up by `SprayJsonSupport`. To get back a `RootJsonFormat` just wrap the complete `lazyFormat` call with another
 call to `rootFormat`.
 
-
 ### Credits
 
-Most of type-class (de)serialization code is nothing but a polished copy of what **Debasish Ghosh** made available
-with his [SJSON] library. These code parts therefore bear his copyright.
-Additionally the JSON AST model is heavily inspired by the one contributed by **Jorge Ortiz** to [Databinder-Dispatch].
-
+- In 2010 **Debasish Ghosh** wrote series of blog articles on typeclasses ([Scala Implicits : Type Classes Here I Come
+][ghosh1] etc), and implemented typeclass-based serialization in sjson. sjson used JSON AST from Dispatch classic, which was contributed by Jorge Ortiz.
+- In 2011 **Mathias Doenitz** created standalone spray-json project, combining sjson's serialization code and JSON AST from Dispatch classic, along with PEG-based parser. Honoring sjson, serialization code bares Debasish's copyright.
 
 ### License
 
-_spray-json_ is licensed under [APL 2.0].
-
-### Mailing list
-
-Please use the [spray-user] mailing list if you have any questions.
-
+sjson-new is licensed under [APL 2.0].
 
 ### Patch Policy
 
@@ -283,10 +255,10 @@ However, patches can only be accepted from their original author.
 Along with any patches, please state that the patch is your original work and that you license the work to the
 _spray-json_ project under the project’s open source license.
 
-
+  [ghosh1]: http://debasishg.blogspot.com/2010/06/scala-implicits-type-classes-here-i.html
   [JSON]: http://json.org
   [repo.spray.io]: http://repo.spray.io
-  [SJSON]: https://github.com/debasishg/sjson
+  [sjson]: https://github.com/debasishg/sjson
   [Databinder-Dispatch]: https://github.com/n8han/Databinder-Dispatch
   [APL 2.0]: http://www.apache.org/licenses/LICENSE-2.0
   [spray-user]: http://groups.google.com/group/spray-user

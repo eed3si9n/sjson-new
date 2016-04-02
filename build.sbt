@@ -1,73 +1,85 @@
-name := "spray-json"
+lazy val root = (project in file(".")).
+  aggregate(core).
+  settings(
+    name := "sjson new",
+    inThisBuild(List(
+      scalaVersion := "2.11.8",
+      description := "A Scala library for JSON (de)serialization"
+    ))
+  )
 
-version := "1.3.2"
+lazy val core = project.
+  settings(
+    name := "sjson new core",
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "3.7.1" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.7.1" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
+    )
+  )
 
-organization := "io.spray"
+// name := "spray-json"
 
-organizationHomepage := Some(new URL("http://spray.io"))
+// version := "1.3.2"
 
-description := "A Scala library for easy and idiomatic JSON (de)serialization"
+// organization := "io.spray"
 
-homepage := Some(new URL("https://github.com/spray/spray-json"))
+// organizationHomepage := Some(new URL("http://spray.io"))
 
-startYear := Some(2011)
+// homepage := Some(new URL("https://github.com/spray/spray-json"))
 
-licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+// startYear := Some(2011)
 
-scalaVersion := "2.11.7"
+// licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+// scalaVersion := "2.11.7"
 
-resolvers += Opts.resolver.sonatypeReleases
+// scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
 
-libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2-core" % "3.7.1" % "test",
-  "org.specs2" %% "specs2-scalacheck" % "3.7.1" % "test",
-  "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
-)
+// resolvers += Opts.resolver.sonatypeReleases
 
-(scalacOptions in doc) ++= Seq("-doc-title", name.value + " " + version.value)
+// (scalacOptions in doc) ++= Seq("-doc-title", name.value + " " + version.value)
 
-// generate boilerplate
-Boilerplate.settings
+// // generate boilerplate
+// Boilerplate.settings
 
-// OSGi settings
-osgiSettings
+// // OSGi settings
+// osgiSettings
 
-OsgiKeys.exportPackage := Seq("""spray.json.*;version="${Bundle-Version}"""")
+// OsgiKeys.exportPackage := Seq("""spray.json.*;version="${Bundle-Version}"""")
 
-OsgiKeys.importPackage <<= scalaVersion { sv => Seq("""scala.*;version="$<range;[==,=+);%s>"""".format(sv)) }
+// OsgiKeys.importPackage <<= scalaVersion { sv => Seq("""scala.*;version="$<range;[==,=+);%s>"""".format(sv)) }
 
-OsgiKeys.importPackage ++= Seq("""spray.json;version="${Bundle-Version}"""", "*")
+// OsgiKeys.importPackage ++= Seq("""spray.json;version="${Bundle-Version}"""", "*")
 
-OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
+// OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
 
-///////////////
-// publishing
-///////////////
+// ///////////////
+// // publishing
+// ///////////////
 
-crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M3")
+// crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M3")
 
-scalaBinaryVersion <<= scalaVersion(sV => if (CrossVersion.isStable(sV)) CrossVersion.binaryScalaVersion(sV) else sV)
+// scalaBinaryVersion <<= scalaVersion(sV => if (CrossVersion.isStable(sV)) CrossVersion.binaryScalaVersion(sV) else sV)
 
-publishMavenStyle := true
+// publishMavenStyle := true
 
-useGpg := true
+// useGpg := true
 
-publishTo <<= version { v: String =>
-  val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else                             Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
+// publishTo <<= version { v: String =>
+//   val nexus = "https://oss.sonatype.org/"
+//   if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+//   else                             Some("releases" at nexus + "service/local/staging/deploy/maven2")
+// }
 
-pomIncludeRepository := { _ => false }
+// pomIncludeRepository := { _ => false }
 
-pomExtra :=
-  <scm>
-    <url>git://github.com/spray/spray.git</url>
-    <connection>scm:git:git@github.com:spray/spray.git</connection>
-  </scm>
-  <developers>
-    <developer><id>sirthias</id><name>Mathias Doenitz</name></developer>
-    <developer><id>jrudolph</id><name>Johannes Rudolph</name></developer>
-  </developers>
+// pomExtra :=
+//   <scm>
+//     <url>git://github.com/spray/spray.git</url>
+//     <connection>scm:git:git@github.com:spray/spray.git</connection>
+//   </scm>
+//   <developers>
+//     <developer><id>sirthias</id><name>Mathias Doenitz</name></developer>
+//     <developer><id>jrudolph</id><name>Johannes Rudolph</name></developer>
+//   </developers>
