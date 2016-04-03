@@ -18,7 +18,7 @@ package sjsonnew
 
 // import org.specs2.mutable.Specification
 
-// class CustomFormatSpec extends Specification with DefaultJsonProtocol {
+// class CustomFormatSpec extends Specification with BasicJsonProtocol {
 
 //   case class MyType(name: String, value: Int)
 

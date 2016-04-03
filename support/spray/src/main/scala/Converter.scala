@@ -9,7 +9,9 @@ object Converter extends SupportConverter[JsValue] {
       def jnull() = JsNull
       def jfalse() = JsFalse
       def jtrue() = JsTrue
+      def jnum(d: Double) = JsNumber(d)
       def jnum(s: String) = JsNumber(s)
+      def jnum(d: BigDecimal) = JsNumber(d)
       def jint(i: Int) = JsNumber(i)
       def jlong(l: Long) = JsNumber(l)
       def jstring(s: String) = JsString(s)
@@ -24,6 +26,29 @@ object Converter extends SupportConverter[JsValue] {
         value match {
           case JsNumber(x) => x.longValue
           case x => deserializationError("Expected Long as JsNumber, but got " + x)
+        }
+      def extractFloat(value: JsValue): Float =
+        value match {
+          case JsNumber(x) => x.floatValue
+          case JsNull      => Float.NaN
+          case x => deserializationError("Expected Float as JsNumber, but got " + x)
+        }
+      def extractDouble(value: JsValue): Double =
+        value match {
+          case JsNumber(x) => x.doubleValue
+          case JsNull      => Double.NaN
+          case x => deserializationError("Expected Double as JsNumber, but got " + x)
+        }
+      def extractBigDecimal(value: JsValue): BigDecimal =
+        value match {
+          case JsNumber(x) => x
+          case x => deserializationError("Expected BigDecimal as JsNumber, but got " + x)
+        }
+      def extractBoolean(value: JsValue): Boolean =
+        value match {
+          case JsTrue => true
+          case JsFalse => false
+          case x => deserializationError("Expected JsBoolean, but got " + x)
         }
       def extractString(value: JsValue): String =
         value match {

@@ -39,14 +39,19 @@ trait Facade[J] {
   def jnull(): J
   def jfalse(): J
   def jtrue(): J
+  def jnum(d: Double): J
   def jnum(s: String): J
+  def jnum(d: BigDecimal): J
   // def jint(s: String): J
   def jint(i: Int): J
   def jlong(l: Long): J
   def jstring(s: String): J
-
   def extractInt(value: J): Int
   def extractLong(value: J): Long
+  def extractFloat(value: J): Float
+  def extractDouble(value: J): Double
+  def extractBigDecimal(value: J): BigDecimal
+  def extractBoolean(value: J): Boolean
   def extractString(value: J): String
   def extractArray(value: J): Vector[J]
   def extractObject(value: J): Vector[(String, J)]

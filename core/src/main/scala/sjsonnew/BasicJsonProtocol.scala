@@ -1,6 +1,7 @@
 /*
  * Original implementation (C) 2009-2011 Debasish Ghosh
  * Adapted and extended in 2011 by Mathias Doenitz
+ * Adapted and extended in 2016 by Eugene Yokota
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +18,16 @@
 
 package sjsonnew
 
-trait DefaultJsonProtocol extends BasicFormats
-  with CollectionFormats
-
 /**
   * Provides all the predefined JsonFormats.
  */
-// trait DefaultJsonProtocol
+trait BasicJsonProtocol extends PrimitiveFormats
+  with CollectionFormats
+
+// trait BasicJsonProtocol
 //         extends BasicFormats
 //         with StandardFormats
 //         with CollectionFormats
 //         with AdditionalFormats
 
-// object DefaultJsonProtocol extends DefaultJsonProtocol
+// object BasicJsonProtocol extends BasicJsonProtocol

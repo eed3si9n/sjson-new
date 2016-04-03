@@ -21,7 +21,7 @@ import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
-class CollectionFormatsSpec extends Specification with DefaultJsonProtocol {
+class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
 
   "The listFormat" should {
     val list = List(1, 2, 3)
