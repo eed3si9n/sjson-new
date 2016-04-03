@@ -1,6 +1,7 @@
 /*
  * Original implementation (C) 2009-2011 Debasish Ghosh
  * Adapted and extended in 2011 by Mathias Doenitz
+ * Adapted and extended in 2016 by Eugene Yokota
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,52 +21,40 @@ package sjsonnew
 import annotation.implicitNotFound
 
 /**
-  * Provides the JSON deserialization for type T.
+  * Provides the JSON deserialization for type A.
  */
-@implicitNotFound(msg = "Cannot find JsonReader or JsonFormat type class for ${T}")
-trait JsonReader[T] {
-  def read(json: JsValue): T
-}
-
-object JsonReader {
-  implicit def func2Reader[T](f: JsValue => T): JsonReader[T] = new JsonReader[T] {
-    def read(json: JsValue) = f(json)
-  }
+@implicitNotFound(msg = "Cannot find JsonReader or JsonFormat type class for ${A}")
+trait JsonReader[A] {
+  def read[J](js: J, facade: Facade[J]): A
 }
 
 /**
-  * Provides the JSON serialization for type T.
+  * Provides the JSON serialization for type A.
  */
-@implicitNotFound(msg = "Cannot find JsonWriter or JsonFormat type class for ${T}")
-trait JsonWriter[T] {
-  def write(obj: T): JsValue
-}
-
-object JsonWriter {
-  implicit def func2Writer[T](f: T => JsValue): JsonWriter[T] = new JsonWriter[T] {
-    def write(obj: T) = f(obj)
-  }
+@implicitNotFound(msg = "Cannot find JsonWriter or JsonFormat type class for ${A}")
+trait JsonWriter[A] {
+  def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit
 }
 
 /**
-  * Provides the JSON deserialization and serialization for type T.
+  * Provides the JSON deserialization and serialization for type A.
  */
-trait JsonFormat[T] extends JsonReader[T] with JsonWriter[T]
+trait JsonFormat[A] extends JsonReader[A] with JsonWriter[A]
 
 /**
  * A special JsonReader capable of reading a legal JSON root object, i.e. either a JSON array or a JSON object.
  */
-@implicitNotFound(msg = "Cannot find RootJsonReader or RootJsonFormat type class for ${T}")
-trait RootJsonReader[T] extends JsonReader[T]
+@implicitNotFound(msg = "Cannot find RootJsonReader or RootJsonFormat type class for ${A}")
+trait RootJsonReader[A] extends JsonReader[A]
 
 /**
  * A special JsonWriter capable of writing a legal JSON root object, i.e. either a JSON array or a JSON object.
  */
-@implicitNotFound(msg = "Cannot find RootJsonWriter or RootJsonFormat type class for ${T}")
-trait RootJsonWriter[T] extends JsonWriter[T]
+@implicitNotFound(msg = "Cannot find RootJsonWriter or RootJsonFormat type class for ${A}")
+trait RootJsonWriter[A] extends JsonWriter[A]
 
 /**
  * A special JsonFormat signaling that the format produces a legal JSON root object, i.e. either a JSON array
  * or a JSON object.
  */
-trait RootJsonFormat[T] extends JsonFormat[T] with RootJsonReader[T] with RootJsonWriter[T]
+trait RootJsonFormat[A] extends JsonFormat[A] with RootJsonReader[A] with RootJsonWriter[A]

@@ -17,13 +17,16 @@
 
 package sjsonnew
 
+trait DefaultJsonProtocol extends BasicFormats
+  with CollectionFormats
+
 /**
   * Provides all the predefined JsonFormats.
  */
-trait DefaultJsonProtocol
-        extends BasicFormats
-        with StandardFormats
-        with CollectionFormats
-        with AdditionalFormats
+// trait DefaultJsonProtocol
+//         extends BasicFormats
+//         with StandardFormats
+//         with CollectionFormats
+//         with AdditionalFormats
 
-object DefaultJsonProtocol extends DefaultJsonProtocol
+// object DefaultJsonProtocol extends DefaultJsonProtocol

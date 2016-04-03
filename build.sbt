@@ -1,5 +1,6 @@
 lazy val root = (project in file(".")).
-  aggregate(core).
+  aggregate(core,
+    supportSpray).
   settings(
     name := "sjson new",
     inThisBuild(List(
@@ -17,6 +18,21 @@ lazy val core = project.
       "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
     )
   )
+
+def support(n: String) =
+  Project(id = n, base = file(s"support/$n")).
+    dependsOn(core).
+    settings(
+      name := s"sjson-new-$n-support",
+      libraryDependencies += "io.spray" %% "spray-json" % "1.3.1",
+      libraryDependencies ++= Seq(
+        "org.specs2" %% "specs2-core" % "3.7.1" % "test",
+        "org.specs2" %% "specs2-scalacheck" % "3.7.1" % "test",
+        "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
+      )
+    )
+
+lazy val supportSpray = support("spray")
 
 // name := "spray-json"
 

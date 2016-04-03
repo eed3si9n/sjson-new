@@ -1,7 +1,7 @@
 sjson-new
 =========
 
-sjson-new is a typeclass based JSON (de)serialization library.
+sjson-new is a typeclass based JSON serialization library.
 
 ### Installation
 
@@ -133,16 +133,6 @@ object MyJsonProtocol extends DefaultJsonProtocol {
 }
 ```
 
-
-#### NullOptions
-
-The `NullOptions` trait supplies an alternative rendering mode for optional case class members. Normally optional
-members that are undefined (`None`) are not rendered at all. By mixing in this trait into your custom JsonProtocol you
-can enforce the rendering of undefined members as `null`.
-(Note that this only affect JSON writing, spray-json will always read missing optional members as well as `null`
-optional members as `None`.)
-
-
 ### Providing JsonFormats for other Types
 
 Of course you can also supply (de)serialization logic for types that aren't case classes.
@@ -240,9 +230,11 @@ call to `rootFormat`.
 
 ### Credits
 
-- In 2010 **Debasish Ghosh** wrote series of blog articles on typeclasses ([Scala Implicits : Type Classes Here I Come
-][ghosh1] etc), and implemented typeclass-based serialization in sjson. sjson used JSON AST from Dispatch classic, which was contributed by Jorge Ortiz.
-- In 2011 **Mathias Doenitz** created standalone spray-json project, combining sjson's serialization code and JSON AST from Dispatch classic, along with PEG-based parser. Honoring sjson, serialization code bares Debasish's copyright.
+- In 2010 **Debasish Ghosh** ([@debasishg]) wrote series of blog articles on typeclasses ([Scala Implicits : Type Classes Here I Come
+][ghosh1] etc), and implemented typeclass-based JSON serialization in [sjson]. sjson used JSON AST from Dispatch classic, which was contributed by Jorge Ortiz.
+- In 2011 **Mathias** ([@sirthias]) created [spray-json] project, combining sjson's serialization code and JSON AST from Dispatch classic, along with PEG-based parser. Honoring sjson, serialization code bares Debasish's copyright.
+- Around 2012 to 2014 **Erik Osheim** ([@non]) wrote [Jawn], a backend generic JSON parser. Jawn's facade code is used in sjson-new with further extension.
+- In 2013 **Heather Miller**, **Philipp Haller**, and **Eugene Burmako** published [Instant Pickles: Generating Object-Oriented Pickler Combinators for Fast and Extensible Serialization][millar1], and wrote [Scala Pickling], which also provides wire format genericity.
 
 ### License
 
@@ -255,10 +247,18 @@ However, patches can only be accepted from their original author.
 Along with any patches, please state that the patch is your original work and that you license the work to the
 _spray-json_ project under the project’s open source license.
 
+  [@debasishg]: https://github.com/debasishg/
+  [@sirthias]: https://github.com/sirthias/
+  [@non]: https://github.com/non/
   [ghosh1]: http://debasishg.blogspot.com/2010/06/scala-implicits-type-classes-here-i.html
+  [millar1]: http://infoscience.epfl.ch/record/187787/files/oopsla-pickling_1.pdf
   [JSON]: http://json.org
   [repo.spray.io]: http://repo.spray.io
   [sjson]: https://github.com/debasishg/sjson
+  [spray-json]: https://github.com/spray/spray-json
   [Databinder-Dispatch]: https://github.com/n8han/Databinder-Dispatch
   [APL 2.0]: http://www.apache.org/licenses/LICENSE-2.0
   [spray-user]: http://groups.google.com/group/spray-user
+  [Jawn]: https://github.com/non/jawn
+  [Scala Pickling]: https://github.com/scala/pickling
+
