@@ -23,7 +23,7 @@ package sjsonnew
  */
 trait BasicJsonProtocol
         extends PrimitiveFormats
-        // with StandardFormats
+        with StandardFormats
         with CollectionFormats
         with AdditionalFormats
 
