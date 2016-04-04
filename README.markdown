@@ -1,7 +1,7 @@
 sjson-new
 =========
 
-sjson-new is a typeclass based JSON serialization library, or wit for that [Jawn].
+sjson-new is a typeclass based JSON codec, or wit for that [Jawn].
 
 ### today's random Philadelphia word
 
@@ -12,7 +12,7 @@ It's a quick way of ordering a cheesesteak "with" sautéed onions.
 
 sjson-new consists of two parts:
 
-1. A typeclass-based JSON serialization toolkit
+1. A typeclass-based JSON codec toolkit
 2. Support packages which serialize to third-party ASTs
 
 ### installation
