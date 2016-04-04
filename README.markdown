@@ -1,74 +1,76 @@
 sjson-new
 =========
 
-sjson-new is a typeclass based JSON serialization library.
+sjson-new is a typeclass based JSON serialization library, or wit for that [Jawn].
 
-### Installation
+### random Philadelphia words time
+
+The term *wit* comes from the Philadelphia area.
+It's a quick way of ordering a cheesesteak "with" sautéed onions.
+
+### overview
+
+sjson-new consists of two parts:
+
+1. A typeclass-based JSON serialization toolkit
+2. Support packages which serialize to third-party ASTs
+
+### installation
+
+Here's how to use with Spray:
 
 ```scala
-libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.1.0"
 ```
 
-### Usage
+### converting
 
-Just bring all relevant elements in scope with
+sjson-new's converter let's you convert from an object of type `A` to
+and an AST of type `J`, given that you provide `JsonFormat[A]`.
+
+This is an example of how you might use the converter into your code:
 
 ```scala
-import sjsonnew._
-import DefaultJsonProtocol._ // if you don't supply your own Protocol (see below)
+scala> import sjsonnew.support.XYZ.Converter
+import sjsonnew.support.XYZ.Converter
+
+scala> import sjsonnew.BasicJsonProtocol._
+import sjsonnew.BasicJsonProtocol._
+
+scala> Converter.toJson[Int](42)
+res0: XYZ.JsValue = 42
+
+scala> Converter.fromJson[Int](res0)
+res1: Int = 42
 ```
 
-and do one or more of the following:
-
-* Parse a JSON string into its Abstract Syntax Tree (AST) representation
-
-    ```scala
-    val source = """{ "some": "JSON source" }"""
-    val jsonAst = source.parseJson // or JsonParser(source)
-    ```
-
-* Print a JSON AST back to a String using either the `CompactPrinter` or the `PrettyPrinter`
-
-    ```scala
-    val json = jsonAst.prettyPrint // or .compactPrint
-    ```
-
-* Convert any Scala object to a JSON AST using the pimped `toJson` method
-
-    ```scala
-    val jsonAst = List(1, 2, 3).toJson
-    ```
-
-* Convert a JSON AST to a Scala object with the `convertTo` method
-
-    ```scala
-    val myObject = jsonAst.convertTo[MyObjectType]
-    ```
-In order to make steps 3 and 4 work for an object of type `T` you need to bring implicit values in scope that
-provide `JsonFormat[T]` instances for `T` and all types used by `T` (directly or indirectly).
-The way you normally do this is via a "JsonProtocol".
-
+In the above substitute `XYZ` with (`"spray"`).
 
 ### JsonProtocol
 
-sjson-new uses [sjson]'s Scala-idiomatic typeclass-based approach to connect an existing type `T` with the logic how
-to (de)serialize its instances to and from JSON. (In fact sjson-new reuses some of [sjson]s code, see the
-'Credits' section below).
+sjson-new uses [sjson]'s Scala-idiomatic typeclass-based approach to connect an existing type `A` with the logic how
+to (de)serialize its instances to and from JSON. This notion was further extended by [spray-json], and
+sjson-new reuses some of both [sjson] and [spray-json]'s code, see the 'Credits' section below.
 
-This approach has the advantage of not requiring any change (or even access) to `T`s source code. All (de)serialization
+While the typeclass in the original [sjson] directly manipulates the JSON AST, sjon-new adds an indirection
+mechanism, which allows it to be backend-independent. This machinary is inspired both by [Jawn] and [Scala Pickling].
+This wire protocol indirection is called *façade* in Jawn, and "format" in Pickling.
+sjson-new will also call this *façade* to avoid the mixup.
+
+The typeclass approach has the advantage of not requiring any change (or even access) to `A`s source code. All (de)serialization
 logic is attached *from the outside*. There is no reflection involved, so the resulting conversions are fast. Scalas
 excellent type inference reduces verbosity and boilerplate to a minimum, while the Scala compiler will make sure at
 compile time that you provided all required (de)serialization logic.
 
-In sjson-new's terminology a 'JsonProtocol' is nothing but a bunch of implicit values of type `JsonFormat[T]`, whereby
-each `JsonFormat[T]` contains the logic of how to convert instance of `T` to and from JSON. All `JsonFormat[T]`s of a
+In sjson-new's terminology a *JSON protocol* is nothing but a bunch of implicit values of type `JsonFormat[A]`, whereby
+each `JsonFormat[A]` contains the logic of how to convert instance of `A` to and from JSON. All `JsonFormat[A]`s of a
 protocol need to be "mece" (mutually exclusive, collectively exhaustive), i.e. they are not allowed to overlap and
 together need to span all types required by the application.
 
 This may sound more complicated than it is.
-_spray-json_ comes with a `DefaultJsonProtocol`, which already covers all of Scala's value types as well as the most
+sjon-new comes with a `BasicJsonProtocol`, which already covers all of Scala's value types as well as the most
 important reference and collection types. As long as your code uses nothing more than these you only need the
-`DefaultJsonProtocol`. Here are the types already taken care of by the `DefaultJsonProtocol`:
+`BasicJsonProtocol`. Here are the types already taken care of by the `BasicJsonProtocol`:
 
 * Byte, Short, Int, Long, Float, Double, Char, Unit, Boolean
 * String, Symbol
@@ -77,15 +79,13 @@ important reference and collection types. As long as your code uses nothing more
 * List, Array
 * immutable.{Map, Iterable, Seq, IndexedSeq, LinearSeq, Set, Vector}
 * collection.{Iterable, Seq, IndexedSeq, LinearSeq, Set}
-* JsValue
 
-In most cases however you'll also want to convert types not covered by the `DefaultJsonProtocol`. In these cases you
-need to provide `JsonFormat[T]`s for your custom types. This is not hard at all.
-
+In most cases however you'll also want to convert types not covered by the `BasicJsonProtocol`. In these cases you
+need to provide `JsonFormat[A]`s for your custom types. This is not hard at all.
 
 ### Providing JsonFormats for Case Classes
 
-If your custom type `T` is a case class then augmenting the `DefaultJsonProtocol` with a `JsonFormat[T]` is really easy:
+If your custom type `A` is a case class then augmenting the `DefaultJsonProtocol` with a `JsonFormat[A]` is really easy:
 
 ```scala
 case class Color(name: String, red: Int, green: Int, blue: Int)
@@ -197,13 +197,13 @@ Only JSON objects or JSON arrays are allowed as JSON document roots.
 
 In order to distinguish, on the type-level, "regular" JsonFormats from the ones producing root-level JSON objects or
 arrays _spray-json_ defines the [`RootJsonFormat`][1] type, which is nothing but a marker specialization of `JsonFormat`.
-Libraries supporting _spray-json_ as a means of document serialization might choose to depend on a `RootJsonFormat[T]`
-for a custom type `T` (rather than a "plain" `JsonFormat[T]`), so as to not allow the rendering of illegal document
+Libraries supporting _spray-json_ as a means of document serialization might choose to depend on a `RootJsonFormat[A]`
+for a custom type `A` (rather than a "plain" `JsonFormat[A]`), so as to not allow the rendering of illegal document
 roots. E.g., the `SprayJsonSupport` trait of _spray-routing_ is one notable example of such a case.
 
 All default converters in the `DefaultJsonProtocol` producing JSON objects or arrays are actually implemented as
-`RootJsonFormat`. When "manually" implementing a `JsonFormat` for a custom type `T` (rather than relying on case class
-support) you should think about whether you'd like to use instances of `T` as JSON document roots and choose between
+`RootJsonFormat`. When "manually" implementing a `JsonFormat` for a custom type `A` (rather than relying on case class
+support) you should think about whether you'd like to use instances of `A` as JSON document roots and choose between
 a "plain" `JsonFormat` and a `RootJsonFormat` accordingly.
 
   [1]: http://spray.github.com/spray/api/spray-json/cc/spray/json/RootJsonFormat.html
