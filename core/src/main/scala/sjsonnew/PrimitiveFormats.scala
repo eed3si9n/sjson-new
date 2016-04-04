@@ -45,7 +45,7 @@ trait PrimitiveFormats {
   implicit object FloatJsonFormat extends JsonFormat[Float] {
     def write[J](x: Float, builder: Builder[J], facade: Facade[J]): Unit = {
       val context = facade.singleContext()
-      context.add(facade.jnum(x))
+      context.add(facade.jdouble(x))
       builder.add(context)
     }
     def read[J](js: J, facade: Facade[J]): Float =
@@ -55,7 +55,7 @@ trait PrimitiveFormats {
   implicit object DoubleJsonFormat extends JsonFormat[Double] {
     def write[J](x: Double, builder: Builder[J], facade: Facade[J]): Unit = {
       val context = facade.singleContext()
-      context.add(facade.jnum(x))
+      context.add(facade.jdouble(x))
       builder.add(context)
     }
     def read[J](js: J, facade: Facade[J]): Double =
@@ -65,7 +65,7 @@ trait PrimitiveFormats {
   implicit object ByteJsonFormat extends JsonFormat[Byte] {
     def write[J](x: Byte, builder: Builder[J], facade: Facade[J]): Unit = {
       val context = facade.singleContext()
-      context.add(facade.jnum(x))
+      context.add(facade.jint(x))
       builder.add(context)
     }
     def read[J](js: J, facade: Facade[J]): Byte =
@@ -75,7 +75,7 @@ trait PrimitiveFormats {
   implicit object ShortJsonFormat extends JsonFormat[Short] {
     def write[J](x: Short, builder: Builder[J], facade: Facade[J]): Unit = {
       val context = facade.singleContext()
-      context.add(facade.jnum(x))
+      context.add(facade.jint(x))
       builder.add(context)
     }
     def read[J](js: J, facade: Facade[J]): Short =
@@ -86,7 +86,7 @@ trait PrimitiveFormats {
     def write[J](x: BigDecimal, builder: Builder[J], facade: Facade[J]): Unit = {
       require(x ne null)
       val context = facade.singleContext()
-      context.add(facade.jnum(x))
+      context.add(facade.jbigdecimal(x))
       builder.add(context)
     }
     def read[J](js: J, facade: Facade[J]): BigDecimal =
@@ -97,7 +97,7 @@ trait PrimitiveFormats {
     def write[J](x: BigInt, builder: Builder[J], facade: Facade[J]): Unit = {
       require(x ne null)
       val context = facade.singleContext()
-      context.add(facade.jnum(BigDecimal(x)))
+      context.add(facade.jbigdecimal(BigDecimal(x)))
       builder.add(context)
     }
     def read[J](js: J, facade: Facade[J]): BigInt =

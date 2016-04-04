@@ -9,9 +9,10 @@ object Converter extends SupportConverter[JsValue] {
       def jnull() = JsNull
       def jfalse() = JsFalse
       def jtrue() = JsTrue
-      def jnum(d: Double) = JsNumber(d)
-      def jnum(s: String) = JsNumber(s)
-      def jnum(d: BigDecimal) = JsNumber(d)
+      def jdouble(d: Double) = JsNumber(d)
+      def jnumstring(s: String) = JsNumber(s)
+      def jbigdecimal(d: BigDecimal) = JsNumber(d)
+      def jintstring(s: String) = JsNumber(s)
       def jint(i: Int) = JsNumber(i)
       def jlong(l: Long) = JsNumber(l)
       def jstring(s: String) = JsString(s)

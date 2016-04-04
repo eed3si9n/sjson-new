@@ -39,10 +39,10 @@ trait Facade[J] {
   def jnull(): J
   def jfalse(): J
   def jtrue(): J
-  def jnum(d: Double): J
-  def jnum(s: String): J
-  def jnum(d: BigDecimal): J
-  // def jint(s: String): J
+  def jdouble(d: Double): J
+  def jnumstring(s: String): J
+  def jbigdecimal(d: BigDecimal): J
+  def jintstring(s: String): J
   def jint(i: Int): J
   def jlong(l: Long): J
   def jstring(s: String): J
