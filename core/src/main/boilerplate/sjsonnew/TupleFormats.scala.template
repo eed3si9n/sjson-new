@@ -1,0 +1,43 @@
+/*
+ * Original implementation (C) 2009-2011 Debasish Ghosh
+ * Adapted and extended in 2011 by Mathias Doenitz
+ * Adapted and extended in 2016 by Eugene Yokota
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package sjsonnew
+
+trait TupleFormats {
+  private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
+
+  [#implicit def tuple1Format[[#A1 :JF#]]: JF[Tuple1[[#A1#]]] = new RootJsonFormat[Tuple1[[#A1#]]] {
+    [#lazy val a1Format = implicitly[JF[A1]]#
+    ]
+
+    def write[J](t: Tuple1[[#A1#]], builder: Builder[J], facade: Facade[J]): Unit = {
+      [#a1Format.write(t._1, builder, facade)#
+      ]
+      val context = facade.arrayContext()
+      val xs = builder.convertContexts
+      builder.clear()
+      xs foreach { x => context.add(x) }
+      builder.add(context)
+    }
+    def read[J](js: J, facade: Facade[J]): Tuple1[[#A1#]] = {
+      val Seq([#a1#]) = facade.extractArray(js)
+      Tuple1([#a1Format.read(a1, facade)#])
+    }
+  }#
+  ]
+}

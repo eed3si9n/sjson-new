@@ -16,6 +16,7 @@ lazy val root = (project in file(".")).
   )
 
 lazy val core = project.
+  enablePlugins(BoilerplatePlugin).
   settings(
     name := "sjson new core",
     libraryDependencies ++= Seq(

@@ -26,7 +26,7 @@ import scala.{Left, Right}
 trait StandardFormats {
   this: AdditionalFormats =>
 
-  private[sjsonnew] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
+  private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
   implicit def optionFormat[A :JF]: JF[Option[A]] = new OptionFormat[A]
 

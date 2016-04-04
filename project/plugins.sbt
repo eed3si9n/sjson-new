@@ -1,1 +1,1 @@
-addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.5.9")
+addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.6.0")

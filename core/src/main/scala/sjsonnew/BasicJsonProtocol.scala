@@ -24,6 +24,7 @@ package sjsonnew
 trait BasicJsonProtocol
         extends PrimitiveFormats
         with StandardFormats
+        with TupleFormats
         with CollectionFormats
         with AdditionalFormats
 
