@@ -15,29 +15,14 @@
  */
 
 package object sjsonnew {
-
   def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
   def serializationError(msg: String) = throw new SerializationException(msg)
 
-  def jsonReader[T](implicit reader: JsonReader[T]) = reader
-  def jsonWriter[T](implicit writer: JsonWriter[T]) = writer 
-
-  // implicit def enrichAny[T](any: T) = new RichAny(any)
-  // implicit def enrichString(string: String) = new RichString(string)
+  def jsonReader[A](implicit reader: JsonReader[A]): JsonReader[A] = reader
+  def jsonWriter[A](implicit writer: JsonWriter[A]): JsonWriter[A] = writer
 }
 
 package sjsonnew {
-
   case class DeserializationException(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) extends RuntimeException(msg, cause)
   class SerializationException(msg: String) extends RuntimeException(msg)
-
-  // private[sjsonnew] class RichAny[T](any: T) {
-  //   def toJson(implicit writer: JsonWriter[T]): JsValue = writer.write(any)
-  // }
-
-  // private[sjsonnew] class RichString(string: String) {
-  //   @deprecated("deprecated in favor of parseJson", "1.2.6")
-  //   def asJson: JsValue = parseJson
-  //   def parseJson: JsValue = JsonParser(string)
-  // }
 }
