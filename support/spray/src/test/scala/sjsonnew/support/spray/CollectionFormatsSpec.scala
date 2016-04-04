@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 Mathias Doenitz
+ * Adapted and extended in 2016 by Eugene Yokota
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +56,7 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
       Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
     "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
-      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Map key must be formatted as JsString, not '1'"))
+      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Map key must be formatted as JString, not '1'"))
     }
   }
 

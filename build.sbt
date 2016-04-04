@@ -1,6 +1,9 @@
+import Dependencies._
+
 lazy val root = (project in file(".")).
   aggregate(core,
-    supportSpray).
+    supportSpray,
+    supportJson4s).
   settings(
     name := "sjson new",
     publish := {},
@@ -19,11 +22,7 @@ lazy val core = project.
   enablePlugins(BoilerplatePlugin).
   settings(
     name := "sjson new core",
-    libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.7.1" % "test",
-      "org.specs2" %% "specs2-scalacheck" % "3.7.1" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
-    ),
+    libraryDependencies ++= testDependencies,
     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
   )
 
@@ -32,13 +31,16 @@ def support(n: String) =
     dependsOn(core).
     settings(
       name := s"sjson-new-$n",
-      libraryDependencies += "io.spray" %% "spray-json" % "1.3.1",
-      libraryDependencies ++= Seq(
-        "org.specs2" %% "specs2-core" % "3.7.1" % "test",
-        "org.specs2" %% "specs2-scalacheck" % "3.7.1" % "test",
-        "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
-      ),
+      libraryDependencies ++= testDependencies,
       scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
     )
 
-lazy val supportSpray = support("spray")
+lazy val supportSpray = support("spray").
+  settings(
+    libraryDependencies += sprayJson
+  )
+
+lazy val supportJson4s = support("json4s").
+  settings(
+    libraryDependencies += json4sAst
+  )

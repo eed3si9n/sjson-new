@@ -83,7 +83,7 @@ trait CollectionFormats {
           val keyStr = (try {
             facade.extractString(k)
           } catch {
-            case DeserializationException(msg, _, _) => serializationError(s"Map key must be formatted as JsString, not '$k'")
+            case DeserializationException(msg, _, _) => serializationError(s"Map key must be formatted as JString, not '$k'")
           })
           context.add(keyStr)
           context.add(v)

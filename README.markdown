@@ -17,6 +17,12 @@ sjson-new consists of two parts:
 
 ### installation
 
+Here's how to use with Json4s-AST:
+
+```scala
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-json4s" % "0.1.0"
+```
+
 Here's how to use with Spray:
 
 ```scala
@@ -44,7 +50,7 @@ scala> Converter.fromJson[Int](res0.get)
 res1: scala.util.Try[Int] = Success(42)
 ```
 
-In the above substitute `XYZ` with (`"spray"`).
+In the above substitute `XYZ` with (`json4s` | `spray`).
 
 A `Converter` object provides the following functions for conversion:
 
