@@ -15,8 +15,8 @@
  */
 
 package sjsonnew
+package support.spray
 
-import support.spray.Converter
 import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }

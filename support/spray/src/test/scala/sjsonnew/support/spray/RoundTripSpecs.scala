@@ -1,4 +1,5 @@
 // package sjsonnew
+// package support.spray
 
 // import org.specs2.mutable.Specification
 // import org.scalacheck._

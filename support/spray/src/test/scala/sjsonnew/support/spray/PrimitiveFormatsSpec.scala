@@ -16,8 +16,8 @@
  */
 
 package sjsonnew
+package support.spray
 
-import support.spray.Converter
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse }
 import org.specs2.mutable._
 
