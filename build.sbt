@@ -1,7 +1,7 @@
 import Dependencies._
 
 lazy val root = (project in file(".")).
-  aggregate(core,
+  aggregate(core, shapeless, shapelessTest,
     supportSpray,
     supportJson4s).
   settings(
@@ -24,6 +24,24 @@ lazy val core = project.
     name := "sjson new core",
     libraryDependencies ++= testDependencies,
     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+  )
+
+lazy val shapeless = project.
+  dependsOn(core).
+  settings(
+    name := "sjson new generic",
+    libraryDependencies ++= shapelessDependencies.value,
+    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+  )
+
+lazy val shapelessTest = (project in file("shapeless-test")).
+  dependsOn(shapeless, supportSpray).
+  settings(
+    name := "sjson new shapeless test",
+    publish := {},
+    publishLocal := {},
+    libraryDependencies ++= testDependencies,
+    libraryDependencies ++= shapelessDependencies.value
   )
 
 def support(n: String) =
