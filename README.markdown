@@ -3,7 +3,7 @@ sjson-new
 
 sjson-new is a typeclass based JSON serialization library, or wit for that [Jawn].
 
-### random Philadelphia words time
+### today's random Philadelphia word
 
 The term *wit* comes from the Philadelphia area.
 It's a quick way of ordering a cheesesteak "with" sautéed onions.
@@ -20,13 +20,13 @@ sjson-new consists of two parts:
 Here's how to use with Json4s-AST:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-json4s" % "0.1.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-json4s" % "0.X.0"
 ```
 
 Here's how to use with Spray:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.1.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.X.0"
 ```
 
 ### converting
