@@ -30,7 +30,7 @@ def support(n: String) =
   Project(id = n, base = file(s"support/$n")).
     dependsOn(core).
     settings(
-      name := s"sjson-new-$n-support",
+      name := s"sjson-new-$n",
       libraryDependencies += "io.spray" %% "spray-json" % "1.3.1",
       libraryDependencies ++= Seq(
         "org.specs2" %% "specs2-core" % "3.7.1" % "test",
