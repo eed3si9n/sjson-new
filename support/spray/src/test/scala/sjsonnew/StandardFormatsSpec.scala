@@ -39,23 +39,23 @@ class StandardFormatsSpec extends Specification with BasicJsonProtocol {
     }
   }
 
-  // "The eitherFormat" should {
-  //   val a: Either[Int, String] = Left(42)
-  //   val b: Either[Int, String] = Right("Hello")
+  "The eitherFormat" should {
+    val a: Either[Int, String] = Left(42)
+    val b: Either[Int, String] = Right("Hello")
 
-  //   "convert the left side of an Either value to Json" in {
-  //     a.toJson mustEqual JsNumber(42)
-  //   }
-  //   "convert the right side of an Either value to Json" in {
-  //     b.toJson mustEqual JsString("Hello")
-  //   }
-  //   "convert the left side of an Either value from Json" in {
-  //     JsNumber(42).convertTo[Either[Int, String]] mustEqual Left(42)
-  //   }
-  //   "convert the right side of an Either value from Json" in {
-  //     JsString("Hello").convertTo[Either[Int, String]] mustEqual Right("Hello")
-  //   }
-  // }
+    "convert the left side of an Either value to Json" in {
+      Converter.toJson(a) mustEqual JsNumber(42)
+    }
+    "convert the right side of an Either value to Json" in {
+      Converter.toJson(b) mustEqual JsString("Hello")
+    }
+    "convert the left side of an Either value from Json" in {
+      Converter.fromJson[Either[Int, String]](JsNumber(42)) mustEqual Left(42)
+    }
+    "convert the right side of an Either value from Json" in {
+      Converter.fromJson[Either[Int, String]](JsString("Hello")) mustEqual Right("Hello")
+    }
+  }
 
   // "The tuple1Format" should {
   //   "convert (42) to a JsNumber" in {

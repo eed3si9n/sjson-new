@@ -46,19 +46,23 @@ trait StandardFormats {
       else Option(elemFormat.read(js, facade))
   }
 
-  // implicit def eitherFormat[A :JF, B :JF] = new JF[Either[A, B]] {
-  //   def write(either: Either[A, B]) = either match {
-  //     case Right(a) => a.toJson
-  //     case Left(b) => b.toJson
-  //   }
-  //   def read(value: JsValue) = (value.convertTo(safeReader[A]), value.convertTo(safeReader[B])) match {
-  //     case (Right(a), _: Left[_, _]) => Left(a)
-  //     case (_: Left[_, _], Right(b)) => Right(b)
-  //     case (_: Right[_, _], _: Right[_, _]) => deserializationError("Ambiguous Either value: can be read as both, Left and Right, values")
-  //     case (Left(ea), Left(eb)) => deserializationError("Could not read Either value:\n" + ea + "---------- and ----------\n" + eb)
-  //   }
-  // }
-  
+  implicit def eitherFormat[A :JF, B :JF] = new JF[Either[A, B]] {
+    lazy val leftFormat = implicitly[JF[A]]
+    lazy val rightFormat = implicitly[JF[B]]
+    def write[J](either: Either[A, B], builder: Builder[J], facade: Facade[J]): Unit =
+      either match {
+        case Left(a)  => leftFormat.write(a, builder, facade)
+        case Right(b) => rightFormat.write(b, builder, facade)
+      }
+    def read[J](js: J, facade: Facade[J]): Either[A, B] =
+      (safeReader[A].read(js, facade), safeReader[B].read(js, facade)) match {
+        case (Right(a), _: Left[_, _]) => Left(a)
+        case (_: Left[_, _], Right(b)) => Right(b)
+        case (_: Right[_, _], _: Right[_, _]) => deserializationError("Ambiguous Either value: can be read as both, Left and Right, values")
+        case (Left(ea), Left(eb)) => deserializationError("Could not read Either value:\n" + ea + "---------- and ----------\n" + eb)
+      }
+  }
+
   // implicit def tuple1Format[A :JF] = new JF[Tuple1[A]] {
   //   def write(t: Tuple1[A]) = t._1.toJson
   //   def read(value: JsValue) = Tuple1(value.convertTo[A])
