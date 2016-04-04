@@ -27,10 +27,10 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     val list = List(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
     "convert a List[Int] to a JsArray of JsNumbers" in {
-      Converter.toJson(list) mustEqual json
+      Converter.toJsonUnsafe(list) mustEqual json
     }
     "convert a JsArray of JsNumbers to a List[Int]" in {
-      Converter.fromJson[List[Int]](json) mustEqual list
+      Converter.fromJsonUnsafe[List[Int]](json) mustEqual list
     }
   }
 
@@ -38,10 +38,10 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     val array = Array(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
     "convert an Array[Int] to a JsArray of JsNumbers" in {
-      Converter.toJson(array) mustEqual json
+      Converter.toJsonUnsafe(array) mustEqual json
     }
     "convert a JsArray of JsNumbers to an Array[Int]" in {
-      Arrays.equals(Converter.fromJson[Array[Int]](json), array) must beTrue
+      Arrays.equals(Converter.fromJsonUnsafe[Array[Int]](json), array) must beTrue
     }
   }
 
@@ -49,13 +49,13 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     val map = Map("a" -> 1, "b" -> 2, "c" -> 3)
     val json = JsObject("a" -> JsNumber(1), "b" -> JsNumber(2), "c" -> JsNumber(3))
     "convert a Map[String, Long] to a JsObject" in {
-      Converter.toJson(map) mustEqual json
+      Converter.toJsonUnsafe(map) mustEqual json
     }
     "be able to convert a JsObject to a Map[String, Long]" in {
-      Converter.fromJson[Map[String, Long]](json) mustEqual map
+      Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
     "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
-      Converter.toJson(Map(1 -> "a")) must throwA(new SerializationException("Map key must be formatted as JsString, not '1'"))
+      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Map key must be formatted as JsString, not '1'"))
     }
   }
 
@@ -63,10 +63,10 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     val set = Set(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
     "convert a Set[Int] to a JsArray of JsNumbers" in {
-      Converter.toJson(set) mustEqual json
+      Converter.toJsonUnsafe(set) mustEqual json
     }
     "convert a JsArray of JsNumbers to a Set[Int]" in {
-      Converter.fromJson[Set[Int]](json) mustEqual set
+      Converter.fromJsonUnsafe[Set[Int]](json) mustEqual set
     }
   }
 
@@ -74,10 +74,10 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     val seq = collection.IndexedSeq(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
     "convert a Set[Int] to a JsArray of JsNumbers" in {
-      Converter.toJson(seq) mustEqual json
+      Converter.toJsonUnsafe(seq) mustEqual json
     }
     "convert a JsArray of JsNumbers to a IndexedSeq[Int]" in {
-      Converter.fromJson[collection.IndexedSeq[Int]](json) mustEqual seq
+      Converter.fromJsonUnsafe[collection.IndexedSeq[Int]](json) mustEqual seq
     }
   }
 }

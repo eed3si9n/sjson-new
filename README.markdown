@@ -38,13 +38,22 @@ scala> import sjsonnew.BasicJsonProtocol._
 import sjsonnew.BasicJsonProtocol._
 
 scala> Converter.toJson[Int](42)
-res0: XYZ.JsValue = 42
+res0: scala.util.Try[XYZ.JsValue] = Success(42)
 
-scala> Converter.fromJson[Int](res0)
-res1: Int = 42
+scala> Converter.fromJson[Int](res0.get)
+res1: scala.util.Try[Int] = Success(42)
 ```
 
 In the above substitute `XYZ` with (`"spray"`).
+
+A `Converter` object provides the following functions for conversion:
+
+```scala
+def toJson[A](obj: A)(implicit writer: JsonWriter[A]): Try[J]
+def toJsonUnsafe[A](obj: A)(implicit writer: JsonWriter[A]): J
+def fromJson[A](js: J)(implicit reader: JsonReader[A]): Try[A]
+def fromJsonUnsafe[A](js: J)(implicit reader: JsonReader[A]): A
+```
 
 ### JsonProtocol
 

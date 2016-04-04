@@ -26,16 +26,16 @@ class StandardFormatsSpec extends Specification with BasicJsonProtocol {
 
   "The optionFormat" should {
     "convert None to JsNull" in {
-      Converter.toJson(None.asInstanceOf[Option[Int]]) mustEqual JsNull
+      Converter.toJsonUnsafe(None.asInstanceOf[Option[Int]]) mustEqual JsNull
     }
     "convert JsNull to None" in {
-      Converter.fromJson[Option[Int]](JsNull) mustEqual None
+      Converter.fromJsonUnsafe[Option[Int]](JsNull) mustEqual None
     }
     "convert Some(Hello) to JsString(Hello)" in {
-      Converter.toJson(Some("Hello").asInstanceOf[Option[String]]) mustEqual JsString("Hello")
+      Converter.toJsonUnsafe(Some("Hello").asInstanceOf[Option[String]]) mustEqual JsString("Hello")
     }
     "convert JsString(Hello) to Some(Hello)" in {
-      Converter.fromJson[Option[String]](JsString("Hello")) mustEqual Some("Hello")
+      Converter.fromJsonUnsafe[Option[String]](JsString("Hello")) mustEqual Some("Hello")
     }
   }
 
@@ -44,16 +44,16 @@ class StandardFormatsSpec extends Specification with BasicJsonProtocol {
     val b: Either[Int, String] = Right("Hello")
 
     "convert the left side of an Either value to Json" in {
-      Converter.toJson(a) mustEqual JsNumber(42)
+      Converter.toJsonUnsafe(a) mustEqual JsNumber(42)
     }
     "convert the right side of an Either value to Json" in {
-      Converter.toJson(b) mustEqual JsString("Hello")
+      Converter.toJsonUnsafe(b) mustEqual JsString("Hello")
     }
     "convert the left side of an Either value from Json" in {
-      Converter.fromJson[Either[Int, String]](JsNumber(42)) mustEqual Left(42)
+      Converter.fromJsonUnsafe[Either[Int, String]](JsNumber(42)) mustEqual Left(42)
     }
     "convert the right side of an Either value from Json" in {
-      Converter.fromJson[Either[Int, String]](JsString("Hello")) mustEqual Right("Hello")
+      Converter.fromJsonUnsafe[Either[Int, String]](JsString("Hello")) mustEqual Right("Hello")
     }
   }
 
