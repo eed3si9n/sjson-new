@@ -56,7 +56,7 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
       Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
     "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
-      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Map key must be formatted as JString, not '1'"))
+      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Unexpected builder state: InObject"))
     }
   }
 

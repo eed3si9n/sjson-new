@@ -3,7 +3,7 @@ package sjsonnew
 import scala.util.Try
 
 trait SupportConverter[J] {
-  def facade: Facade[J]
+  implicit def facade: Facade[J]
   def makeBuilder: Builder[J] = new Builder()
 
   /**
@@ -19,7 +19,7 @@ trait SupportConverter[J] {
   def toJsonUnsafe[A](obj: A)(implicit writer: JsonWriter[A]): J =
     {
       val builder = makeBuilder
-      writer.write(obj, builder, facade)
+      writer.write(obj, builder)
       builder.result match {
         case Some(r) => r
         case _       => facade.jnull()

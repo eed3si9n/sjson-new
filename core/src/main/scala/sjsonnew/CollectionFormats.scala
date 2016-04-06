@@ -24,13 +24,10 @@ trait CollectionFormats {
    */
   implicit def listFormat[A: JsonFormat] = new RootJsonFormat[List[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](list: List[A], builder: Builder[J], facade: Facade[J]): Unit = {
-      list foreach { x => elemFormat.write(x, builder, facade) }
-      val context = facade.arrayContext()
-      val xs = builder.convertContexts
-      builder.clear()
-      xs foreach { x => context.add(x) }
-      builder.add(context)
+    def write[J](list: List[A], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+      builder.beginArray()
+      list foreach { x => elemFormat.write(x, builder)(facade) }
+      builder.endArray()
     }
     def read[J](value: J, facade: Facade[J]): List[A] = {
       val elems = facade.extractArray(value)
@@ -45,13 +42,10 @@ trait CollectionFormats {
    */
   implicit def arrayFormat[A: JsonFormat: ClassManifest] = new RootJsonFormat[Array[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](array: Array[A], builder: Builder[J], facade: Facade[J]): Unit = {
-      array foreach { x => elemFormat.write(x, builder, facade) }
-      val context = facade.arrayContext()
-      val xs = builder.convertContexts
-      builder.clear()
-      xs foreach { x => context.add(x) }
-      builder.add(context)
+    def write[J](array: Array[A], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+      builder.beginArray()
+      array foreach { x => elemFormat.write(x, builder) }
+      builder.endArray()
     }
     def read[J](value: J, facade: Facade[J]): Array[A] = {
       val elems = facade.extractArray(value)
@@ -68,27 +62,14 @@ trait CollectionFormats {
   implicit def mapFormat[K: JsonFormat, V: JsonFormat] = new RootJsonFormat[Map[K, V]] {
     lazy val keyFormat = implicitly[JsonFormat[K]]
     lazy val valueFormat = implicitly[JsonFormat[V]]
-    def write[J](m: Map[K, V], builder: Builder[J], facade: Facade[J]): Unit = {
+    def write[J](m: Map[K, V], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+      builder.beginObject()
       m foreach {
         case (k, v) =>
-          keyFormat.write(k, builder, facade)
-          valueFormat.write(v, builder, facade)
+          keyFormat.write(k, builder)
+          valueFormat.write(v, builder)
       }
-      val xs = builder.convertContexts
-      builder.clear()
-      val context = facade.objectContext()
-      if (xs.size % 2 == 1) serializationError(s"Expected even number of fields but contains ${xs.size}")
-      xs.grouped(2) foreach {
-        case List(k, v) =>
-          val keyStr = (try {
-            facade.extractString(k)
-          } catch {
-            case DeserializationException(msg, _, _) => serializationError(s"Map key must be formatted as JString, not '$k'")
-          })
-          context.add(keyStr)
-          context.add(v)
-      }
-      builder.add(context)
+      builder.endObject()
     }
     def read[J](value: J, facade: Facade[J]): Map[K, V] = {
       val fields = facade.extractObject(value)
@@ -123,13 +104,10 @@ trait CollectionFormats {
    */
   def viaSeq[I <: Iterable[A], A: JsonFormat](f: imm.Seq[A] => I): RootJsonFormat[I] = new RootJsonFormat[I] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](iterable: I, builder: Builder[J], facade: Facade[J]): Unit = {
-      iterable foreach { x => elemFormat.write(x, builder, facade) }
-      val context = facade.arrayContext()
-      val xs = builder.convertContexts
-      builder.clear()
-      xs foreach { x => context.add(x) }
-      builder.add(context)
+    def write[J](iterable: I, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+      builder.beginArray()
+      iterable foreach { x => elemFormat.write(x, builder) }
+      builder.endArray()
     }
     def read[J](value: J, facade: Facade[J]): I = {
       val elems = facade.extractArray(value)

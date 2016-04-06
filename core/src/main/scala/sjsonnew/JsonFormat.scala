@@ -33,7 +33,7 @@ trait JsonReader[A] {
  */
 @implicitNotFound(msg = "Cannot find JsonWriter or JsonFormat type class for ${A}")
 trait JsonWriter[A] {
-  def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit
+  def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit
 }
 
 /**

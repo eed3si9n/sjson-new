@@ -26,7 +26,7 @@ trait AdditionalFormats {
    * Constructs a JsonFormat from its two parts, JsonReader and JsonWriter.
    */
   def jsonFormat[A](reader: JsonReader[A], writer: JsonWriter[A]) = new JsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit = writer.write(obj, builder, facade)
+    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = writer.write(obj, builder)(facade)
     def read[J](js: J, facade: Facade[J]): A = reader.read(js, facade)
   }
 
@@ -40,7 +40,7 @@ trait AdditionalFormats {
    * Turns a JsonWriter into a JsonFormat that throws an UnsupportedOperationException for reads.
    */
   def lift[A](writer: JsonWriter[A]) = new JsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit = writer.write(obj, builder, facade)
+    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = writer.write(obj, builder)(facade)
     def read[J](js: J, facade: Facade[J]): A =
       throw new UnsupportedOperationException("JsonReader implementation missing")
   }
@@ -55,7 +55,7 @@ trait AdditionalFormats {
    * Turns a JsonReader into a JsonFormat that throws an UnsupportedOperationException for writes.
    */
   def lift[A <: AnyRef](reader: JsonReader[A]) = new JsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit =
+    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit =
       throw new UnsupportedOperationException("No JsonWriter[" + obj.getClass + "] available")
     def read[J](js: J, facade: Facade[J]): A = reader.read(js, facade)
   }
@@ -71,7 +71,7 @@ trait AdditionalFormats {
    */
   def lazyFormat[A](format: => JsonFormat[A]) = new JsonFormat[A] {
     lazy val delegate = format
-    def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit = delegate.write(obj, builder, facade)
+    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = delegate.write(obj, builder)(facade)
     def read[J](js: J, facade: Facade[J]): A = delegate.read(js, facade)
   }
 
@@ -79,7 +79,7 @@ trait AdditionalFormats {
    * Explicitly turns a JsonFormat into a RootJsonFormat.
    */
   def rootFormat[A](format: JsonFormat[A]) = new RootJsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J], facade: Facade[J]): Unit = format.write(obj, builder, facade)
+    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = format.write(obj, builder)(facade)
     def read[J](js: J, facade: Facade[J]): A = format.read(js, facade)
   }
 

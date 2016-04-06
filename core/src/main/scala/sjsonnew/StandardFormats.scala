@@ -32,14 +32,10 @@ trait StandardFormats {
 
   class OptionFormat[A :JF] extends JF[Option[A]] {
     lazy val elemFormat = implicitly[JF[A]]
-    def write[J](option: Option[A], builder: Builder[J], facade: Facade[J]): Unit =
+    def write[J](option: Option[A], builder: Builder[J])(implicit facade: Facade[J]): Unit =
       option match {
-        case Some(x) =>
-          elemFormat.write(x, builder, facade)
-        case None =>
-          val context = facade.singleContext()
-          context.add(facade.jnull())
-          builder.add(context)
+        case Some(x) => elemFormat.write(x, builder)
+        case None => builder.writeNull()
       }
     def read[J](js: J, facade: Facade[J]): Option[A] =
       if (facade.isJnull(js)) None
@@ -49,10 +45,10 @@ trait StandardFormats {
   implicit def eitherFormat[A :JF, B :JF] = new JF[Either[A, B]] {
     lazy val leftFormat = implicitly[JF[A]]
     lazy val rightFormat = implicitly[JF[B]]
-    def write[J](either: Either[A, B], builder: Builder[J], facade: Facade[J]): Unit =
+    def write[J](either: Either[A, B], builder: Builder[J])(implicit facade: Facade[J]): Unit =
       either match {
-        case Left(a)  => leftFormat.write(a, builder, facade)
-        case Right(b) => rightFormat.write(b, builder, facade)
+        case Left(a)  => leftFormat.write(a, builder)
+        case Right(b) => rightFormat.write(b, builder)
       }
     def read[J](js: J, facade: Facade[J]): Either[A, B] =
       (safeReader[A].read(js, facade), safeReader[B].read(js, facade)) match {

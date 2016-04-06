@@ -5,7 +5,7 @@ import poly._
 
 trait GenericEmpty {
   def emptyProduct: JsonFormat[HNil] = new RootJsonFormat[HNil] {
-    def write[J](m: HNil, builder: Builder[J], facade: Facade[J]): Unit = {
+    def write[J](m: HNil, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
       val xs = builder.convertContexts
       builder.clear()
       val context = facade.objectContext()
@@ -30,7 +30,7 @@ trait GenericFormats {
   object GenericFormat extends LabelledProductTypeClassCompanion[JsonFormat] {
     object typeClass extends LabelledProductTypeClass[JsonFormat] with GenericEmpty {
       def product[F, T <: HList](name: String, FHead: JsonFormat[F], FTail: JsonFormat[T]) = new RootJsonFormat[F :#: T] {
-        def write[J](m: F :#: T, builder: Builder[J], facade: Facade[J]): Unit = {
+        def write[J](m: F :#: T, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
           m match {
             case head :#: tail =>
               val context = facade.singleContext()
@@ -53,7 +53,7 @@ trait GenericFormats {
       }
 
       def project[A1, A2](instance: => JsonFormat[A2], to: A1 => A2, from: A2 => A1) = new JsonFormat[A1] {
-        def write[J](a1: A1, builder: Builder[J], facade: Facade[J]): Unit =
+        def write[J](a1: A1, builder: Builder[J])(implicit facade: Facade[J]): Unit =
           instance.write(to(a1), builder, facade)
         def read[J](value: J, facade: Facade[J]): A1 =
           from(instance.read(value, facade))
