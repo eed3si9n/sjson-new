@@ -43,25 +43,25 @@ lazy val core = project.
   )
 
 // shapeless integration is not done.
-// lazy val shapeless = project.
-//   dependsOn(core).
-//   settings(
-//     commonSettings,
-//     name := "sjson new generic",
-//     libraryDependencies ++= shapelessDependencies.value,
-//     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
-//   )
+lazy val shapeless = project.
+  dependsOn(core).
+  settings(
+    commonSettings,
+    name := "sjson new generic",
+    libraryDependencies ++= shapelessDependencies.value,
+    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+  )
 
-// lazy val shapelessTest = (project in file("shapeless-test")).
-//   dependsOn(shapeless, supportSpray).
-//   settings(
-//     commonSettings,
-//     name := "sjson new shapeless test",
-//     publish := {},
-//     publishLocal := {},
-//     libraryDependencies ++= testDependencies,
-//     libraryDependencies ++= shapelessDependencies.value
-//   )
+lazy val shapelessTest = (project in file("shapeless-test")).
+  dependsOn(shapeless, supportSpray).
+  settings(
+    commonSettings,
+    name := "sjson new shapeless test",
+    publish := {},
+    publishLocal := {},
+    libraryDependencies ++= testDependencies,
+    libraryDependencies ++= shapelessDependencies.value
+  )
 
 def support(n: String) =
   Project(id = n, base = file(s"support/$n")).

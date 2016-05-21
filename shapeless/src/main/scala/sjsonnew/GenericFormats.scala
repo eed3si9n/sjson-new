@@ -6,21 +6,24 @@ import poly._
 trait GenericEmpty {
   def emptyProduct: JsonFormat[HNil] = new RootJsonFormat[HNil] {
     def write[J](m: HNil, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
-      val xs = builder.convertContexts
-      builder.clear()
-      val context = facade.objectContext()
-      if (xs.size % 2 == 1) serializationError(s"Expected even number of fields but contains ${xs.size}")
-      xs.grouped(2) foreach {
-        case List(k, v) =>
-          val keyStr = (try {
-            facade.extractString(k)
-          } catch {
-            case DeserializationException(msg, _, _) => serializationError(s"Map key must be formatted as JString, not '$k'")
-          })
-          context.add(keyStr)
-          context.add(v)
-      }
-      builder.add(context)
+      // val xs = builder.convertContexts
+      // builder.clear()
+      // val context = facade.objectContext()
+      // if (xs.size % 2 == 1) serializationError(s"Expected even number of fields but contains ${xs.size}")
+      // xs.grouped(2) foreach {
+      //   case List(k, v) =>
+      //     val keyStr = (try {
+      //       facade.extractString(k)
+      //     } catch {
+      //       case DeserializationException(msg, _, _) => serializationError(s"Map key must be formatted as JString, not '$k'")
+      //     })
+      //     context.add(keyStr)
+      //     context.add(v)
+      // }
+      // builder.add(context)
+      builder.beginObject()
+
+      builder.endObject()
     }
     def read[J](value: J, facade: Facade[J]): HNil = HNil
   }
@@ -33,11 +36,11 @@ trait GenericFormats {
         def write[J](m: F :#: T, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
           m match {
             case head :#: tail =>
-              val context = facade.singleContext()
-              context.add(facade.jstring(name))
-              builder.add(context)
-              FHead.write(head, builder, facade)
-              FTail.write(tail, builder, facade)
+              // val context = facade.singleContext()
+              // context.add(facade.jstring(name))
+              // builder.add(context)
+              FHead.write(head, builder)
+              FTail.write(tail, builder)
           }
         }
         def read[J](value: J, facade: Facade[J]): F :#: T = {
@@ -54,7 +57,7 @@ trait GenericFormats {
 
       def project[A1, A2](instance: => JsonFormat[A2], to: A1 => A2, from: A2 => A1) = new JsonFormat[A1] {
         def write[J](a1: A1, builder: Builder[J])(implicit facade: Facade[J]): Unit =
-          instance.write(to(a1), builder, facade)
+          instance.write(to(a1), builder)
         def read[J](value: J, facade: Facade[J]): A1 =
           from(instance.read(value, facade))
       }
@@ -62,4 +65,4 @@ trait GenericFormats {
   }
 }
 
-// object Generic extends GenericInstances
+object GenericFormats extends GenericFormats
