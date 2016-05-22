@@ -54,6 +54,11 @@ object Converter extends SupportConverter[JValue] {
         case JNull => true
         case _      => false
       }
+    def isObject(value: JValue): Boolean =
+      value match {
+        case JObject(_) => true
+        case _          => false
+      }
     def extractInt(value: JValue): Int =
       value match {
         case JDouble(x) => x.toInt

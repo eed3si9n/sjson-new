@@ -32,93 +32,30 @@ trait StandardFormats {
 
   class OptionFormat[A :JF] extends JF[Option[A]] {
     lazy val elemFormat = implicitly[JF[A]]
-    def write[J](option: Option[A], builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](option: Option[A], builder: Builder[J]): Unit =
       option match {
         case Some(x) => elemFormat.write(x, builder)
         case None => builder.writeNull()
       }
-    def read[J](js: J, facade: Facade[J]): Option[A] =
-      if (facade.isJnull(js)) None
-      else Option(elemFormat.read(js, facade))
+    def read[J](js: J, unbuilder: Unbuilder[J]): Option[A] =
+      if (unbuilder.isJnull(js)) None
+      else Option(elemFormat.read(js, unbuilder))
   }
 
   implicit def eitherFormat[A :JF, B :JF] = new JF[Either[A, B]] {
     lazy val leftFormat = implicitly[JF[A]]
     lazy val rightFormat = implicitly[JF[B]]
-    def write[J](either: Either[A, B], builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](either: Either[A, B], builder: Builder[J]): Unit =
       either match {
         case Left(a)  => leftFormat.write(a, builder)
         case Right(b) => rightFormat.write(b, builder)
       }
-    def read[J](js: J, facade: Facade[J]): Either[A, B] =
-      (safeReader[A].read(js, facade), safeReader[B].read(js, facade)) match {
+    def read[J](js: J, unbuilder: Unbuilder[J]): Either[A, B] =
+      (safeReader[A].read(js, unbuilder), safeReader[B].read(js, unbuilder)) match {
         case (Right(a), _: Left[_, _]) => Left(a)
         case (_: Left[_, _], Right(b)) => Right(b)
         case (_: Right[_, _], _: Right[_, _]) => deserializationError("Ambiguous Either value: can be read as both, Left and Right, values")
         case (Left(ea), Left(eb)) => deserializationError("Could not read Either value:\n" + ea + "---------- and ----------\n" + eb)
       }
   }
-
-  // implicit def tuple1Format[A :JF] = new JF[Tuple1[A]] {
-  //   def write(t: Tuple1[A]) = t._1.toJson
-  //   def read(value: JsValue) = Tuple1(value.convertTo[A])
-  // }
-  
-  // implicit def tuple2Format[A :JF, B :JF] = new RootJsonFormat[(A, B)] {
-  //   def write(t: (A, B)) = JsArray(t._1.toJson, t._2.toJson)
-  //   def read(value: JsValue) = value match {
-  //     case JsArray(Seq(a, b)) => (a.convertTo[A], b.convertTo[B])
-  //     case x => deserializationError("Expected Tuple2 as JsArray, but got " + x)
-  //   }
-  // }
-  
-  // implicit def tuple3Format[A :JF, B :JF, C :JF] = new RootJsonFormat[(A, B, C)] {
-  //   def write(t: (A, B, C)) = JsArray(t._1.toJson, t._2.toJson, t._3.toJson)
-  //   def read(value: JsValue) = value match {
-  //     case JsArray(Seq(a, b, c)) => (a.convertTo[A], b.convertTo[B], c.convertTo[C])
-  //     case x => deserializationError("Expected Tuple3 as JsArray, but got " + x)
-  //   }
-  // }
-  
-  // implicit def tuple4Format[A :JF, B :JF, C :JF, D :JF] = new RootJsonFormat[(A, B, C, D)] {
-  //   def write(t: (A, B, C, D)) = JsArray(t._1.toJson, t._2.toJson, t._3.toJson, t._4.toJson)
-  //   def read(value: JsValue) = value match {
-  //     case JsArray(Seq(a, b, c, d)) => (a.convertTo[A], b.convertTo[B], c.convertTo[C], d.convertTo[D])
-  //     case x => deserializationError("Expected Tuple4 as JsArray, but got " + x)
-  //   }
-  // }
-  
-  // implicit def tuple5Format[A :JF, B :JF, C :JF, D :JF, E :JF] = {
-  //   new RootJsonFormat[(A, B, C, D, E)] {
-  //     def write(t: (A, B, C, D, E)) = JsArray(t._1.toJson, t._2.toJson, t._3.toJson, t._4.toJson, t._5.toJson)
-  //     def read(value: JsValue) = value match {
-  //       case JsArray(Seq(a, b, c, d, e)) =>
-  //         (a.convertTo[A], b.convertTo[B], c.convertTo[C], d.convertTo[D], e.convertTo[E])
-  //       case x => deserializationError("Expected Tuple5 as JsArray, but got " + x)
-  //     }
-  //   }
-  // }
-  
-  // implicit def tuple6Format[A :JF, B :JF, C :JF, D :JF, E :JF, F: JF] = {
-  //   new RootJsonFormat[(A, B, C, D, E, F)] {
-  //     def write(t: (A, B, C, D, E, F)) = JsArray(t._1.toJson, t._2.toJson, t._3.toJson, t._4.toJson, t._5.toJson, t._6.toJson)
-  //     def read(value: JsValue) = value match {
-  //       case JsArray(Seq(a, b, c, d, e, f)) =>
-  //         (a.convertTo[A], b.convertTo[B], c.convertTo[C], d.convertTo[D], e.convertTo[E], f.convertTo[F])
-  //       case x => deserializationError("Expected Tuple6 as JsArray, but got " + x)
-  //     }
-  //   }
-  // }
-  
-  // implicit def tuple7Format[A :JF, B :JF, C :JF, D :JF, E :JF, F: JF, G: JF] = {
-  //   new RootJsonFormat[(A, B, C, D, E, F, G)] {
-  //     def write(t: (A, B, C, D, E, F, G)) = JsArray(t._1.toJson, t._2.toJson, t._3.toJson, t._4.toJson, t._5.toJson, t._6.toJson, t._7.toJson)
-  //     def read(value: JsValue) = value match {
-  //       case JsArray(Seq(a, b, c, d, e, f, g)) =>
-  //         (a.convertTo[A], b.convertTo[B], c.convertTo[C], d.convertTo[D], e.convertTo[E], f.convertTo[F], g.convertTo[G])
-  //       case x => deserializationError("Expected Tuple7 as JsArray, but got " + x)
-  //     }
-  //   }
-  // }
-  
 }

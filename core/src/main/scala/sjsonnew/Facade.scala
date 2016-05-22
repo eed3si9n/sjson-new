@@ -47,6 +47,7 @@ trait Facade[J] {
   def jlong(l: Long): J
   def jstring(s: String): J
   def isJnull(value: J): Boolean
+  def isObject(value: J): Boolean
   def extractInt(value: J): Int
   def extractLong(value: J): Long
   def extractFloat(value: J): Float

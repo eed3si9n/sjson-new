@@ -23,98 +23,98 @@ package sjsonnew
  */
 trait PrimitiveFormats {
   implicit object IntJsonFormat extends JsonFormat[Int] {
-    def write[J](x: Int, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Int, builder: Builder[J]): Unit =
       builder.writeInt(x)
-    def read[J](js: J, facade: Facade[J]): Int =
-      facade.extractInt(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Int =
+      unbuilder.readInt(js)
   }
 
   implicit object LongJsonFormat extends JsonFormat[Long] {
-    def write[J](x: Long, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Long, builder: Builder[J]): Unit =
       builder.writeLong(x)
-    def read[J](js: J, facade: Facade[J]): Long =
-      facade.extractLong(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Long =
+      unbuilder.readLong(js)
   }
 
   implicit object FloatJsonFormat extends JsonFormat[Float] {
-    def write[J](x: Float, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Float, builder: Builder[J]): Unit =
       builder.writeDouble(x)
-    def read[J](js: J, facade: Facade[J]): Float =
-      facade.extractFloat(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Float =
+      unbuilder.readFloat(js)
   }
 
   implicit object DoubleJsonFormat extends JsonFormat[Double] {
-    def write[J](x: Double, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Double, builder: Builder[J]): Unit =
       builder.writeDouble(x)
-    def read[J](js: J, facade: Facade[J]): Double =
-      facade.extractDouble(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Double =
+      unbuilder.readDouble(js)
   }
 
   implicit object ByteJsonFormat extends JsonFormat[Byte] {
-    def write[J](x: Byte, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Byte, builder: Builder[J]): Unit =
       builder.writeInt(x)
-    def read[J](js: J, facade: Facade[J]): Byte =
-      facade.extractInt(js).toByte
+    def read[J](js: J, unbuilder: Unbuilder[J]): Byte =
+      unbuilder.readInt(js).toByte
   }
 
   implicit object ShortJsonFormat extends JsonFormat[Short] {
-    def write[J](x: Short, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Short, builder: Builder[J]): Unit =
       builder.writeInt(x)
-    def read[J](js: J, facade: Facade[J]): Short =
-      facade.extractInt(js).toShort
+    def read[J](js: J, unbuilder: Unbuilder[J]): Short =
+      unbuilder.readInt(js).toShort
   }
 
   implicit object BigDecimalJsonFormat extends JsonFormat[BigDecimal] {
-    def write[J](x: BigDecimal, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: BigDecimal, builder: Builder[J]): Unit =
       builder.writeBigDecimal(x)
-    def read[J](js: J, facade: Facade[J]): BigDecimal =
-      facade.extractBigDecimal(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): BigDecimal =
+      unbuilder.readBigDecimal(js)
   }
 
   implicit object BigIntJsonFormat extends JsonFormat[BigInt] {
-    def write[J](x: BigInt, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+    def write[J](x: BigInt, builder: Builder[J]): Unit = {
       require(x ne null)
       builder.writeBigDecimal(BigDecimal(x))
     }
-    def read[J](js: J, facade: Facade[J]): BigInt =
-      facade.extractBigDecimal(js).toBigInt
+    def read[J](js: J, unbuilder: Unbuilder[J]): BigInt =
+      unbuilder.readBigDecimal(js).toBigInt
   }
 
   implicit object UnitJsonFormat extends JsonFormat[Unit] {
-    def write[J](x: Unit, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Unit, builder: Builder[J]): Unit =
       builder.writeInt(1)
-    def read[J](js: J, facade: Facade[J]): Unit = ()
+    def read[J](js: J, unbuilder: Unbuilder[J]): Unit = ()
   }
 
   implicit object BooleanJsonFormat extends JsonFormat[Boolean] {
-    def write[J](x: Boolean, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Boolean, builder: Builder[J]): Unit =
       builder.writeBoolean(x)
-    def read[J](js: J, facade: Facade[J]): Boolean =
-      facade.extractBoolean(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Boolean =
+      unbuilder.readBoolean(js)
   }
 
   implicit object CharJsonFormat extends JsonFormat[Char] {
-    def write[J](x: Char, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Char, builder: Builder[J]): Unit =
       builder.writeString(String.valueOf(x))
-    def read[J](js: J, facade: Facade[J]): Char = {
-      val str = facade.extractString(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Char = {
+      val str = unbuilder.readString(js)
       if (str.length == 1) str.charAt(0)
       else deserializationError("Expected Char as single-character JsString, but got " + str)
     }
   }
 
   implicit object StringJsonFormat extends JsonFormat[String] {
-    def write[J](x: String, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: String, builder: Builder[J]): Unit =
       builder.writeString(x)
-    def read[J](js: J, facade: Facade[J]): String =
-      facade.extractString(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): String =
+      unbuilder.readString(js)
   }
 
   implicit object SymbolJsonFormat extends JsonFormat[Symbol] {
-    def write[J](x: Symbol, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](x: Symbol, builder: Builder[J]): Unit =
       builder.writeString(x.name)
-    def read[J](js: J, facade: Facade[J]): Symbol = {
-      val str = facade.extractString(js)
+    def read[J](js: J, unbuilder: Unbuilder[J]): Symbol = {
+      val str = unbuilder.readString(js)
       Symbol(str)
     }
   }

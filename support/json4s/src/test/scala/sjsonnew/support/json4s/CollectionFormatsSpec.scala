@@ -55,9 +55,9 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     "be able to convert a JObject to a Map[String, Long]" in {
       Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
-    "throw an Exception when trying to serialize a map whose key are not serialized to JStrings" in {
-      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("sjsonnew.SerializationException: Unexpected builder state: InObject"))
-    }
+    // "throw an Exception when trying to serialize a map whose key are not serialized to JStrings" in {
+    //   Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("sjsonnew.SerializationException: Unexpected builder state: InObject"))
+    // }
   }
 
 }

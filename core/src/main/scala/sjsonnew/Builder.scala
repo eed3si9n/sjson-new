@@ -7,32 +7,32 @@ import BuilderState._
 /**
  * Builder is an mutable structure to write JSON into.
  */
-class Builder[J] {
+class Builder[J](facade: Facade[J]) {
   private var resultOpt: Option[J] = None
   private var state: BuilderState = BuilderState.Begin
   protected val contexts: mutable.Stack[FContext[J]] = mutable.Stack.empty[FContext[J]]
 
   /** Write `Int` value to the current context. */
-  def writeInt(x: Int)(implicit facade: Facade[J]): Unit =
+  def writeInt(x: Int): Unit =
     writeJ(facade.jint(x))
   /** Write `Long` value to the current context. */
-  def writeLong(x: Long)(implicit facade: Facade[J]): Unit =
+  def writeLong(x: Long): Unit =
     writeJ(facade.jlong(x))
   /** Write `Double` value to the current context. */
-  def writeDouble(x: Double)(implicit facade: Facade[J]): Unit =
+  def writeDouble(x: Double): Unit =
     writeJ(facade.jdouble(x))
   /** Write `BigDecimal` value to the current context. */
-  def writeBigDecimal(x: BigDecimal)(implicit facade: Facade[J]): Unit =
+  def writeBigDecimal(x: BigDecimal): Unit =
     writeJ(facade.jbigdecimal(x))
   /** Write `Boolean` value to the current context. */
-  def writeBoolean(x: Boolean)(implicit facade: Facade[J]): Unit =
+  def writeBoolean(x: Boolean): Unit =
     if (x) writeJ(facade.jtrue())
     else writeJ(facade.jfalse())
   /** Write null to the current context. */
-  def writeNull()(implicit facade: Facade[J]): Unit =
+  def writeNull(): Unit =
     writeJ(facade.jnull())
   /** Write `String` value to the current context. */
-  def writeString(x: String)(implicit facade: Facade[J]): Unit =
+  def writeString(x: String): Unit =
     state match {
       case InObject =>
         if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
@@ -41,10 +41,11 @@ class Builder[J] {
       case _ => writeJ(facade.jstring(x))
     }
 
-  /** Begins JArray. The builder state will be in BuilderState.InContext,
-    * and further `writeXXX` calls will be written into this array.
+  /** Begins JArray. The builder state will be in `BuilderState.InContext`.
+    * Make `writeXXX` calls to write into this array,
+    * and end with `endArray`.
     */
-  def beginArray()(implicit facade: Facade[J]): Unit =
+  def beginArray(): Unit =
     state match {
       case Begin | InArray | InField =>
         val context = facade.arrayContext()
@@ -55,7 +56,7 @@ class Builder[J] {
     }
   /** Ends the current array context.
     */
-  def endArray()(implicit facade: Facade[J]): Unit =
+  def endArray(): Unit =
     state match {
       case InArray =>
         val x = contexts.pop
@@ -72,7 +73,11 @@ class Builder[J] {
       case x => stateError(x)
     }
 
-  def beginObject()(implicit facade: Facade[J]): Unit =
+  /** Begins JObject. The builder state will be in `BuilderState.InObject`.
+    * Make pairs `writeString` and `writeXXX` calls to make field entries,
+    * and end with `endObject`.
+    */
+  def beginObject(): Unit =
     state match {
       case Begin | InArray | InField =>
         val context = facade.objectContext()
@@ -81,9 +86,9 @@ class Builder[J] {
       case InObject => stateError(InObject) // expecting field name
       case End => stateError(End)
     }
-  /** Ends the current array context.
+  /** Ends the current object context.
     */
-  def endObject()(implicit facade: Facade[J]): Unit =
+  def endObject(): Unit =
     state match {
       case InObject =>
         val x = contexts.pop
@@ -100,7 +105,7 @@ class Builder[J] {
       case x => stateError(x)
     }
 
-  private def writeJ(js: J)(implicit facade: Facade[J]): Unit =
+  private def writeJ(js: J): Unit =
     state match {
       case Begin =>
         resultOpt = Some(js)

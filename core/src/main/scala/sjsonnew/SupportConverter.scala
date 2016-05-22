@@ -4,7 +4,8 @@ import scala.util.Try
 
 trait SupportConverter[J] {
   implicit def facade: Facade[J]
-  def makeBuilder: Builder[J] = new Builder()
+  def makeBuilder: Builder[J] = new Builder(facade)
+  def makeUnbuilder: Unbuilder[J] = new Unbuilder(facade)
 
   /**
     * Convert an object of type `A` to a JSON AST of type `J`.
@@ -37,5 +38,8 @@ trait SupportConverter[J] {
     * This might fail by throwing an exception.
     */
   def fromJsonUnsafe[A](js: J)(implicit reader: JsonReader[A]): A =
-    reader.read[J](js, facade)
+    {
+      val unbuilder = makeUnbuilder
+      reader.read[J](js, unbuilder)
+    }
 }

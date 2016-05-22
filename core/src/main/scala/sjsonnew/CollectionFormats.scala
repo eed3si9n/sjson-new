@@ -24,17 +24,21 @@ trait CollectionFormats {
    */
   implicit def listFormat[A: JsonFormat] = new RootJsonFormat[List[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](list: List[A], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+    def write[J](list: List[A], builder: Builder[J]): Unit = {
       builder.beginArray()
-      list foreach { x => elemFormat.write(x, builder)(facade) }
+      list foreach { x => elemFormat.write(x, builder) }
       builder.endArray()
     }
-    def read[J](value: J, facade: Facade[J]): List[A] = {
-      val elems = facade.extractArray(value)
-      (elems map { elem =>
-        elemFormat.read(elem, facade)
-      }).toList
-    }
+    def read[J](value: J, unbuilder: Unbuilder[J]): List[A] =
+      {
+        val size = unbuilder.beginArray(value)
+        val xs = (1 to size).toList map { x =>
+          val elem = unbuilder.nextElement
+          elemFormat.read(elem, unbuilder)
+        }
+        unbuilder.endArray
+        xs
+      }
   }
 
   /**
@@ -42,17 +46,21 @@ trait CollectionFormats {
    */
   implicit def arrayFormat[A: JsonFormat: ClassManifest] = new RootJsonFormat[Array[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](array: Array[A], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+    def write[J](array: Array[A], builder: Builder[J]): Unit = {
       builder.beginArray()
       array foreach { x => elemFormat.write(x, builder) }
       builder.endArray()
     }
-    def read[J](value: J, facade: Facade[J]): Array[A] = {
-      val elems = facade.extractArray(value)
-      (elems map { elem =>
-        elemFormat.read(elem, facade)
-      }).toArray[A]
-    }
+    def read[J](value: J, unbuilder: Unbuilder[J]): Array[A] =
+      {
+        val size = unbuilder.beginArray(value)
+        val xs = (1 to size).toList map { x =>
+          val elem = unbuilder.nextElement
+          elemFormat.read(elem, unbuilder)
+        }
+        unbuilder.endArray
+        xs.toArray
+      }
   }
 
   /**
@@ -62,7 +70,7 @@ trait CollectionFormats {
   implicit def mapFormat[K: JsonFormat, V: JsonFormat] = new RootJsonFormat[Map[K, V]] {
     lazy val keyFormat = implicitly[JsonFormat[K]]
     lazy val valueFormat = implicitly[JsonFormat[V]]
-    def write[J](m: Map[K, V], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+    def write[J](m: Map[K, V], builder: Builder[J]): Unit = {
       builder.beginObject()
       m foreach {
         case (k, v) =>
@@ -71,13 +79,13 @@ trait CollectionFormats {
       }
       builder.endObject()
     }
-    def read[J](value: J, facade: Facade[J]): Map[K, V] = {
-      val fields = facade.extractObject(value)
-      Map(fields map {
-        case (kStr, v) =>
-          val k = facade.jstring(kStr)
-          keyFormat.read(k, facade) -> valueFormat.read(v, facade)
-      }: _*)
+    def read[J](value: J, unbuilder: Unbuilder[J]): Map[K, V] = {
+      val size = unbuilder.beginObject(value)
+      val xs = (1 to size).toList map { x =>
+        val (k, v) = unbuilder.nextFeildWithJString
+        keyFormat.read(k, unbuilder) -> valueFormat.read(v, unbuilder)
+      }
+      Map(xs: _*)
     }
   }
 
@@ -104,16 +112,19 @@ trait CollectionFormats {
    */
   def viaSeq[I <: Iterable[A], A: JsonFormat](f: imm.Seq[A] => I): RootJsonFormat[I] = new RootJsonFormat[I] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](iterable: I, builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+    def write[J](iterable: I, builder: Builder[J]): Unit = {
       builder.beginArray()
       iterable foreach { x => elemFormat.write(x, builder) }
       builder.endArray()
     }
-    def read[J](value: J, facade: Facade[J]): I = {
-      val elems = facade.extractArray(value)
-      f(elems map { elem =>
-        elemFormat.read(elem, facade)
-      })
+    def read[J](value: J, unbuilder: Unbuilder[J]): I = {
+      val size = unbuilder.beginArray(value)
+      val xs = (1 to size).toList map { x =>
+        val elem = unbuilder.nextElement
+        elemFormat.read(elem, unbuilder)
+      }
+      unbuilder.endArray
+      f(xs)
     }
   }
 }

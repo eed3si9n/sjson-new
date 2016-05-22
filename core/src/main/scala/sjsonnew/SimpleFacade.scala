@@ -26,7 +26,7 @@ import scala.collection.mutable
 /**
  * Facade is a type class that describes how Jawn should construct
  * JSON AST elements of type J.
- * 
+ *
  * Facade[J] also uses FContext[J] instances, so implementors will
  * usually want to define both.
  */

@@ -23,6 +23,12 @@ object Converter extends SupportConverter[JsValue] {
         case JsNull => true
         case _      => false
       }
+
+    def isObject(value: JsValue): Boolean =
+      value match {
+        case JsObject(_) => true
+        case _           => false
+      }
     def extractInt(value: JsValue): Int =
       value match {
         case JsNumber(x) => x.intValue

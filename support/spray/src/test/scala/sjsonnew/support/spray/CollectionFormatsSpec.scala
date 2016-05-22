@@ -55,9 +55,9 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     "be able to convert a JsObject to a Map[String, Long]" in {
       Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
-    "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
-      Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Unexpected builder state: InObject"))
-    }
+    // "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
+    //   Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Unexpected builder state: InObject"))
+    // }
   }
 
   "The immutableSetFormat" should {

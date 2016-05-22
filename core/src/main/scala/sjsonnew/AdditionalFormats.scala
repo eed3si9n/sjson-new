@@ -26,8 +26,8 @@ trait AdditionalFormats {
    * Constructs a JsonFormat from its two parts, JsonReader and JsonWriter.
    */
   def jsonFormat[A](reader: JsonReader[A], writer: JsonWriter[A]) = new JsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = writer.write(obj, builder)(facade)
-    def read[J](js: J, facade: Facade[J]): A = reader.read(js, facade)
+    def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
+    def read[J](js: J, unbuilder: Unbuilder[J]): A = reader.read(js, unbuilder)
   }
 
   /**
@@ -40,8 +40,8 @@ trait AdditionalFormats {
    * Turns a JsonWriter into a JsonFormat that throws an UnsupportedOperationException for reads.
    */
   def lift[A](writer: JsonWriter[A]) = new JsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = writer.write(obj, builder)(facade)
-    def read[J](js: J, facade: Facade[J]): A =
+    def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
+    def read[J](js: J, unbuilder: Unbuilder[J]): A =
       throw new UnsupportedOperationException("JsonReader implementation missing")
   }
 
@@ -55,9 +55,9 @@ trait AdditionalFormats {
    * Turns a JsonReader into a JsonFormat that throws an UnsupportedOperationException for writes.
    */
   def lift[A <: AnyRef](reader: JsonReader[A]) = new JsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit =
+    def write[J](obj: A, builder: Builder[J]): Unit =
       throw new UnsupportedOperationException("No JsonWriter[" + obj.getClass + "] available")
-    def read[J](js: J, facade: Facade[J]): A = reader.read(js, facade)
+    def read[J](js: J, unbuilder: Unbuilder[J]): A = reader.read(js, unbuilder)
   }
 
   /**
@@ -71,26 +71,26 @@ trait AdditionalFormats {
    */
   def lazyFormat[A](format: => JsonFormat[A]) = new JsonFormat[A] {
     lazy val delegate = format
-    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = delegate.write(obj, builder)(facade)
-    def read[J](js: J, facade: Facade[J]): A = delegate.read(js, facade)
+    def write[J](obj: A, builder: Builder[J]): Unit = delegate.write(obj, builder)
+    def read[J](js: J, unbuilder: Unbuilder[J]): A = delegate.read(js, unbuilder)
   }
 
   /**
    * Explicitly turns a JsonFormat into a RootJsonFormat.
    */
   def rootFormat[A](format: JsonFormat[A]) = new RootJsonFormat[A] {
-    def write[J](obj: A, builder: Builder[J])(implicit facade: Facade[J]): Unit = format.write(obj, builder)(facade)
-    def read[J](js: J, facade: Facade[J]): A = format.read(js, facade)
+    def write[J](obj: A, builder: Builder[J]): Unit = format.write(obj, builder)
+    def read[J](js: J, unbuilder: Unbuilder[J]): A = format.read(js, unbuilder)
   }
 
   /**
    * Wraps an existing JsonReader with Exception protection.
    */
   def safeReader[A: JsonReader] = new JsonReader[Either[Exception, A]] {
-    def read[J](js: J, facade: Facade[J]): Either[Exception, A] = {
+    def read[J](js: J, unbuilder: Unbuilder[J]): Either[Exception, A] = {
       val reader = implicitly[JsonReader[A]]
       try {
-        Right(reader.read(js, facade))
+        Right(reader.read(js, unbuilder))
       } catch {
         case e: Exception => Left(e)
       }

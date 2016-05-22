@@ -25,15 +25,19 @@ trait TupleFormats {
     [#lazy val a1Format = implicitly[JF[A1]]#
     ]
 
-    def write[J](t: Tuple1[[#A1#]], builder: Builder[J])(implicit facade: Facade[J]): Unit = {
+    def write[J](t: Tuple1[[#A1#]], builder: Builder[J]): Unit = {
       builder.beginArray()
-      [#a1Format.write(t._1, builder)(facade)#
+      [#a1Format.write(t._1, builder)#
       ]
       builder.endArray()
     }
-    def read[J](js: J, facade: Facade[J]): Tuple1[[#A1#]] = {
-      val Seq([#a1#]) = facade.extractArray(js)
-      Tuple1([#a1Format.read(a1, facade)#])
+    def read[J](js: J, unbuilder: Unbuilder[J]): Tuple1[[#A1#]] = {
+      unbuilder.beginArray(js)
+      [#val a1 = unbuilder.nextElement#
+      ]
+      val xs = Tuple1([#a1Format.read(a1, unbuilder)#])
+      unbuilder.endArray()
+      xs
     }
   }#
   ]
