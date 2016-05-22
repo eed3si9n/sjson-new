@@ -74,7 +74,8 @@ class Unbuilder[J](facade: Facade[J]) {
   def beginObject(js: J): Int =
     state match {
       case Begin | InArray | InObject =>
-        val context = UnbuilderContext.ObjectContext(facade.extractObject(js))
+        val (fields, names) = facade.extractObject(js)
+        val context = UnbuilderContext.ObjectContext(fields, names)
         contexts.push(context)
         state = InObject
         context.fields.size
@@ -92,6 +93,15 @@ class Unbuilder[J](facade: Facade[J]) {
   def nextFeildWithJString(): (J, J) =
     nextFeild match {
       case (k, v) => (facade.jstring(k), v)
+    }
+  def lookupField(name: String): Option[J] =
+    state match {
+      case InObject =>
+        contexts.top match {
+          case ctx: UnbuilderContext.ObjectContext[J] => ctx.fields.get(name)
+          case x => deserializationError(s"Unexpected context: $x")
+        }
+      case x => stateError(x)
     }
   /** End reading JSON object. Returns the size. */
   def endObject(): Unit =
@@ -132,12 +142,13 @@ private[sjsonnew] object UnbuilderState {
 
 private[sjsonnew] trait UnbuilderContext[J]
 private[sjsonnew] object UnbuilderContext {
-  case class ObjectContext[J](fields: Vector[(String, J)]) extends UnbuilderContext[J] {
+  case class ObjectContext[J](fields: Map[String, J], names: Vector[String]) extends UnbuilderContext[J] {
     private var idx: Int = 0
     def next: (String, J) = {
-      val x = fields(idx)
+      val name = names(idx)
+      val x = fields(names(idx))
       idx = idx + 1
-      x
+      (name, x)
     }
   }
   case class ArrayContext[J](elements: Vector[J]) extends UnbuilderContext[J] {

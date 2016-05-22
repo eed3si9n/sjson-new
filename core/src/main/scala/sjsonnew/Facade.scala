@@ -56,7 +56,7 @@ trait Facade[J] {
   def extractBoolean(value: J): Boolean
   def extractString(value: J): String
   def extractArray(value: J): Vector[J]
-  def extractObject(value: J): Vector[(String, J)]
+  def extractObject(value: J): (Map[String, J], Vector[String])
 }
 
 /**

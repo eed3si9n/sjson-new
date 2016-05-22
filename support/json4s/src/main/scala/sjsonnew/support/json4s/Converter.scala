@@ -111,9 +111,12 @@ object Converter extends SupportConverter[JValue] {
         case JArray(elements) => elements.toVector
         case x => deserializationError("Expected List as JArray, but got " + x)
       }
-    def extractObject(value: JValue): Vector[(String, JValue)] =
+    def extractObject(value: JValue): (Map[String, JValue], Vector[String]) =
       value match {
-        case JObject(fields) => fields.toVector
+        case JObject(fs) =>
+          val names = (fs map { case (k, v) => k }).toVector
+          val fields = Map(fs: _*)
+          (fields, names)
         case x => deserializationError("Expected Map as JsObject, but got " + x)
       }
   }
