@@ -82,7 +82,7 @@ trait CollectionFormats {
     def read[J](value: J, unbuilder: Unbuilder[J]): Map[K, V] = {
       val size = unbuilder.beginObject(value)
       val xs = (1 to size).toList map { x =>
-        val (k, v) = unbuilder.nextFeildWithJString
+        val (k, v) = unbuilder.nextFieldWithJString
         keyFormat.read(k, unbuilder) -> valueFormat.read(v, unbuilder)
       }
       Map(xs: _*)

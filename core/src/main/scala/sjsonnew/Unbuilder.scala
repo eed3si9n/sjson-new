@@ -35,6 +35,9 @@ class Unbuilder[J](facade: Facade[J]) {
   /** Check if js is null */
   def isJnull(js: J): Boolean =
     facade.isJnull(js)
+  /** Check if js is null */
+  def isObject(js: J): Boolean =
+    facade.isObject(js)
   /** Begin reading JSON array. Returns the size.
     * Call `nextElement` n-times, and then call `endArray`.
     */
@@ -68,6 +71,7 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+  def isInObject: Boolean = state == InObject
   /** Begin reading JSON object. Returns the size.
     * Call `nextField` n-times, and then call `endObject`.
     */
@@ -81,7 +85,16 @@ class Unbuilder[J](facade: Facade[J]) {
         context.fields.size
       case End => stateError(End)
     }
-  def nextFeild(): (String, J) =
+  def hasNextField: Boolean =
+    state match {
+      case InObject =>
+        contexts.top match {
+          case ctx: UnbuilderContext.ObjectContext[J] => ctx.hasNext
+          case x => deserializationError(s"Unexpected context: $x")
+        }
+      case x => stateError(x)
+    }
+  def nextField(): (String, J) =
     state match {
       case InObject =>
         contexts.top match {
@@ -90,8 +103,8 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
-  def nextFeildWithJString(): (J, J) =
-    nextFeild match {
+  def nextFieldWithJString(): (J, J) =
+    nextField match {
       case (k, v) => (facade.jstring(k), v)
     }
   def lookupField(name: String): Option[J] =
@@ -143,7 +156,9 @@ private[sjsonnew] object UnbuilderState {
 private[sjsonnew] trait UnbuilderContext[J]
 private[sjsonnew] object UnbuilderContext {
   case class ObjectContext[J](fields: Map[String, J], names: Vector[String]) extends UnbuilderContext[J] {
+    private val size = names.size
     private var idx: Int = 0
+    def hasNext: Boolean = idx < size
     def next: (String, J) = {
       val name = names(idx)
       val x = fields(names(idx))

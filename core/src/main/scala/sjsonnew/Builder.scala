@@ -72,7 +72,8 @@ class Builder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
-
+  /** Checks if the current state is `InObject` */
+  def isInObject: Boolean = state == InObject
   /** Begins JObject. The builder state will be in `BuilderState.InObject`.
     * Make pairs `writeString` and `writeXXX` calls to make field entries,
     * and end with `endObject`.
