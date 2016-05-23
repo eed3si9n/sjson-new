@@ -1,0 +1,40 @@
+package sjsonnew
+
+trait UnionFormats {
+  private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
+
+  [#def unionFormat1[U, [#A1 :JF: Manifest#]]: JF[U] = new JF[U] {
+    [#lazy val a1Format = implicitly[JF[A1]]#
+    ]
+
+    def write[J](u: U, builder: Builder[J]): Unit = {
+      builder.beginObject()
+      builder.writeString("value")
+      u match {
+      [#  case x if implicitly[Manifest[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
+      ]
+      }
+      builder.writeString("$type")
+      builder.writeString(u.getClass.getCanonicalName)
+      builder.endObject()
+    }
+    def read[J](js: J, unbuilder: Unbuilder[J]): U = {
+      unbuilder.beginObject(js)
+      val typeName = unbuilder.lookupField("$type") match {
+        case Some(x) => unbuilder.readString(x)
+        case None    => deserializationError("Field not found: $type")
+      }
+      val valueJs = unbuilder.lookupField("value") match {
+        case Some(x) => x
+        case None    => deserializationError("Field not found: value")
+      }
+      val value = typeName match {
+      [#  case x if implicitly[Manifest[A1]].runtimeClass.getCanonicalName == x => a1Format.read(valueJs, unbuilder)#
+      ]
+      }
+      unbuilder.endObject()
+      value match { case u: U @unchecked => u }
+    }
+  }#
+  ]
+}

@@ -27,5 +27,6 @@ trait BasicJsonProtocol
         with TupleFormats
         with CollectionFormats
         with AdditionalFormats
+        with UnionFormats
 
 object BasicJsonProtocol extends BasicJsonProtocol
