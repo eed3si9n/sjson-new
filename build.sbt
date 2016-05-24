@@ -8,6 +8,9 @@ lazy val root = (project in file(".")).
     name := "sjson new",
     publish := {},
     publishLocal := {},
+    PgpKeys.publishSigned := {},
+    publishArtifact in Test := false,
+    publishArtifact in Compile := false,
     inThisBuild(List(
       organization := "com.eed3si9n",
       organizationName in ThisBuild := "eed3si9n",
@@ -17,7 +20,7 @@ lazy val root = (project in file(".")).
       developers in ThisBuild := List(
         Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
       ),
-      version := "0.1.0",
+      version := "0.2.0",
       crossScalaVersions := Seq("2.10.6", "2.11.8"),
       scalaVersion := "2.11.8",
       description := "A Scala library for JSON (de)serialization",
