@@ -35,10 +35,20 @@ class Builder[J](facade: Facade[J]) {
   def writeString(x: String): Unit =
     state match {
       case InObject =>
+        // This is effectively same as addField, but allows to use keyFormat.write.
         if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
         else contexts.top.add(x)
         state = InField
       case _ => writeJ(facade.jstring(x))
+    }
+  /** Write field name to the current context. */
+  def addField(x: String): Unit =
+    state match {
+      case InObject =>
+        if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
+        else contexts.top.add(x)
+        state = InField
+      case x => stateError(x)
     }
 
   /** Begins JArray. The builder state will be in `BuilderState.InContext`.
@@ -75,7 +85,7 @@ class Builder[J](facade: Facade[J]) {
   /** Checks if the current state is `InObject` */
   def isInObject: Boolean = state == InObject
   /** Begins JObject. The builder state will be in `BuilderState.InObject`.
-    * Make pairs `writeString` and `writeXXX` calls to make field entries,
+    * Make pairs `addField("abc")` and `writeXXX` calls to make field entries,
     * and end with `endObject`.
     */
   def beginObject(): Unit =

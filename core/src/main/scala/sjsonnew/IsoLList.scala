@@ -1,7 +1,5 @@
 /*
- * Original implementation (C) 2009-2011 Debasish Ghosh
- * Adapted and extended in 2011 by Mathias Doenitz
- * Adapted and extended in 2016 by Eugene Yokota
+ * Copyright (C) 2016 Eugene Yokota
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +16,21 @@
 
 package sjsonnew
 
-/**
-  * Provides all the predefined JsonFormats.
- */
-trait BasicJsonProtocol
-        extends PrimitiveFormats
-        with StandardFormats
-        with TupleFormats
-        with CollectionFormats
-        with AdditionalFormats
-        with UnionFormats
-        with IsoLListFormats
+/** Same as LabelledGeneric in shapeless. */
+trait IsoLList[A] {
+  type R <: LList
+  def to(a: A): R
+  def from(r: R): A
+  def jsonFormat: JsonFormat[R]
+}
 
-object BasicJsonProtocol extends BasicJsonProtocol
+object IsoLList {
+  type Aux[A, R0] = IsoLList[A]{ type R = R0 }
+  def apply[A](implicit iso: IsoLList[A]): Aux[A, iso.R] = iso
+  def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): Aux[A, R0] = new IsoLList[A] {
+    type R = R0
+    def to(a: A): R = to0(a)
+    def from(r: R): A = from0(r)
+    val jsonFormat: JsonFormat[R] = implicitly[JsonFormat[R]]
+  }
+}

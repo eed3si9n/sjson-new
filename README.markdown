@@ -99,9 +99,103 @@ important reference and collection types. As long as your code uses nothing more
 * List, Array
 * immutable.{Map, Iterable, Seq, IndexedSeq, LinearSeq, Set, Vector}
 * collection.{Iterable, Seq, IndexedSeq, LinearSeq, Set}
+* LList
+
+### LList
+
+sjson-new comes with a datatype called **LList**, which stands for
+labelled heterogeneous list.
+`List[A]` that comes with the Standard Library can only store values of one type `A`.
+Unlike the standard `List[A]`, LList can store values of different types per cell,
+and it can also store a label per cell.
+Because of this reason, each LList has its own type. Here's how it looks in the REPL:
+
+```scala
+scala> import sjsonnew._, LList.:+:
+import sjsonnew._
+import LList.$colon$plus$colon
+
+scala> import BasicJsonProtocol._
+import BasicJsonProtocol._
+
+scala> val x = ("name", "A") :+: ("value", 1) :+: LNil
+x: sjsonnew.LList.:+:[String,sjsonnew.LList.:+:[Int,sjsonnew.LNil]] = (name, A) :+: (value, 1) :+: LNil
+
+scala> val y: String :+: Int :+: LNil = x
+y: sjsonnew.LList.:+:[String,sjsonnew.LList.:+:[Int,sjsonnew.LNil]] = (name, A) :+: (value, 1) :+: LNil
+```
+
+`BasicJsonProtocol` is able to convert all LList values into a JSON object.
+
+### Custom types
 
 In most cases however you'll also want to convert types not covered by the `BasicJsonProtocol`. In these cases you
-need to provide `JsonFormat[A]`s for your custom types. This is not hard at all.
+need to provide `JsonFormat[A]`s for your custom types
+
+All you have to do is provide an isomorphism between your types and an LList using `LList.iso` function.
+
+```scala
+scala> import sjsonnew._, LList.:+:
+import sjsonnew._
+import LList.$colon$plus$colon
+
+scala> import BasicJsonProtocol._
+import BasicJsonProtocol._
+
+scala> case class Person(name: String, value: Int)
+defined class Person
+
+scala> implicit val personIso = LList.iso(
+         { p: Person => ("name", p.name) :+: ("value", p.value) :+: LNil },
+         { in: String :+: Int :+: LNil => Person(in.head, in.tail.head) })
+personIso: sjsonnew.IsoLList.Aux[Person,sjsonnew.LList.:+:[String,sjsonnew.LList.:+:[Int,sjsonnew.LNil]]] = sjsonnew.IsoLList$$anon$1@4140e9d0
+
+scala> import sjsonnew.support.spray.Converter
+import sjsonnew.support.spray.Converter
+
+scala> Converter.toJson[Person](Person("A", 1))
+res0: scala.util.Try[spray.json.JsValue] = Success({"name":"A","value":1})
+```
+
+Using `personIso`, sjson-new derived the `JsonFomrat` for `Person`.
+
+Suppose now that we have an algebraic datatype (ADT) represented by a sealed trait.
+There's a function to compose the `JsonFormat` called `unionFormat2`, `unionFormat3`, ...
+
+```scala
+scala> import sjsonnew._, LList.:+:
+import sjsonnew._
+import LList.$colon$plus$colon
+
+scala> import BasicJsonProtocol._
+import BasicJsonProtocol._
+
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+sealed trait Contact
+case class Person(name: String, value: Int) extends Contact
+case class Organization(name: String, value: Int) extends Contact
+
+implicit val personIso = LList.iso(
+  { p: Person => ("name", p.name) :+: ("value", p.value) :+: LNil },
+  { in: String :+: Int :+: LNil => Person(in.head, in.tail.head) })
+implicit val organizationIso = LList.iso(
+  { o: Organization => ("name", o.name) :+: ("value", o.value) :+: LNil },
+  { in: String :+: Int :+: LNil => Organization(in.head, in.tail.head) })
+implicit val ContactFormat = unionFormat2[Contact, Person, Organization]
+
+// Exiting paste mode, now interpreting.
+
+scala> import sjsonnew.support.spray.Converter
+import sjsonnew.support.spray.Converter
+
+scala> Converter.toJson[Contact](Organization("Company", 2))
+res0: scala.util.Try[spray.json.JsValue] = Success({"value":{"name":"Company","value":2},"type":"Organization"})
+```
+
+The `unionFormatN[U, A1, A2, ...]` functions assume that type `U` is the sealed parent trait of the passed in types.
+In the JSON object this is encoded by putting the simple type name (just the class name portion) into `type` field.
 
 ### Credits
 

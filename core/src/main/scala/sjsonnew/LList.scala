@@ -60,7 +60,7 @@ final case class LCons[A1: JsonFormat, A2 <: LList: JsonFormat](name: String, he
   import LList.:+:
   // type Wrap[F[_]] = F[A1] :+: A2#Wrap[F]
   def :+:[B1: JsonFormat](labelled: (String, B1)): B1 :+: A1 :+: A2 = LCons(labelled._1, labelled._2, this)
-  override def toString: String = head + " :+: " + tail.toString
+  override def toString: String = s"($name, $head) :+: $tail"
 }
 object LCons {
   implicit def lconsFormat[A1: JsonFormat, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
@@ -71,7 +71,7 @@ object LCons {
         if (!builder.isInObject) {
           builder.beginObject()
         }
-        builder.writeString(x.name)
+        builder.addField(x.name)
         a1Format.write(x.head, builder)
         a2Format.write(x.tail, builder)
       }
@@ -97,4 +97,6 @@ object LCons {
 object LList {
   type :+:[A1, A2 <: LList] = LCons[A1, A2]
   val :+: = LCons
+  def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
+    IsoLList.iso[A, R0](to0, from0)
 }

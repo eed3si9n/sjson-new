@@ -1,7 +1,5 @@
 /*
- * Original implementation (C) 2009-2011 Debasish Ghosh
- * Adapted and extended in 2011 by Mathias Doenitz
- * Adapted and extended in 2016 by Eugene Yokota
+ * Copyright (C) 2016 Eugene Yokota
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +16,12 @@
 
 package sjsonnew
 
-/**
-  * Provides all the predefined JsonFormats.
- */
-trait BasicJsonProtocol
-        extends PrimitiveFormats
-        with StandardFormats
-        with TupleFormats
-        with CollectionFormats
-        with AdditionalFormats
-        with UnionFormats
-        with IsoLListFormats
-
-object BasicJsonProtocol extends BasicJsonProtocol
+trait IsoLListFormats {
+  implicit def isolistFormat[A: IsoLList]: JsonFormat[A] =new JsonFormat[A] {
+    val iso = implicitly[IsoLList[A]]
+    def write[J](x: A, builder: Builder[J]): Unit =
+      iso.jsonFormat.write(iso.to(x), builder)
+    def read[J](js: J, unbuilder: Unbuilder[J]): A =
+      iso.from(iso.jsonFormat.read(js, unbuilder))
+  }
+}

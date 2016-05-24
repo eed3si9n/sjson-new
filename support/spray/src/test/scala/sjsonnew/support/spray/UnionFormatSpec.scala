@@ -47,7 +47,7 @@ class UnionFormatsSpec extends Specification with BasicJsonProtocol {
   implicit val FruitFormat = unionFormat2[Fruit, Apple, Orange]
 
   val fruit: Fruit = Apple()
-  val fruitJson = JsObject("value" -> JsNumber(0), "$type" -> JsString("sjsonnew.support.spray.UnionFormatsSpec.Apple"))
+  val fruitJson = JsObject("value" -> JsNumber(0), "type" -> JsString("Apple"))
   "The unionFormat" should {
     "convert a value of ADT to JObject" in {
       Converter.toJsonUnsafe(fruit) mustEqual fruitJson
