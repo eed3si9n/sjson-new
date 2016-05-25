@@ -21,9 +21,9 @@ sealed trait LList {
   // type Wrap[F[_]] <: LList
 }
 sealed trait LNil extends LList {
-  import LList.:+:
+  import LList.:*:
   // type Wrap[F[_]] = LNil
-  def :+:[A1: JsonFormat](labelled: (String, A1)): A1 :+: LNil = LCons(labelled._1, labelled._2, this)
+  def :*:[A1: JsonFormat](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
 
   override def toString: String = "LNil"
 }
@@ -57,10 +57,10 @@ object LNil extends LNil {
 }
 
 final case class LCons[A1: JsonFormat, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
-  import LList.:+:
-  // type Wrap[F[_]] = F[A1] :+: A2#Wrap[F]
-  def :+:[B1: JsonFormat](labelled: (String, B1)): B1 :+: A1 :+: A2 = LCons(labelled._1, labelled._2, this)
-  override def toString: String = s"($name, $head) :+: $tail"
+  import LList.:*:
+  // type Wrap[F[_]] = F[A1] :*: A2#Wrap[F]
+  def :*:[B1: JsonFormat](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
+  override def toString: String = s"($name, $head) :*: $tail"
 }
 object LCons {
   implicit def lconsFormat[A1: JsonFormat, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
@@ -95,8 +95,8 @@ object LCons {
 }
 
 object LList {
-  type :+:[A1, A2 <: LList] = LCons[A1, A2]
-  val :+: = LCons
+  type :*:[A1, A2 <: LList] = LCons[A1, A2]
+  val :*: = LCons
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
     IsoLList.iso[A, R0](to0, from0)
 }

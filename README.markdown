@@ -111,18 +111,18 @@ and it can also store a label per cell.
 Because of this reason, each LList has its own type. Here's how it looks in the REPL:
 
 ```scala
-scala> import sjsonnew._, LList.:+:
+scala> import sjsonnew._, LList.:*:
 import sjsonnew._
 import LList.$colon$plus$colon
 
 scala> import BasicJsonProtocol._
 import BasicJsonProtocol._
 
-scala> val x = ("name", "A") :+: ("value", 1) :+: LNil
-x: sjsonnew.LList.:+:[String,sjsonnew.LList.:+:[Int,sjsonnew.LNil]] = (name, A) :+: (value, 1) :+: LNil
+scala> val x = ("name", "A") :*: ("value", 1) :*: LNil
+x: sjsonnew.LList.:*:[String,sjsonnew.LList.:*:[Int,sjsonnew.LNil]] = (name, A) :*: (value, 1) :*: LNil
 
-scala> val y: String :+: Int :+: LNil = x
-y: sjsonnew.LList.:+:[String,sjsonnew.LList.:+:[Int,sjsonnew.LNil]] = (name, A) :+: (value, 1) :+: LNil
+scala> val y: String :*: Int :*: LNil = x
+y: sjsonnew.LList.:*:[String,sjsonnew.LList.:*:[Int,sjsonnew.LNil]] = (name, A) :*: (value, 1) :*: LNil
 ```
 
 `BasicJsonProtocol` is able to convert all LList values into a JSON object.
@@ -135,7 +135,7 @@ need to provide `JsonFormat[A]`s for your custom types
 All you have to do is provide an isomorphism between your types and an LList using `LList.iso` function.
 
 ```scala
-scala> import sjsonnew._, LList.:+:
+scala> import sjsonnew._, LList.:*:
 import sjsonnew._
 import LList.$colon$plus$colon
 
@@ -146,9 +146,9 @@ scala> case class Person(name: String, value: Int)
 defined class Person
 
 scala> implicit val personIso = LList.iso(
-         { p: Person => ("name", p.name) :+: ("value", p.value) :+: LNil },
-         { in: String :+: Int :+: LNil => Person(in.head, in.tail.head) })
-personIso: sjsonnew.IsoLList.Aux[Person,sjsonnew.LList.:+:[String,sjsonnew.LList.:+:[Int,sjsonnew.LNil]]] = sjsonnew.IsoLList$$anon$1@4140e9d0
+         { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
+         { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
+personIso: sjsonnew.IsoLList.Aux[Person,sjsonnew.LList.:*:[String,sjsonnew.LList.:*:[Int,sjsonnew.LNil]]] = sjsonnew.IsoLList$$anon$1@4140e9d0
 
 scala> import sjsonnew.support.spray.Converter
 import sjsonnew.support.spray.Converter
@@ -163,7 +163,7 @@ Suppose now that we have an algebraic datatype (ADT) represented by a sealed tra
 There's a function to compose the `JsonFormat` called `unionFormat2`, `unionFormat3`, ...
 
 ```scala
-scala> import sjsonnew._, LList.:+:
+scala> import sjsonnew._, LList.:*:
 import sjsonnew._
 import LList.$colon$plus$colon
 
@@ -178,11 +178,11 @@ case class Person(name: String, value: Int) extends Contact
 case class Organization(name: String, value: Int) extends Contact
 
 implicit val personIso = LList.iso(
-  { p: Person => ("name", p.name) :+: ("value", p.value) :+: LNil },
-  { in: String :+: Int :+: LNil => Person(in.head, in.tail.head) })
+  { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
+  { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
 implicit val organizationIso = LList.iso(
-  { o: Organization => ("name", o.name) :+: ("value", o.value) :+: LNil },
-  { in: String :+: Int :+: LNil => Organization(in.head, in.tail.head) })
+  { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil },
+  { in: String :*: Int :*: LNil => Organization(in.head, in.tail.head) })
 implicit val ContactFormat = unionFormat2[Contact, Person, Organization]
 
 // Exiting paste mode, now interpreting.

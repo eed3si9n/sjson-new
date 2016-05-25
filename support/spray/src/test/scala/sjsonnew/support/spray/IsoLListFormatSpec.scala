@@ -27,11 +27,11 @@ class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
   case class Organization(name: String, value: Int) extends Contact
 
   implicit val personIso = LList.iso(
-    { p: Person => ("name", p.name) :+: ("value", p.value) :+: LNil },
-    { in: String :+: Int :+: LNil => Person(in.head, in.tail.head) })
+    { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
+    { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
   implicit val organizationIso = LList.iso(
-    { o: Organization => ("name", o.name) :+: ("value", o.value) :+: LNil },
-    { in: String :+: Int :+: LNil => Organization(in.head, in.tail.head) })
+    { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil },
+    { in: String :*: Int :*: LNil => Organization(in.head, in.tail.head) })
   implicit val ContactFormat = unionFormat2[Contact, Person, Organization]
   val p1 = Person("Alice", 1)
   val personJs = JsObject("name" -> JsString("Alice"), "value" -> JsNumber(1))
