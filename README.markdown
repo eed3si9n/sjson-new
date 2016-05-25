@@ -197,6 +197,53 @@ res0: scala.util.Try[spray.json.JsValue] = Success({"value":{"name":"Company","v
 The `unionFormatN[U, A1, A2, ...]` functions assume that type `U` is the sealed parent trait of the passed in types.
 In the JSON object this is encoded by putting the simple type name (just the class name portion) into `type` field.
 
+### Low-level API: Builder and Unbuilder
+
+If you want to drop down to a more lower level JSON writing, for example, to encode something as JString, sjon-new offers Builder and Unbuilder. This is a procedural style API, and it's closer to the AST. For instance, `IntJsonFormat` is defined as follows:
+
+```scala
+implicit object IntJsonFormat extends JsonFormat[Int] {
+  def write[J](x: Int, builder: Builder[J]): Unit =
+    builder.writeInt(x)
+  def read[J](js: J, unbuilder: Unbuilder[J]): Int =
+    unbuilder.readInt(js)
+}
+```
+
+`Builder` provides other `writeX` methods to write primitive values. `Unbuilder` on the other hand provides `readX` methods.
+
+`BasicJsonProtocol` already provides encoding for standard collections like `List[A]`, but you might want to encode your own type using JSON array. To write a JSON array, use `beginArray()`, `writeX` methods, and `endArray()`. The builder internally tracks the states, so it won't let you end an array if you haven't started one.
+
+To write a JSON object, you can use the LList isomorphism as described above, or use `beginObject()`, pairs of `addField("...")` and `writeX` methods, and `endObject()`. Here's an example codec of the same case class `Person` using Builder/Unbuilder:
+
+```scala
+implicit object PersonFormat extends JsonFormat[Person] {
+  def write[J](x: Person, builder: Builder[J]): Unit = {
+    builder.beginObject()
+    builder.addField("name")
+    builder.writeString(x.name)
+    builder.addField("value")
+    builder.writeInt(x.value)
+    builder.endObject()
+  }
+  def read[J](js: J, unbuilder: Unbuilder[J]): Person = {
+    unbuilder.beginObject(js)
+    val name = unbuilder.lookupField("name") match {
+      case Some(x) => unbuilder.readString(x)
+      case _       => deserializationError(s"Missing field: name")
+    }
+    val value = unbuilder.lookupField("value") match {
+      case Some(x) => unbuilder.readInt(x)
+      case _       => 0
+    }
+    unbuilder.endObject()
+    Person(name, value)
+  }
+}
+```
+
+The other one was three lines of iso, but this is 25 lines of code. Since it doesn't create LList, it might run faster.
+
 ### Credits
 
 - In 2010 **Debasish Ghosh** ([@debasishg]) wrote series of blog articles on typeclasses ([Scala Implicits : Type Classes Here I Come
