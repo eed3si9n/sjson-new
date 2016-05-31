@@ -85,6 +85,7 @@ trait CollectionFormats {
         val (k, v) = unbuilder.nextFieldWithJString
         keyFormat.read(k, unbuilder) -> valueFormat.read(v, unbuilder)
       }
+      unbuilder.endObject
       Map(xs: _*)
     }
   }
