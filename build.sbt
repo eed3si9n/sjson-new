@@ -85,3 +85,8 @@ lazy val supportJson4s = support("json4s").
   settings(
     libraryDependencies += json4sAst
   )
+
+lazy val supportMsgpack = support("msgpack").
+  settings(
+    libraryDependencies += msgpackCore
+  )
