@@ -19,12 +19,14 @@
 package sjsonnew
 
 import scala.{Left, Right}
+import java.util.UUID
+import java.net.{ URI, URL }
 
 /**
   * Provides the JsonFormats for the non-collection standard types.
  */
 trait StandardFormats {
-  this: AdditionalFormats =>
+  this: AdditionalFormats with IsoFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
@@ -58,4 +60,11 @@ trait StandardFormats {
         case (Left(ea), Left(eb)) => deserializationError("Could not read Either value:\n" + ea + "---------- and ----------\n" + eb)
       }
   }
+
+  implicit val uuidStringIso = IsoString.iso[UUID](
+    _.toString, UUID.fromString)
+  implicit val uriStringIso = IsoString.iso[URI](
+    _.toASCIIString, new URI(_))
+  implicit val urlStringIso = IsoString.iso[URL](
+    _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
 }
