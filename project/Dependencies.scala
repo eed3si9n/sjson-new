@@ -8,6 +8,10 @@ object Dependencies {
     "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
     "org.scalatest" %% "scalatest" % "2.2.6" % "test"
   )
+  lazy val scalaTestDependencies = Seq(
+    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
+  )
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.1"
   lazy val scalaJson = "org.mdedetrich" %% "scala-json-ast" % "1.0.0-M1"
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.7"
