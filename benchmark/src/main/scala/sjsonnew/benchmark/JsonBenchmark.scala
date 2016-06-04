@@ -1,0 +1,105 @@
+package sjsonnew
+package benchmark
+
+import org.openjdk.jmh.annotations._
+import java.util.concurrent.TimeUnit
+import sbt.librarymanagement.ModuleID
+import sbt.internal.librarymanagement.impl.DependencyBuilders
+import java.io.File
+import sbt.io.{ IO, Using }
+import sbt.io.syntax._
+
+@State(Scope.Benchmark)
+abstract class JsonBenchmark[J](converter: SupportConverter[J]) extends DependencyBuilders {
+  @Benchmark
+  @BenchmarkMode(Array(Mode.AverageTime))
+  @OutputTimeUnit(TimeUnit.MILLISECONDS)
+  def moduleId1SaveToFile: Unit = {
+    import LibraryManagementProtocol._
+    val js = converter.toJson(listOfModuleIds(20000))
+    saveToFile(js.get, testFile)
+  }
+
+  @Benchmark
+  @BenchmarkMode(Array(Mode.AverageTime))
+  @OutputTimeUnit(TimeUnit.MILLISECONDS)
+  def moduleId2LoadFromFile: Unit = {
+    import LibraryManagementProtocol._
+    val js = loadFromFile(testFile)
+    converter.fromJson[List[ModuleID]](js)
+  }
+
+  def saveToFile(js: J, f: File): Unit
+  def loadFromFile(f: File): J
+  def testFile: File
+  def listOfModuleIds(n: Int): List[ModuleID] =
+    (1 to n).toList map { x =>
+      "com.example" % s"foo$x" % "1.0.0"
+    }
+}
+
+class SprayBenchmark extends JsonBenchmark[spray.json.JsValue](
+  sjsonnew.support.spray.Converter) {
+  import spray.json._
+  lazy val testFile: File = file("target") / "test.json"
+  def saveToFile(js: JsValue, f: File): Unit =
+    IO.write(f, CompactPrinter(js), IO.utf8)
+  def loadFromFile(f: File): JsValue =
+    jawn.support.spray.Parser.parseFromFile(f).get
+}
+
+class GzipSprayBenchmark extends JsonBenchmark[spray.json.JsValue](
+  sjsonnew.support.spray.Converter) {
+  import java.io.{ OutputStreamWriter, StringWriter }
+  import spray.json._
+  lazy val testFile: File = file("target") / "test.json.gz"
+  def saveToFile(js: JsValue, f: File): Unit =
+    Using.fileOutputStream(false)(f) { out =>
+      Using.gzipOutputStream(out) { gz =>
+        val w = new OutputStreamWriter(gz, "UTF-8")
+        try {
+          val s = CompactPrinter(js)
+          w.write(s)
+        } finally {
+          w.close()
+        }
+      }
+    }
+  def loadFromFile(f: File): JsValue =
+    Using.fileInputStream(f) { in =>
+      Using.gzipInputStream(in) { gz =>
+        Using.streamReader(gz, IO.utf8) { r =>
+          val writer = new StringWriter
+          val buffer = new Array[Char](10240)
+          var length = r.read(buffer)
+          while (length > 0) {
+            writer.write(buffer, 0, length)
+            length = r.read(buffer)
+          }
+          jawn.support.spray.Parser.parseFromString(writer.toString).get
+        }
+      }
+    }
+}
+
+class MessagePackBenchmark extends JsonBenchmark[org.msgpack.value.Value](
+  sjsonnew.support.msgpack.Converter) {
+  import org.msgpack.core.MessagePack
+  import org.msgpack.value.Value
+  lazy val testFile: File = file("target") / "test.bin"
+  def saveToFile(js: Value, f: File): Unit =
+    Using.fileOutputStream(false)(f) { out0 =>
+      Using.bufferedOutputStream(out0) { out =>
+        val packer = MessagePack.newDefaultPacker(out)
+        packer.packValue(js)
+        packer.flush
+      }
+    }
+  def loadFromFile(f: File): Value =
+    Using.fileInputStream(f) { in0 =>
+      Using.bufferedInputStream(in0) { in =>
+        val unpacker = MessagePack.newDefaultUnpacker(in)
+        unpacker.unpackValue
+      }
+    }
+}

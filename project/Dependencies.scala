@@ -11,6 +11,8 @@ object Dependencies {
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.1"
   lazy val json4sAst = "org.json4s" %% "json4s-ast" % "3.3.0.RC1"
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.7"
+  lazy val jawnSpray = "org.spire-math" %% "jawn-spray" % "0.8.4"
+  lazy val lm = "org.scala-sbt" %% "librarymanagement" % "0.1.0-M11"
   lazy val shaplessVersion = "2.3.0"
   lazy val shapelessDependencies = Def.setting {
     if (scalaVersion.value startsWith "2.10.") Seq(

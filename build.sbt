@@ -69,3 +69,13 @@ lazy val supportMsgpack = support("msgpack").
   settings(
     libraryDependencies += msgpackCore
   )
+
+lazy val benchmark = (project in file("benchmark")).
+  dependsOn(supportSpray, supportJson4s, supportMsgpack).
+  enablePlugins(JmhPlugin).
+  settings(
+    libraryDependencies ++= Seq(jawnSpray, lm),
+    javaOptions in (Jmh, run) += "-Xmx1G",
+    publish := (),
+    publishLocal := ()
+  )
