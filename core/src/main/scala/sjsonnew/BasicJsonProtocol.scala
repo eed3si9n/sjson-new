@@ -28,6 +28,6 @@ trait BasicJsonProtocol
         with CollectionFormats
         with AdditionalFormats
         with UnionFormats
-        with IsoLListFormats
+        with IsoFormats
 
 object BasicJsonProtocol extends BasicJsonProtocol

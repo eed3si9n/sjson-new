@@ -16,12 +16,14 @@
 
 package sjsonnew
 
-trait IsoLListFormats {
-  implicit def isolistFormat[A: IsoLList]: JsonFormat[A] =new JsonFormat[A] {
-    val iso = implicitly[IsoLList[A]]
-    def write[J](x: A, builder: Builder[J]): Unit =
-      iso.jsonFormat.write(iso.to(x), builder)
-    def read[J](js: J, unbuilder: Unbuilder[J]): A =
-      iso.from(iso.jsonFormat.read(js, unbuilder))
+trait IsoString[A] {
+  def to(a: A): String
+  def from(s: String): A
+}
+
+object IsoString {
+  def iso[A](to0: A => String, from0: String => A): IsoString[A] = new IsoString[A] {
+    def to(a: A): String = to0(a)
+    def from(s: String): A = from0(s)
   }
 }
