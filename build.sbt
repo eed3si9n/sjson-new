@@ -3,7 +3,8 @@ import Dependencies._
 lazy val root = (project in file(".")).
   aggregate(core, // shapeless, shapelessTest,
     supportSpray,
-    supportScalaJson).
+    supportScalaJson,
+    supportMsgpack).
   settings(
     name := "sjson new",
     publish := {},
