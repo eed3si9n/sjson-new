@@ -2,6 +2,7 @@ import Dependencies._
 
 lazy val root = (project in file(".")).
   aggregate(core, // shapeless, shapelessTest,
+    binary,
     supportSpray,
     supportScalaJson,
     supportMsgpack).
@@ -71,8 +72,19 @@ lazy val supportMsgpack = support("msgpack").
     libraryDependencies += msgpackCore
   )
 
+lazy val binary = (project in file("binary")).
+  dependsOn(core).
+  settings(
+    commonSettings,
+    name := "sjson new binary",
+    libraryDependencies ++= scalaTestDependencies,
+    libraryDependencies += sprayJson % Test,
+    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+    initialCommands in console := "import sjsonnew.binary._, BUtil._"
+  )
+
 lazy val benchmark = (project in file("benchmark")).
-  dependsOn(supportSpray, supportScalaJson, supportMsgpack).
+  dependsOn(supportSpray, supportScalaJson, supportMsgpack, binary).
   enablePlugins(JmhPlugin).
   settings(
     libraryDependencies ++= Seq(jawnSpray, lm),

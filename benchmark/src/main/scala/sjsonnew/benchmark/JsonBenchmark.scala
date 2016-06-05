@@ -157,3 +157,32 @@ class MessagePackBenchmark extends JsonBenchmark[org.msgpack.value.Value](
       }
     }
 }
+
+class BinaryBenchmark extends JsonBenchmark[binary.BValue](
+  sjsonnew.binary.Converter) {
+  import binary.{ BValue, BTopMessage }
+  import java.io.ByteArrayOutputStream
+  lazy val testFile: File = file("target") / "test-binary.bin"
+  def saveToFile(js: BValue, f: File): Unit =
+    Using.fileOutputStream(false)(f) { out0 =>
+      Using.bufferedOutputStream(out0) { out =>
+        val xs = js.toTopMessage.toBytes
+        out.write(xs)
+      }
+    }
+  def loadFromFile(f: File): BValue =
+    Using.fileInputStream(f) { in0 =>
+      Using.bufferedInputStream(in0) { in =>
+        val out = new ByteArrayOutputStream
+        val buffer = new Array[Byte](10240)
+        var length = in.read(buffer)
+        while (length > 0) {
+          out.write(buffer, 0, length)
+          length = in.read(buffer)
+        }
+        out.flush
+        val message = BTopMessage.fromBytes(out.toByteArray)
+        message.toBValue
+      }
+    }
+}
