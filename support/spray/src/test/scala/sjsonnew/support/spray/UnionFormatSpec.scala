@@ -29,19 +29,27 @@ class UnionFormatsSpec extends Specification with BasicJsonProtocol {
   implicit object AppleJsonFormat extends JsonFormat[Apple] {
     def write[J](x: Apple, builder: Builder[J]): Unit =
       builder.writeInt(0)
-    def read[J](js: J, unbuilder: Unbuilder[J]): Apple =
-      unbuilder.readInt(js) match {
-        case 0 => Apple()
-        case x => deserializationError(s"Unexpected value: $x")
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Apple =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.readInt(js) match {
+            case 0 => Apple()
+            case x => deserializationError(s"Unexpected value: $x")
+          }
+        case None => deserializationError("Expected JsNumber but found None")
       }
   }
   implicit object OrangeJsonFormat extends JsonFormat[Orange] {
     def write[J](x: Orange, builder: Builder[J]): Unit =
       builder.writeInt(1)
-    def read[J](js: J, unbuilder: Unbuilder[J]): Orange =
-      unbuilder.readInt(js) match {
-        case 1 => Orange()
-        case x => deserializationError(s"Unexpected value: $x")
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Orange =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.readInt(js) match {
+            case 1 => Orange()
+            case x => deserializationError(s"Unexpected value: $x")
+          }
+        case None => deserializationError("Expected JsNumber but found None")
       }
   }
   implicit val FruitFormat = unionFormat2[Fruit, Apple, Orange]

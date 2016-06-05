@@ -23,64 +23,49 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
   implicit object ModuleIDFormat extends JsonFormat[ModuleID] {
     def write[J](x: ModuleID, builder: Builder[J]): Unit = {
       builder.beginObject()
-      builder.addField("organization")
-      builder.writeString(x.organization)
-      builder.addField("name")
-      builder.writeString(x.name)
-      builder.addField("revision")
-      builder.writeString(x.revision)
-      x.configurations map { cs =>
-        builder.addField("configurations")
-        builder.writeString(cs)
-      }
+      builder.addField("organization", x.organization)
+      builder.addField("name", x.name)
+      builder.addField("revision", x.revision)
+      builder.addField("configurations", x.configurations)
       if (x.isChanging) {
-        builder.addField("isChanging")
+        builder.addFieldName("isChanging")
         builder.writeBoolean(x.isChanging)
       }
       if (!x.isTransitive) {
-        builder.addField("isTransitive")
+        builder.addFieldName("isTransitive")
         builder.writeBoolean(x.isTransitive)
       }
       if (x.isForce) {
-        builder.addField("isForce")
+        builder.addFieldName("isForce")
         builder.writeBoolean(x.isForce)
       }
       builder.endObject()
     }
-    def read[J](js: J, unbuilder: Unbuilder[J]): ModuleID = {
-      unbuilder.beginObject(js)
-      val organization = unbuilder.lookupField("organization") match {
-        case Some(x) => unbuilder.readString(x)
-        case _       => deserializationError(s"Missing field: organization")
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ModuleID =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val organization = unbuilder.readField[String]("organization")
+          val name = unbuilder.readField[String]("name")
+          val revision = unbuilder.readField[String]("revision")
+          val configurations = unbuilder.readField[Option[String]]("configurations")
+          val isChanging = unbuilder.lookupField("isChanging") match {
+            case Some(x) => unbuilder.readBoolean(x)
+            case _       => false
+          }
+          val isTransitive = unbuilder.lookupField("isTransitive") match {
+            case Some(x) => unbuilder.readBoolean(x)
+            case _       => true
+          }
+          val isForce = unbuilder.lookupField("isForce") match {
+            case Some(x) => unbuilder.readBoolean(x)
+            case _       => false
+          }
+          unbuilder.endObject()
+          ModuleID(organization, name, revision, configurations,
+            isChanging, isTransitive, isForce)
+        case None => deserializationError(s"Expected JsObject but got None")
       }
-      val name = unbuilder.lookupField("name") match {
-        case Some(x) => unbuilder.readString(x)
-        case _       => deserializationError(s"Missing field: name")
-      }
-      val revision = unbuilder.lookupField("revision") match {
-        case Some(x) => unbuilder.readString(x)
-        case _       => deserializationError(s"Missing field: revision")
-      }
-      val configurations = unbuilder.lookupField("configurations") match {
-        case Some(x) => Some(unbuilder.readString(x))
-        case _       => None
-      }
-      val isChanging = unbuilder.lookupField("isChanging") match {
-        case Some(x) => unbuilder.readBoolean(x)
-        case _       => false
-      }
-      val isTransitive = unbuilder.lookupField("isTransitive") match {
-        case Some(x) => unbuilder.readBoolean(x)
-        case _       => true
-      }
-      val isForce = unbuilder.lookupField("isForce") match {
-        case Some(x) => unbuilder.readBoolean(x)
-        case _       => false
-      }
-      unbuilder.endObject()
-      ModuleID(organization, name, revision, configurations,
-        isChanging, isTransitive, isForce)
-    }
   }
 }
 

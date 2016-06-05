@@ -31,14 +31,19 @@ trait TupleFormats {
       ]
       builder.endArray()
     }
-    def read[J](js: J, unbuilder: Unbuilder[J]): Tuple1[[#A1#]] = {
-      unbuilder.beginArray(js)
-      [#val a1 = unbuilder.nextElement#
-      ]
-      val xs = Tuple1([#a1Format.read(a1, unbuilder)#])
-      unbuilder.endArray()
-      xs
-    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Tuple1[[#A1#]] =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginArray(js)
+          [#val a1 = unbuilder.nextElement#
+          ]
+          val xs = Tuple1([#a1Format.read(Some(a1), unbuilder)#])
+          unbuilder.endArray()
+          xs
+        case None =>
+          val xs = Tuple1([#a1Format.read(None, unbuilder)#])
+          xs
+      }
   }#
   ]
 }

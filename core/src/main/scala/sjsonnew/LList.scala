@@ -19,13 +19,15 @@ package sjsonnew
 /** Heterogeneous list with labels. */
 sealed trait LList {
   // type Wrap[F[_]] <: LList
+  def find[A1: ClassManifest](n: String): Option[A1]
 }
 sealed trait LNil extends LList {
   import LList.:*:
   // type Wrap[F[_]] = LNil
-  def :*:[A1: JsonFormat](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
+  def :*:[A1: JsonFormat: ClassManifest](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
 
   override def toString: String = "LNil"
+  override def find[A1: ClassManifest](n: String): Option[A1] = None
 }
 object LNil extends LNil {
   implicit val singletonFormat: JsonFormat[LNil.type] = new JsonFormat[LNil.type] {
@@ -36,7 +38,7 @@ object LNil extends LNil {
         }
         builder.endObject()
       }
-    def read[J](js: J, unbuilder: Unbuilder[J]): LNil.type = LNil
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LNil.type = LNil
   }
   implicit val lnilFormat: JsonFormat[LNil] =new JsonFormat[LNil] {
     def write[J](x: LNil, builder: Builder[J]): Unit =
@@ -46,7 +48,7 @@ object LNil extends LNil {
         }
         builder.endObject()
       }
-    def read[J](js: J, unbuilder: Unbuilder[J]): LNil.type =
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LNil.type =
       {
         if (unbuilder.isInObject) {
           unbuilder.endObject()
@@ -56,14 +58,17 @@ object LNil extends LNil {
   }
 }
 
-final case class LCons[A1: JsonFormat, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
+final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
   import LList.:*:
   // type Wrap[F[_]] = F[A1] :*: A2#Wrap[F]
-  def :*:[B1: JsonFormat](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
+  def :*:[B1: JsonFormat: ClassManifest](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
   override def toString: String = s"($name, $head) :*: $tail"
+  override def find[B1: ClassManifest](n: String): Option[B1] =
+    if (name == n && implicitly[ClassManifest[A1]] == implicitly[ClassManifest[B1]]) Option(head match { case x: B1 @unchecked => x })
+    else tail.find[B1](n)
 }
 object LCons {
-  implicit def lconsFormat[A1: JsonFormat, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
+  implicit def lconsFormat[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
     val a1Format = implicitly[JsonFormat[A1]]
     val a2Format = implicitly[JsonFormat[A2]]
     def write[J](x: LCons[A1, A2], builder: Builder[J]): Unit =
@@ -71,25 +76,29 @@ object LCons {
         if (!builder.isInObject) {
           builder.beginObject()
         }
-        builder.addField(x.name)
-        a1Format.write(x.head, builder)
+        builder.addField(x.name, x.head)(a1Format)
         a2Format.write(x.tail, builder)
       }
-    def read[J](js: J, unbuilder: Unbuilder[J]): LCons[A1, A2] =
-      {
-        if (!unbuilder.isInObject) {
-          unbuilder.beginObject(js)
-        }
-        if (unbuilder.hasNextField) {
-          val (name, x) = unbuilder.nextField
-          if (unbuilder.isObject(x)) {
-            unbuilder.beginObject(x)
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LCons[A1, A2] =
+      jsOpt match {
+        case Some(js) =>
+          if (!unbuilder.isInObject) {
+            unbuilder.beginObject(js)
           }
-          val elem = a1Format.read(x, unbuilder)
-          val tail = a2Format.read(js, unbuilder)
-          LCons(name, elem, tail)
-        }
-        else deserializationError(s"Unexpected end of object: $js")
+          if (unbuilder.hasNextField) {
+            val (name, x) = unbuilder.nextField
+            if (unbuilder.isObject(x)) {
+              unbuilder.beginObject(x)
+            }
+            val elem = a1Format.read(Some(x), unbuilder)
+            val tail = a2Format.read(Some(js), unbuilder)
+            LCons(name, elem, tail)
+          }
+          else deserializationError(s"Unexpected end of object: $js")
+        case None =>
+          val elem = a1Format.read(None, unbuilder)
+          val tail = a2Format.read(None, unbuilder)
+          LCons("*", elem, tail)
       }
   }
 }

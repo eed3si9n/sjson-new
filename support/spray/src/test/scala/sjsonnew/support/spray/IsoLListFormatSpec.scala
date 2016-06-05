@@ -23,21 +23,25 @@ import org.specs2.mutable.Specification
 
 class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
   sealed trait Contact
-  case class Person(name: String, value: Int) extends Contact
-  case class Organization(name: String, value: Int) extends Contact
+  case class Person(name: String, value: Option[Int]) extends Contact
+  case class Organization(name: String, value: Option[Int]) extends Contact
 
   implicit val personIso = LList.iso(
     { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
-    { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
+    { in: String :*: Option[Int] :*: LNil => Person(
+      in.find[String]("name").get,
+      in.find[Option[Int]]("value").flatten) })
   implicit val organizationIso = LList.iso(
     { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil },
-    { in: String :*: Int :*: LNil => Organization(in.head, in.tail.head) })
+    { in: String :*: Option[Int] :*: LNil => Organization(
+      in.find[String]("name").get,
+      in.find[Option[Int]]("value").flatten) })
   implicit val ContactFormat = unionFormat2[Contact, Person, Organization]
-  val p1 = Person("Alice", 1)
+  val p1 = Person("Alice", Some(1))
   val personJs = JsObject("name" -> JsString("Alice"), "value" -> JsNumber(1))
-  val c1: Contact = Organization("Company", 2)
+  val c1: Contact = Organization("Company", None)
   val contactJs =
-    JsObject("value" -> JsObject("name" -> JsString("Company"), "value" -> JsNumber(2)),
+    JsObject("value" -> JsObject("name" -> JsString("Company")),
       "type" -> JsString("Organization"))
   "The isomorphism from a custom type to LList" should {
     "convert from value to JObject" in {

@@ -23,6 +23,35 @@ import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
 class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
+  case class Person(name: String, value: List[Int], ary: Array[Int],
+    m: Map[String, Int], vs: Vector[Int])
+  implicit object PersonFormat extends JsonFormat[Person] {
+    def write[J](x: Person, builder: Builder[J]): Unit = {
+      builder.beginObject()
+      builder.addField("name", x.name)
+      builder.addField("value", x.value)
+      builder.addField("ary", x.ary)
+      builder.addField("m", x.m)
+      builder.addField("vs", x.vs)
+      builder.endObject()
+    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val name = unbuilder.readField[String]("name")
+          val value = unbuilder.readField[List[Int]]("value")
+          val ary = unbuilder.readField[Array[Int]]("ary")
+          val m = unbuilder.readField[Map[String, Int]]("m")
+          val vs = unbuilder.readField[Vector[Int]]("vs")
+          unbuilder.endObject()
+          Person(name, value, ary, m, vs)
+        case None =>
+          deserializationError("Expected JsObject but found None")
+      }
+  }
+  val person = Person("x", Nil, Array(), Map(), Vector())
+  val personJson = JsObject("name" -> JsString("x"))
 
   "The listFormat" should {
     val list = List(1, 2, 3)
@@ -32,6 +61,9 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     }
     "convert a JsArray of JsNumbers to a List[Int]" in {
       Converter.fromJsonUnsafe[List[Int]](json) mustEqual list
+    }
+    "omit Nil fields" in {
+      Converter.toJsonUnsafe(person) mustEqual personJson
     }
   }
 

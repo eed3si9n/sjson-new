@@ -37,16 +37,19 @@ class Builder[J](facade: Facade[J]) {
       case InObject =>
         // This is effectively same as addField, but allows to use keyFormat.write.
         if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
-        else contexts.top.add(x)
+        else contexts.top.addField(x)
         state = InField
       case _ => writeJ(facade.jstring(x))
     }
+
+  def addField[A](field: String, a: A)(implicit format: JsonFormat[A]): Unit =
+    format.addField(field, a, this)
   /** Write field name to the current context. */
-  def addField(x: String): Unit =
+  def addFieldName(field: String): Unit =
     state match {
       case InObject =>
         if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
-        else contexts.top.add(x)
+        else contexts.top.addField(field)
         state = InField
       case x => stateError(x)
     }
@@ -84,6 +87,7 @@ class Builder[J](facade: Facade[J]) {
     }
   /** Checks if the current state is `InObject` */
   def isInObject: Boolean = state == InObject
+
   /** Begins JObject. The builder state will be in `BuilderState.InObject`.
     * Make pairs `addField("abc")` and `writeXXX` calls to make field entries,
     * and end with `endObject`.

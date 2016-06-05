@@ -24,20 +24,29 @@ trait CollectionFormats {
    */
   implicit def listFormat[A: JsonFormat] = new RootJsonFormat[List[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](list: List[A], builder: Builder[J]): Unit = {
-      builder.beginArray()
-      list foreach { x => elemFormat.write(x, builder) }
-      builder.endArray()
-    }
-    def read[J](value: J, unbuilder: Unbuilder[J]): List[A] =
+    def write[J](list: List[A], builder: Builder[J]): Unit =
       {
-        val size = unbuilder.beginArray(value)
-        val xs = (1 to size).toList map { x =>
-          val elem = unbuilder.nextElement
-          elemFormat.read(elem, unbuilder)
-        }
-        unbuilder.endArray
-        xs
+        builder.beginArray()
+        list foreach { x => elemFormat.write(x, builder) }
+        builder.endArray()
+      }
+    override def addField[J](name: String, xs: List[A], builder: Builder[J]): Unit =
+      if (xs.isEmpty) ()
+      else {
+        builder.addFieldName(name)
+        write(xs, builder)
+      }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): List[A] =
+      jsOpt match {
+        case Some(js) =>
+          val size = unbuilder.beginArray(js)
+          val xs = (1 to size).toList map { x =>
+            val elem = unbuilder.nextElement
+            elemFormat.read(Some(elem), unbuilder)
+          }
+          unbuilder.endArray
+          xs
+        case None => Nil
       }
   }
 
@@ -46,20 +55,29 @@ trait CollectionFormats {
    */
   implicit def arrayFormat[A: JsonFormat: ClassManifest] = new RootJsonFormat[Array[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](array: Array[A], builder: Builder[J]): Unit = {
-      builder.beginArray()
-      array foreach { x => elemFormat.write(x, builder) }
-      builder.endArray()
-    }
-    def read[J](value: J, unbuilder: Unbuilder[J]): Array[A] =
+    def write[J](array: Array[A], builder: Builder[J]): Unit =
       {
-        val size = unbuilder.beginArray(value)
-        val xs = (1 to size).toList map { x =>
-          val elem = unbuilder.nextElement
-          elemFormat.read(elem, unbuilder)
-        }
-        unbuilder.endArray
-        xs.toArray
+        builder.beginArray()
+        array foreach { x => elemFormat.write(x, builder) }
+        builder.endArray()
+      }
+    override def addField[J](name: String, xs: Array[A], builder: Builder[J]): Unit =
+      if (xs.isEmpty) ()
+      else {
+        builder.addFieldName(name)
+        write(xs, builder)
+      }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Array[A] =
+      jsOpt match {
+        case Some(js) =>
+          val size = unbuilder.beginArray(js)
+          val xs = (1 to size).toList map { x =>
+            val elem = unbuilder.nextElement
+            elemFormat.read(Some(elem), unbuilder)
+          }
+          unbuilder.endArray
+          xs.toArray
+        case None => Array()
       }
   }
 
@@ -70,24 +88,34 @@ trait CollectionFormats {
   implicit def mapFormat[K: JsonFormat, V: JsonFormat] = new RootJsonFormat[Map[K, V]] {
     lazy val keyFormat = implicitly[JsonFormat[K]]
     lazy val valueFormat = implicitly[JsonFormat[V]]
-    def write[J](m: Map[K, V], builder: Builder[J]): Unit = {
-      builder.beginObject()
-      m foreach {
-        case (k, v) =>
-          keyFormat.write(k, builder)
-          valueFormat.write(v, builder)
+    def write[J](m: Map[K, V], builder: Builder[J]): Unit =
+      {
+        builder.beginObject()
+        m foreach {
+          case (k, v) =>
+            keyFormat.write(k, builder)
+            valueFormat.write(v, builder)
+        }
+        builder.endObject()
       }
-      builder.endObject()
-    }
-    def read[J](value: J, unbuilder: Unbuilder[J]): Map[K, V] = {
-      val size = unbuilder.beginObject(value)
-      val xs = (1 to size).toList map { x =>
-        val (k, v) = unbuilder.nextFieldWithJString
-        keyFormat.read(k, unbuilder) -> valueFormat.read(v, unbuilder)
+    override def addField[J](name: String, m: Map[K, V], builder: Builder[J]): Unit =
+      if (m.isEmpty) ()
+      else {
+        builder.addFieldName(name)
+        write(m, builder)
       }
-      unbuilder.endObject
-      Map(xs: _*)
-    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Map[K, V] =
+      jsOpt match {
+        case Some(js) =>
+          val size = unbuilder.beginObject(js)
+          val xs = (1 to size).toList map { x =>
+            val (k, v) = unbuilder.nextFieldWithJString
+            keyFormat.read(Some(k), unbuilder) -> valueFormat.read(Some(v), unbuilder)
+          }
+          unbuilder.endObject
+          Map(xs: _*)
+        case None => Map()
+      }
   }
 
   import collection.{immutable => imm}
@@ -113,19 +141,29 @@ trait CollectionFormats {
    */
   def viaSeq[I <: Iterable[A], A: JsonFormat](f: imm.Seq[A] => I): RootJsonFormat[I] = new RootJsonFormat[I] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](iterable: I, builder: Builder[J]): Unit = {
-      builder.beginArray()
-      iterable foreach { x => elemFormat.write(x, builder) }
-      builder.endArray()
-    }
-    def read[J](value: J, unbuilder: Unbuilder[J]): I = {
-      val size = unbuilder.beginArray(value)
-      val xs = (1 to size).toList map { x =>
-        val elem = unbuilder.nextElement
-        elemFormat.read(elem, unbuilder)
+    def write[J](iterable: I, builder: Builder[J]): Unit =
+      {
+        builder.beginArray()
+        iterable foreach { x => elemFormat.write(x, builder) }
+        builder.endArray()
       }
-      unbuilder.endArray
-      f(xs)
-    }
+    override def addField[J](name: String, xs: I, builder: Builder[J]): Unit =
+      if (xs.isEmpty) ()
+      else {
+        builder.addFieldName(name)
+        write(xs, builder)
+      }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): I =
+      jsOpt match {
+        case Some(js) =>
+          val size = unbuilder.beginArray(js)
+          val xs = (1 to size).toList map { x =>
+            val elem = unbuilder.nextElement
+            elemFormat.read(Some(elem), unbuilder)
+          }
+          unbuilder.endArray
+          f(xs)
+        case None => f(Nil)
+      }
   }
 }
