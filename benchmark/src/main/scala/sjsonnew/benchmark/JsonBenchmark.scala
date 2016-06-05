@@ -8,15 +8,16 @@ import sbt.internal.librarymanagement.impl.DependencyBuilders
 import java.io.File
 import sbt.io.{ IO, Using }
 import sbt.io.syntax._
+import scala.util.Random
 
 @State(Scope.Benchmark)
-abstract class JsonBenchmark[J](converter: SupportConverter[J]) extends DependencyBuilders {
+abstract class JsonBenchmark[J](converter: SupportConverter[J]) {
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
   def moduleId1SaveToFile: Unit = {
     import LibraryManagementProtocol._
-    val js = converter.toJson(listOfModuleIds(20000))
+    val js = converter.toJson(BenchmarkData.moduleIds)
     saveToFile(js.get, testFile)
   }
 
@@ -26,16 +27,23 @@ abstract class JsonBenchmark[J](converter: SupportConverter[J]) extends Dependen
   def moduleId2LoadFromFile: Unit = {
     import LibraryManagementProtocol._
     val js = loadFromFile(testFile)
-    converter.fromJson[List[ModuleID]](js)
+    converter.fromJson[Vector[ModuleID]](js)
   }
 
   def saveToFile(js: J, f: File): Unit
   def loadFromFile(f: File): J
   def testFile: File
-  def listOfModuleIds(n: Int): List[ModuleID] =
-    (1 to n).toList map { x =>
-      "com.example" % s"foo$x" % "1.0.0"
+}
+
+object BenchmarkData extends DependencyBuilders {
+  lazy val moduleIds = listOfModuleIds(20000)
+  def listOfModuleIds(n: Int): Vector[ModuleID] =
+    (1 to n).toVector map { x =>
+      "com.example" % s"foo$x" % randomVersion
     }
+  private val rand = new Random(1L)
+  def randomVersion: String =
+    s"${rand.nextInt % 10}.${rand.nextInt % 10}.${rand.nextInt % 10}"
 }
 
 class SprayBenchmark extends JsonBenchmark[spray.json.JsValue](
