@@ -20,7 +20,7 @@ lazy val root = (project in file(".")).
       developers in ThisBuild := List(
         Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
       ),
-      version := "0.3.0",
+      version := "0.4.0",
       crossScalaVersions := Seq("2.10.6", "2.11.8"),
       scalaVersion := "2.11.8",
       description := "A Scala library for JSON (de)serialization",
@@ -76,6 +76,7 @@ lazy val benchmark = (project in file("benchmark")).
   settings(
     libraryDependencies ++= Seq(jawnSpray, lm),
     javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
-    publish := (),
-    publishLocal := ()
+    publish := {},
+    publishLocal := {},
+    PgpKeys.publishSigned := {}
   )
