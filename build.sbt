@@ -3,7 +3,7 @@ import Dependencies._
 lazy val root = (project in file(".")).
   aggregate(core, // shapeless, shapelessTest,
     supportSpray,
-    supportJson4s).
+    supportScalaJson).
   settings(
     name := "sjson new",
     publish := {},
@@ -60,9 +60,9 @@ lazy val supportSpray = support("spray").
     libraryDependencies += sprayJson
   )
 
-lazy val supportJson4s = support("json4s").
+lazy val supportScalaJson = support("scalajson").
   settings(
-    libraryDependencies += json4sAst
+    libraryDependencies ++= Seq(scalaJson, jawnParser)
   )
 
 lazy val supportMsgpack = support("msgpack").
@@ -71,11 +71,11 @@ lazy val supportMsgpack = support("msgpack").
   )
 
 lazy val benchmark = (project in file("benchmark")).
-  dependsOn(supportSpray, supportJson4s, supportMsgpack).
+  dependsOn(supportSpray, supportScalaJson, supportMsgpack).
   enablePlugins(JmhPlugin).
   settings(
     libraryDependencies ++= Seq(jawnSpray, lm),
-    javaOptions in (Jmh, run) += "-Xmx1G",
+    javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
     publish := (),
     publishLocal := ()
   )

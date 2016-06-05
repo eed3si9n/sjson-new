@@ -41,7 +41,7 @@ abstract class JsonBenchmark[J](converter: SupportConverter[J]) extends Dependen
 class SprayBenchmark extends JsonBenchmark[spray.json.JsValue](
   sjsonnew.support.spray.Converter) {
   import spray.json._
-  lazy val testFile: File = file("target") / "test.json"
+  lazy val testFile: File = file("target") / "test-spray.json"
   def saveToFile(js: JsValue, f: File): Unit =
     IO.write(f, CompactPrinter(js), IO.utf8)
   def loadFromFile(f: File): JsValue =
@@ -52,7 +52,7 @@ class GzipSprayBenchmark extends JsonBenchmark[spray.json.JsValue](
   sjsonnew.support.spray.Converter) {
   import java.io.{ OutputStreamWriter, StringWriter }
   import spray.json._
-  lazy val testFile: File = file("target") / "test.json.gz"
+  lazy val testFile: File = file("target") / "test-spray.json.gz"
   def saveToFile(js: JsValue, f: File): Unit =
     Using.fileOutputStream(false)(f) { out =>
       Using.gzipOutputStream(out) { gz =>
@@ -82,11 +82,57 @@ class GzipSprayBenchmark extends JsonBenchmark[spray.json.JsValue](
     }
 }
 
+class ScalaJsonBenchmark extends JsonBenchmark[scala.json.ast.unsafe.JValue](
+  sjsonnew.support.scalajson.unsafe.Converter) {
+  import scala.json.ast.unsafe._
+  import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Parser }
+  lazy val testFile: File = file("target") / "test-scalajson.json"
+  def saveToFile(js: JValue, f: File): Unit =
+    IO.write(f, CompactPrinter(js), IO.utf8)
+  def loadFromFile(f: File): JValue =
+    Parser.parseFromFile(f).get
+}
+
+class GzipScalaJsonBenchmark extends JsonBenchmark[scala.json.ast.unsafe.JValue](
+  sjsonnew.support.scalajson.unsafe.Converter) {
+  import java.io.{ OutputStreamWriter, StringWriter }
+  import scala.json.ast.unsafe._
+  import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Parser }
+  lazy val testFile: File = file("target") / "test-scalajson.json.gz"
+  def saveToFile(js: JValue, f: File): Unit =
+    Using.fileOutputStream(false)(f) { out =>
+      Using.gzipOutputStream(out) { gz =>
+        val w = new OutputStreamWriter(gz, "UTF-8")
+        try {
+          val s = CompactPrinter(js)
+          w.write(s)
+        } finally {
+          w.close()
+        }
+      }
+    }
+  def loadFromFile(f: File): JValue =
+    Using.fileInputStream(f) { in =>
+      Using.gzipInputStream(in) { gz =>
+        Using.streamReader(gz, IO.utf8) { r =>
+          val writer = new StringWriter
+          val buffer = new Array[Char](10240)
+          var length = r.read(buffer)
+          while (length > 0) {
+            writer.write(buffer, 0, length)
+            length = r.read(buffer)
+          }
+          Parser.parseFromString(writer.toString).get
+        }
+      }
+    }
+}
+
 class MessagePackBenchmark extends JsonBenchmark[org.msgpack.value.Value](
   sjsonnew.support.msgpack.Converter) {
   import org.msgpack.core.MessagePack
   import org.msgpack.value.Value
-  lazy val testFile: File = file("target") / "test.bin"
+  lazy val testFile: File = file("target") / "test-msgpack.bin"
   def saveToFile(js: Value, f: File): Unit =
     Using.fileOutputStream(false)(f) { out0 =>
       Using.bufferedOutputStream(out0) { out =>
