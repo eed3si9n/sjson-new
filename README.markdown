@@ -17,16 +17,22 @@ sjson-new consists of two parts:
 
 ### installation
 
-Here's how to use with Json4s-AST:
+Here's how to use sjson-new with Spray:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-json4s" % "0.3.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.4.0"
 ```
 
-Here's how to use with Spray:
+Here's how to use sjson-new with Scala JSON:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.3.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.4.0"
+```
+
+Here's how to use sjson-new with MessagePack:
+
+```scala
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.4.0"
 ```
 
 ### converting
@@ -50,7 +56,7 @@ scala> Converter.fromJson[Int](res0.get)
 res1: scala.util.Try[Int] = Success(42)
 ```
 
-In the above substitute `XYZ` with (`json4s` | `spray`).
+In the above substitute `XYZ` with (`spray` | `scalajson.unsafe` | `msgpack`).
 
 A `Converter` object provides the following functions for conversion:
 
@@ -64,7 +70,7 @@ def fromJsonUnsafe[A](js: J)(implicit reader: JsonReader[A]): A
 ### dependencies
 
 - `sjson-new-core` has not dependencies other than Scala.
-- The support libraries (e.g. `sjon-new-json4s`) depend on the corresponding ASTs they are supporting.
+- The support libraries (e.g. `sjon-new-spray`) depend on the corresponding ASTs they are supporting.
 
 ### JsonProtocol
 

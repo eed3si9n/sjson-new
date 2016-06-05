@@ -3,7 +3,8 @@ import Dependencies._
 lazy val root = (project in file(".")).
   aggregate(core, // shapeless, shapelessTest,
     supportSpray,
-    supportJson4s).
+    supportScalaJson,
+    supportMsgpack).
   settings(
     name := "sjson new",
     publish := {},
@@ -20,7 +21,7 @@ lazy val root = (project in file(".")).
       developers in ThisBuild := List(
         Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
       ),
-      version := "0.3.0",
+      version := "0.4.0",
       crossScalaVersions := Seq("2.10.6", "2.11.8"),
       scalaVersion := "2.11.8",
       description := "A Scala library for JSON (de)serialization",
@@ -60,9 +61,9 @@ lazy val supportSpray = support("spray").
     libraryDependencies += sprayJson
   )
 
-lazy val supportJson4s = support("json4s").
+lazy val supportScalaJson = support("scalajson").
   settings(
-    libraryDependencies += json4sAst
+    libraryDependencies ++= Seq(scalaJson, jawnParser)
   )
 
 lazy val supportMsgpack = support("msgpack").
@@ -71,11 +72,12 @@ lazy val supportMsgpack = support("msgpack").
   )
 
 lazy val benchmark = (project in file("benchmark")).
-  dependsOn(supportSpray, supportJson4s, supportMsgpack).
+  dependsOn(supportSpray, supportScalaJson, supportMsgpack).
   enablePlugins(JmhPlugin).
   settings(
     libraryDependencies ++= Seq(jawnSpray, lm),
-    javaOptions in (Jmh, run) += "-Xmx1G",
-    publish := (),
-    publishLocal := ()
+    javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
+    publish := {},
+    publishLocal := {},
+    PgpKeys.publishSigned := {}
   )
