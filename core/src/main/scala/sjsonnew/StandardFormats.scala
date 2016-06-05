@@ -32,16 +32,27 @@ trait StandardFormats {
 
   implicit def optionFormat[A :JF]: JF[Option[A]] = new OptionFormat[A]
 
-  class OptionFormat[A :JF] extends JF[Option[A]] {
+  final class OptionFormat[A :JF] extends JF[Option[A]] {
     lazy val elemFormat = implicitly[JF[A]]
     def write[J](option: Option[A], builder: Builder[J]): Unit =
       option match {
         case Some(x) => elemFormat.write(x, builder)
-        case None => builder.writeNull()
+        case None    => builder.writeNull()
       }
-    def read[J](js: J, unbuilder: Unbuilder[J]): Option[A] =
-      if (unbuilder.isJnull(js)) None
-      else Option(elemFormat.read(js, unbuilder))
+    override def addField[J](name: String, option: Option[A], builder: Builder[J]): Unit =
+      option match {
+        case Some(x) =>
+          builder.addFieldName(name)
+          write(option, builder)
+        case None => ()
+      }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Option[A] =
+      jsOpt match {
+        case Some(js) =>
+          if (unbuilder.isJnull(js)) None
+          else Option(elemFormat.read(jsOpt, unbuilder))
+        case None => None
+      }
   }
 
   implicit def eitherFormat[A :JF, B :JF] = new JF[Either[A, B]] {
@@ -52,8 +63,8 @@ trait StandardFormats {
         case Left(a)  => leftFormat.write(a, builder)
         case Right(b) => rightFormat.write(b, builder)
       }
-    def read[J](js: J, unbuilder: Unbuilder[J]): Either[A, B] =
-      (safeReader[A].read(js, unbuilder), safeReader[B].read(js, unbuilder)) match {
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Either[A, B] =
+      (safeReader[A].read(jsOpt, unbuilder), safeReader[B].read(jsOpt, unbuilder)) match {
         case (Right(a), _: Left[_, _]) => Left(a)
         case (_: Left[_, _], Right(b)) => Right(b)
         case (_: Right[_, _], _: Right[_, _]) => deserializationError("Ambiguous Either value: can be read as both, Left and Right, values")

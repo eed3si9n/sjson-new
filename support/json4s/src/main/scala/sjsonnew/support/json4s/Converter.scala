@@ -21,7 +21,7 @@ object Converter extends SupportConverter[JValue] {
     def singleContext() =
       new FContext[JValue] {
         var value: JValue = null
-        def add(s: String) { value = jstring(s) }
+        def addField(s: String): Unit = { value = jstring(s) }
         def add(v: JValue) { value = v }
         def finish: JValue = value
         def isObj: Boolean = false
@@ -30,7 +30,7 @@ object Converter extends SupportConverter[JValue] {
     def arrayContext() =
       new FContext[JValue] {
         val vs = mutable.ListBuffer.empty[JValue]
-        def add(s: String) { vs += jstring(s) }
+        def addField(s: String): Unit = { vs += jstring(s) }
         def add(v: JValue) { vs += v }
         def finish: JValue = JArray(vs.toList)
         def isObj: Boolean = false
@@ -40,7 +40,7 @@ object Converter extends SupportConverter[JValue] {
       new FContext[JValue] {
         var key: String = null
         var vs = List.empty[JField]
-        def add(s: String): Unit =
+        def addField(s: String): Unit =
           if (key == null) key = s
           else { vs = JField(key, jstring(s)) :: vs; key = null }
         def add(v: JValue): Unit =

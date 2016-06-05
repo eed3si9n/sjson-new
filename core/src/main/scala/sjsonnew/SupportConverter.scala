@@ -31,15 +31,22 @@ trait SupportConverter[J] {
     * Convert a JSON AST of type `J` to an object of type `A`.
     */
   def fromJson[A](js: J)(implicit reader: JsonReader[A]): Try[A] =
-    Try(fromJsonUnsafe[A](js)(reader))
+    Try(fromJsonOptionUnsafe[A](Some(js))(reader))
 
   /**
     * Convert a JSON AST of type `J` to an object of type `A`.
     * This might fail by throwing an exception.
     */
   def fromJsonUnsafe[A](js: J)(implicit reader: JsonReader[A]): A =
+    fromJsonOptionUnsafe(Some(js))(reader)
+
+  /**
+    * Convert a JSON AST of type `J` to an object of type `A`.
+    * This might fail by throwing an exception.
+    */
+  def fromJsonOptionUnsafe[A](jsOpt: Option[J])(implicit reader: JsonReader[A]): A =
     {
       val unbuilder = makeUnbuilder
-      reader.read[J](js, unbuilder)
+      reader.read[J](jsOpt, unbuilder)
     }
 }

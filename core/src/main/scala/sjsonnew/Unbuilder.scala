@@ -116,6 +116,9 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+  def readField[A: JsonFormat](name: String): A =
+    implicitly[JsonFormat[A]].read(lookupField(name), this)
+
   /** End reading JSON object. Returns the size. */
   def endObject(): Unit =
     state match {

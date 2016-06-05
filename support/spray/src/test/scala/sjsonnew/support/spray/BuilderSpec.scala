@@ -27,25 +27,21 @@ class BuilderSpec extends Specification with BasicJsonProtocol {
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
       builder.beginObject()
-      builder.addField("name")
-      builder.writeString(x.name)
-      builder.addField("value")
-      builder.writeInt(x.value)
+      builder.addField("name", x.name)
+      builder.addField("value", x.value)
       builder.endObject()
     }
-    def read[J](js: J, unbuilder: Unbuilder[J]): Person = {
-      unbuilder.beginObject(js)
-      val name = unbuilder.lookupField("name") match {
-        case Some(x) => unbuilder.readString(x)
-        case _       => deserializationError(s"Missing field: name")
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val name = unbuilder.readField[String]("name")
+          val value = unbuilder.readField[Int]("value")
+          unbuilder.endObject()
+          Person(name, value)
+        case None =>
+          deserializationError("Expected JsObject but found None")
       }
-      val value = unbuilder.lookupField("value") match {
-        case Some(x) => unbuilder.readInt(x)
-        case _       => 0
-      }
-      unbuilder.endObject()
-      Person(name, value)
-    }
   }
 
   "Custom format using builder" should {

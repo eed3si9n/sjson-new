@@ -9,32 +9,35 @@ trait UnionFormats {
 
     def write[J](u: U, builder: Builder[J]): Unit = {
       builder.beginObject()
-      builder.addField("value")
+      builder.addFieldName("value")
       u match {
       [#  case x if implicitly[Manifest[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
       ]
       }
-      builder.addField("type")
+      builder.addFieldName("type")
       builder.writeString(className(u.getClass))
       builder.endObject()
     }
-    def read[J](js: J, unbuilder: Unbuilder[J]): U = {
-      unbuilder.beginObject(js)
-      val typeName = unbuilder.lookupField("type") match {
-        case Some(x) => unbuilder.readString(x)
-        case None    => deserializationError("Field not found: $type")
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): U =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val typeName = unbuilder.lookupField("type") match {
+            case Some(x) => unbuilder.readString(x)
+            case None    => deserializationError("Field not found: $type")
+          }
+          val valueJs = unbuilder.lookupField("value") match {
+            case Some(x) => x
+            case None    => deserializationError("Field not found: value")
+          }
+          val value = typeName match {
+          [#  case x if className(implicitly[Manifest[A1]].runtimeClass) == x => a1Format.read(Some(valueJs), unbuilder)#
+          ]
+          }
+          unbuilder.endObject()
+          value match { case u: U @unchecked => u }
+        case None => deserializationError("Expected union JsObject, but got None")
       }
-      val valueJs = unbuilder.lookupField("value") match {
-        case Some(x) => x
-        case None    => deserializationError("Field not found: value")
-      }
-      val value = typeName match {
-      [#  case x if className(implicitly[Manifest[A1]].runtimeClass) == x => a1Format.read(valueJs, unbuilder)#
-      ]
-      }
-      unbuilder.endObject()
-      value match { case u: U @unchecked => u }
-    }
   }#
   ]
 

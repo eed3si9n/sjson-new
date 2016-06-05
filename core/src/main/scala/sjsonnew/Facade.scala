@@ -67,7 +67,7 @@ trait Facade[J] {
  * cases where the entire JSON document consists of "333.33".
  */
 trait FContext[J] {
-  def add(s: String): Unit
+  def addField(s: String): Unit
   def add(v: J): Unit
   def finish: J
   def isObj: Boolean

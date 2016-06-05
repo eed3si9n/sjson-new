@@ -25,7 +25,7 @@ import annotation.implicitNotFound
  */
 @implicitNotFound(msg = "Cannot find JsonReader or JsonFormat type class for ${A}")
 trait JsonReader[A] {
-  def read[J](js: J, unbuilder: Unbuilder[J]): A
+  def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A
 }
 
 /**
@@ -34,6 +34,11 @@ trait JsonReader[A] {
 @implicitNotFound(msg = "Cannot find JsonWriter or JsonFormat type class for ${A}")
 trait JsonWriter[A] {
   def write[J](obj: A, builder: Builder[J]): Unit
+  def addField[J](name: String, obj: A, builder: Builder[J]): Unit =
+    {
+      builder.addFieldName(name)
+      write(obj, builder)
+    }
 }
 
 /**

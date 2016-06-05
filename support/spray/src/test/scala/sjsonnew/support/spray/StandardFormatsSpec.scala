@@ -18,13 +18,33 @@
 package sjsonnew
 package support.spray
 
-import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse }
+import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import org.specs2.mutable._
 import scala.Right
 import java.util.UUID
 import java.net.{ URI, URL }
 
 class StandardFormatsSpec extends Specification with BasicJsonProtocol {
+  case class Person(name: Option[String], value: Option[Int])
+  implicit object PersonFormat extends JsonFormat[Person] {
+    def write[J](x: Person, builder: Builder[J]): Unit = {
+      builder.beginObject()
+      builder.addField("name", x.name)
+      builder.addField("value", x.value)
+      builder.endObject()
+    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val name = unbuilder.readField[Option[String]]("name")
+          val value = unbuilder.readField[Option[Int]]("value")
+          unbuilder.endObject()
+          Person(name, value)
+        case None =>
+          deserializationError("Expected JsObject but found None")
+      }
+  }
 
   "The optionFormat" should {
     "convert None to JsNull" in {
@@ -38,6 +58,9 @@ class StandardFormatsSpec extends Specification with BasicJsonProtocol {
     }
     "convert JsString(Hello) to Some(Hello)" in {
       Converter.fromJsonUnsafe[Option[String]](JsString("Hello")) mustEqual Some("Hello")
+    }
+    "omit None fields" in {
+      Converter.toJsonUnsafe(Person(None, None)) mustEqual JsObject()
     }
   }
 

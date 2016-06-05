@@ -205,8 +205,11 @@ If you want to drop down to a more lower level JSON writing, for example, to enc
 implicit object IntJsonFormat extends JsonFormat[Int] {
   def write[J](x: Int, builder: Builder[J]): Unit =
     builder.writeInt(x)
-  def read[J](js: J, unbuilder: Unbuilder[J]): Int =
-    unbuilder.readInt(js)
+  def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Int =
+    jsOpt match {
+      case Some(js) => unbuilder.readInt(js)
+      case None     => 0
+    }
 }
 ```
 
@@ -214,31 +217,27 @@ implicit object IntJsonFormat extends JsonFormat[Int] {
 
 `BasicJsonProtocol` already provides encoding for standard collections like `List[A]`, but you might want to encode your own type using JSON array. To write a JSON array, use `beginArray()`, `writeX` methods, and `endArray()`. The builder internally tracks the states, so it won't let you end an array if you haven't started one.
 
-To write a JSON object, you can use the LList isomorphism as described above, or use `beginObject()`, pairs of `addField("...")` and `writeX` methods, and `endObject()`. Here's an example codec of the same case class `Person` using Builder/Unbuilder:
+To write a JSON object, you can use the LList isomorphism as described above, or use `beginObject()`, `addField("name", x)` method, and `endObject()`. Here's an example codec of the same case class `Person` using Builder/Unbuilder:
 
 ```scala
 implicit object PersonFormat extends JsonFormat[Person] {
   def write[J](x: Person, builder: Builder[J]): Unit = {
     builder.beginObject()
-    builder.addField("name")
-    builder.writeString(x.name)
-    builder.addField("value")
-    builder.writeInt(x.value)
+    builder.addField("name", x.name)
+    builder.addField("value", x.value)
     builder.endObject()
   }
-  def read[J](js: J, unbuilder: Unbuilder[J]): Person = {
-    unbuilder.beginObject(js)
-    val name = unbuilder.lookupField("name") match {
-      case Some(x) => unbuilder.readString(x)
-      case _       => deserializationError(s"Missing field: name")
+  def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
+    jsOpt match {
+      case Some(js) =>
+        unbuilder.beginObject(js)
+        val name = unbuilder.readField[String]("name")
+        val value = unbuilder.readField[Int]("value")
+        unbuilder.endObject()
+        Person(name, value)
+      case None =>
+        deserializationError("Expected JsObject but found None")
     }
-    val value = unbuilder.lookupField("value") match {
-      case Some(x) => unbuilder.readInt(x)
-      case _       => 0
-    }
-    unbuilder.endObject()
-    Person(name, value)
-  }
 }
 ```
 

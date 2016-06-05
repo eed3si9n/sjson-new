@@ -21,15 +21,18 @@ trait IsoFormats {
     val iso = implicitly[IsoLList[A]]
     def write[J](x: A, builder: Builder[J]): Unit =
       iso.jsonFormat.write(iso.to(x), builder)
-    def read[J](js: J, unbuilder: Unbuilder[J]): A =
-      iso.from(iso.jsonFormat.read(js, unbuilder))
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
+      iso.from(iso.jsonFormat.read(jsOpt, unbuilder))
   }
 
   implicit def isoStringFormat[A: IsoString]: JsonFormat[A] = new JsonFormat[A] {
     val iso = implicitly[IsoString[A]]
     def write[J](x: A, builder: Builder[J]): Unit =
       builder.writeString(iso.to(x))
-    def read[J](js: J, unbuilder: Unbuilder[J]): A =
-      iso.from(unbuilder.readString(js))
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
+      jsOpt match {
+        case Some(js) => iso.from(unbuilder.readString(js))
+        case None     => iso.from("")
+      }
   }
 }

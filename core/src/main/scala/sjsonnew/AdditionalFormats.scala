@@ -27,7 +27,7 @@ trait AdditionalFormats {
    */
   def jsonFormat[A](reader: JsonReader[A], writer: JsonWriter[A]) = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
-    def read[J](js: J, unbuilder: Unbuilder[J]): A = reader.read(js, unbuilder)
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = reader.read(jsOpt, unbuilder)
   }
 
   /**
@@ -41,7 +41,7 @@ trait AdditionalFormats {
    */
   def lift[A](writer: JsonWriter[A]) = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
-    def read[J](js: J, unbuilder: Unbuilder[J]): A =
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       throw new UnsupportedOperationException("JsonReader implementation missing")
   }
 
@@ -57,7 +57,7 @@ trait AdditionalFormats {
   def lift[A <: AnyRef](reader: JsonReader[A]) = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit =
       throw new UnsupportedOperationException("No JsonWriter[" + obj.getClass + "] available")
-    def read[J](js: J, unbuilder: Unbuilder[J]): A = reader.read(js, unbuilder)
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = reader.read(jsOpt, unbuilder)
   }
 
   /**
@@ -72,7 +72,7 @@ trait AdditionalFormats {
   def lazyFormat[A](format: => JsonFormat[A]) = new JsonFormat[A] {
     lazy val delegate = format
     def write[J](obj: A, builder: Builder[J]): Unit = delegate.write(obj, builder)
-    def read[J](js: J, unbuilder: Unbuilder[J]): A = delegate.read(js, unbuilder)
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = delegate.read(jsOpt, unbuilder)
   }
 
   /**
@@ -80,17 +80,17 @@ trait AdditionalFormats {
    */
   def rootFormat[A](format: JsonFormat[A]) = new RootJsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = format.write(obj, builder)
-    def read[J](js: J, unbuilder: Unbuilder[J]): A = format.read(js, unbuilder)
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = format.read(jsOpt, unbuilder)
   }
 
   /**
    * Wraps an existing JsonReader with Exception protection.
    */
   def safeReader[A: JsonReader] = new JsonReader[Either[Exception, A]] {
-    def read[J](js: J, unbuilder: Unbuilder[J]): Either[Exception, A] = {
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Either[Exception, A] = {
       val reader = implicitly[JsonReader[A]]
       try {
-        Right(reader.read(js, unbuilder))
+        Right(reader.read(jsOpt, unbuilder))
       } catch {
         case e: Exception => Left(e)
       }
