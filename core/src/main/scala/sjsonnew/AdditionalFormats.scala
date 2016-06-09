@@ -108,7 +108,7 @@ trait AdditionalFormats {
   /**
    * A `JsonFormat` that can read and write an instance of `T` by using a `JsonFormat` for `U`.
    */
-  def wrap[T, U](f1: T => U, f2: U => T)(implicit fu: JsonFormat[U]): JsonFormat[T] = new JsonFormat[T] {
+  def project[T, U](f1: T => U, f2: U => T)(implicit fu: JsonFormat[U]): JsonFormat[T] = new JsonFormat[T] {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): T = f2(fu.read(jsOpt, unbuilder))
     def write[J](obj: T, builder: Builder[J]): Unit = fu.write(f1(obj), builder)
   }
