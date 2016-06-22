@@ -16,9 +16,11 @@ object Parser extends SupportParser[JValue] {
       def jstring(s: String) = JString(s)
       def jarray(vs: mutable.ArrayBuffer[JValue]) = JArray(vs.toArray)
       def jobject(vs: mutable.Map[String, JValue]) = {
-        val array = Array[JField]()
+        val array = new Array[JField](vs.size)
+        var i = 0
         vs.foreach {case (key,value) =>
-          array :+ JField(key,value)
+          array(i) = JField(key, value)
+          i += 1
         }
         JObject(array)
       }
