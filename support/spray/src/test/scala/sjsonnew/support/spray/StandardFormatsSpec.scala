@@ -21,8 +21,6 @@ package support.spray
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import org.specs2.mutable._
 import scala.Right
-import java.util.UUID
-import java.net.{ URI, URL }
 
 class StandardFormatsSpec extends Specification with BasicJsonProtocol {
   case class Person(name: Option[String], value: Option[Int])
@@ -79,36 +77,6 @@ class StandardFormatsSpec extends Specification with BasicJsonProtocol {
     }
     "convert the right side of an Either value from Json" in {
       Converter.fromJsonUnsafe[Either[Int, String]](JsString("Hello")) mustEqual Right("Hello")
-    }
-  }
-
-  "The uuidStringIso" should {
-    val uuid = UUID.fromString("abc220ea-2a01-11e6-b67b-9e71128cae77")
-    "convert a UUID to JsString" in {
-      Converter.toJsonUnsafe(uuid) mustEqual JsString("abc220ea-2a01-11e6-b67b-9e71128cae77")
-    }
-    "convert the JsString back to the UUID" in {
-      Converter.fromJsonUnsafe[UUID](JsString("abc220ea-2a01-11e6-b67b-9e71128cae77")) mustEqual uuid
-    }
-  }
-
-  "The uriStringIso" should {
-    val uri = new URI("http://localhost")
-    "convert a URI to JsString" in {
-      Converter.toJsonUnsafe(uri) mustEqual JsString("http://localhost")
-    }
-    "convert the JsString back to the URI" in {
-      Converter.fromJsonUnsafe[URI](JsString("http://localhost")) mustEqual uri
-    }
-  }
-
-  "The urlStringIso" should {
-    val url = new URL("http://localhost")
-    "convert a URL to JsString" in {
-      Converter.toJsonUnsafe(url) mustEqual JsString("http://localhost")
-    }
-    "convert the JsString back to the URI" in {
-      Converter.fromJsonUnsafe[URL](JsString("http://localhost")) mustEqual url
     }
   }
 }
