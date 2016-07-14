@@ -1,0 +1,7 @@
+See [sjson-new and the prisoner of Azkaban][1] for details.
+
+- MessagePack support
+- SLIP-28 Scala JSON AST support
+- changes encoding so the lack of value can be expressed
+
+  [1]: http://eed3si9n.com/sjson-new-and-the-prisoner-of-azkaban

@@ -1,0 +1,12 @@
+### fixes and enhacements
+
+- Fixes SLIP-28 JSON parsing. [#9][9] by [@Duhemm][@Duhemm]
+- Adds `project` for `JsonFormat` projection from one type to another, and `asSingleton` formats. [#8][8] by [@Duhemm][@Duhemm]
+- Adds built-in formats for `java.util.Calendar`, `java.math.BigInteger`, `java.math.BigDecimal`, and `java.io.File`. [#10][10] by [@eed3si9n][@eed3si9n]
+
+  [8]: https://github.com/eed3si9n/sjson-new/pull/8
+  [9]: https://github.com/eed3si9n/sjson-new/pull/9
+  [10]: https://github.com/eed3si9n/sjson-new/pull/10
+  [@eed3si9n]: https://github.com/eed3si9n
+  [@dwijnand]: http://github.com/dwijnand
+  [@Duhemm]: http://github.com/Duhemm
