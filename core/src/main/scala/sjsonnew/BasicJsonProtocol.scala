@@ -29,5 +29,7 @@ trait BasicJsonProtocol
         with AdditionalFormats
         with UnionFormats
         with IsoFormats
+        with JavaExtraFormats
+        with CalendarFormats
 
 object BasicJsonProtocol extends BasicJsonProtocol
