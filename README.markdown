@@ -20,19 +20,19 @@ sjson-new consists of two parts:
 Here's how to use sjson-new with Spray:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.4.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.4.1"
 ```
 
 Here's how to use sjson-new with Scala JSON:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.4.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.4.1"
 ```
 
 Here's how to use sjson-new with MessagePack:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.4.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.4.1"
 ```
 
 ### converting
