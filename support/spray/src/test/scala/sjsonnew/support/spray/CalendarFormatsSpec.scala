@@ -23,14 +23,27 @@ import java.util.{ Calendar, TimeZone }
 
 class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
   "The dateStringIso" should {
-    val c = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    c.clear
-    c.set(1999, 1, 1, 0, 0, 0)
+    val seconds = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    seconds.clear
+    seconds.set(1999, 1, 1, 0, 0, 0)
+    val milliseconds = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    milliseconds.clear
+    milliseconds.set(1999, 1, 1, 0, 0, 0)
+    milliseconds.set(Calendar.MILLISECOND, 1)
     "convert a Date to JsString" in {
-      Converter.toJsonUnsafe(c) mustEqual JsString("1999-02-01T00:00:00.000Z")
+      Converter.toJsonUnsafe(seconds) mustEqual JsString("1999-02-01T00:00:00Z")
+    }
+    "convert a Date with milliseconds to JsString" in {
+      Converter.toJsonUnsafe(milliseconds) mustEqual JsString("1999-02-01T00:00:00.001Z")
     }
     "convert the JsString back to the Date" in {
-      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00.000Z")).getTimeInMillis mustEqual c.getTimeInMillis
+      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00Z")).getTimeInMillis mustEqual seconds.getTimeInMillis
+    }
+    "convert the JsString with milliseconds back to the Date" in {
+      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00.001Z")).getTimeInMillis mustEqual milliseconds.getTimeInMillis
+    }
+    "convert the JsString with no time back to the Date" in {
+      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01Z")).getTimeInMillis mustEqual seconds.getTimeInMillis
     }
   }
 }
