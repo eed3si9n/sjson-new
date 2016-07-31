@@ -17,28 +17,13 @@
 package sjsonnew
 
 import java.util.{Date, TimeZone, Calendar}
-import java.text.SimpleDateFormat
+import javax.xml.bind.DatatypeConverter
 
 trait CalendarFormats {
   self: IsoFormats =>
 
-  private val dateFormatTemplate = {
-    val format =
-      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") //use ISO_8601 format
-    format.setLenient(false)
-    format.setTimeZone(TimeZone.getTimeZone("UTC"))
-    format
-  }
-  private def clonedDateFormat =
-    dateFormatTemplate.clone.asInstanceOf[SimpleDateFormat]
   implicit val calendarStringIso = {
-    IsoString.iso[Calendar]( (c: Calendar) => {
-        clonedDateFormat.format(c.getTime)
-      },
-      (s: String) => {
-        val c = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        c.setTime(clonedDateFormat.parse(s))
-        c
-      })
+    IsoString.iso[Calendar]( (c: Calendar) => DatatypeConverter.printDateTime(c),
+      (s: String) => DatatypeConverter.parseDateTime(s))
   }
 }
