@@ -21,7 +21,7 @@ lazy val root = (project in file(".")).
       developers in ThisBuild := List(
         Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
       ),
-      version := "0.4.2",
+      version := "0.4.3-SNAPSHOT",
       crossScalaVersions := Seq("2.10.6", "2.11.8"),
       scalaVersion := "2.11.8",
       description := "A Scala library for JSON (de)serialization",
