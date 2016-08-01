@@ -1,0 +1,5 @@
+### fixes and enhacements
+
+- Improves `java.util.Calendar` formatting by using JAXB's DatatypeConverter.
+
+  [11]: https://github.com/eed3si9n/sjson-new/pull/11
