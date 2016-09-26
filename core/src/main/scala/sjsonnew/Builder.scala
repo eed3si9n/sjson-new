@@ -10,7 +10,7 @@ import BuilderState._
 class Builder[J](facade: Facade[J]) {
   private var resultOpt: Option[J] = None
   private var state: BuilderState = BuilderState.Begin
-  protected val contexts: mutable.Stack[FContext[J]] = mutable.Stack.empty[FContext[J]]
+  protected var contexts: List[FContext[J]] = Nil
 
   /** Write `Int` value to the current context. */
   def writeInt(x: Int): Unit =
@@ -37,7 +37,7 @@ class Builder[J](facade: Facade[J]) {
       case InObject =>
         // This is effectively same as addField, but allows to use keyFormat.write.
         if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
-        else contexts.top.addField(x)
+        else contexts.head.addField(x)
         state = InField
       case _ => writeJ(facade.jstring(x))
     }
@@ -49,7 +49,7 @@ class Builder[J](facade: Facade[J]) {
     state match {
       case InObject =>
         if (contexts.isEmpty) serializationError("The builder state is InObject, but the context is empty.")
-        else contexts.top.addField(field)
+        else contexts.head.addField(field)
         state = InField
       case x => stateError(x)
     }
@@ -62,7 +62,7 @@ class Builder[J](facade: Facade[J]) {
     state match {
       case Begin | InArray | InField =>
         val context = facade.arrayContext()
-        contexts.push(context)
+        contexts ::= context
         state = InArray
       case InObject => stateError(InObject) // expecting field name
       case End => stateError(End)
@@ -72,14 +72,15 @@ class Builder[J](facade: Facade[J]) {
   def endArray(): Unit =
     state match {
       case InArray =>
-        val x = contexts.pop
+        val x = contexts.head
+        contexts = contexts.tail
         val js = x.finish
         if (contexts.isEmpty) {
           resultOpt = Some(js)
           state = End
         }
         else {
-          if (contexts.top.isObj) state = InField
+          if (contexts.head.isObj) state = InField
           else state = InArray
           writeJ(js)
         }
@@ -96,7 +97,7 @@ class Builder[J](facade: Facade[J]) {
     state match {
       case Begin | InArray | InField =>
         val context = facade.objectContext()
-        contexts.push(context)
+        contexts ::= context
         state = InObject
       case InObject => stateError(InObject) // expecting field name
       case End => stateError(End)
@@ -106,14 +107,15 @@ class Builder[J](facade: Facade[J]) {
   def endObject(): Unit =
     state match {
       case InObject =>
-        val x = contexts.pop
+        val x = contexts.head
+        contexts = contexts.tail
         val js = x.finish
         if (contexts.isEmpty) {
           resultOpt = Some(js)
           state = End
         }
         else {
-          if (contexts.top.isObj) state = InField
+          if (contexts.head.isObj) state = InField
           else state = InArray
           writeJ(js)
         }
@@ -127,10 +129,10 @@ class Builder[J](facade: Facade[J]) {
         state = End
       case InArray =>
         if (contexts.isEmpty) serializationError("The builder state is InArray, but the context is empty.")
-        else contexts.top.add(js)
+        else contexts.head.add(js)
       case InField =>
         if (contexts.isEmpty) serializationError("The builder state is InField, but the context is empty.")
-        else contexts.top.add(js)
+        else contexts.head.add(js)
         state = InObject
       case InObject => stateError(InObject)
       case End => stateError(End)

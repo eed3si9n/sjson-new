@@ -9,7 +9,7 @@ import UnbuilderState._
  */
 class Unbuilder[J](facade: Facade[J]) {
   private var state: UnbuilderState = UnbuilderState.Begin
-  private val contexts: mutable.Stack[UnbuilderContext[J]] = mutable.Stack.empty[UnbuilderContext[J]]
+  private var contexts: List[UnbuilderContext[J]] = Nil
 
   /** Read `Int` value to the current context. */
   def readInt(js: J): Int =
@@ -45,7 +45,7 @@ class Unbuilder[J](facade: Facade[J]) {
     state match {
       case Begin | InArray | InObject =>
         val context = UnbuilderContext.ArrayContext(facade.extractArray(js))
-        contexts.push(context)
+        contexts ::= context
         state = InArray
         context.elements.size
       case End => stateError(End)
@@ -53,7 +53,7 @@ class Unbuilder[J](facade: Facade[J]) {
   def nextElement: J =
     state match {
       case InArray =>
-        contexts.top match {
+        contexts.head match {
           case ctx: UnbuilderContext.ArrayContext[J] => ctx.next
           case x => deserializationError(s"Unexpected context: $x")
         }
@@ -63,9 +63,9 @@ class Unbuilder[J](facade: Facade[J]) {
   def endArray(): Unit =
     state match {
       case InArray =>
-        contexts.pop
+        contexts = contexts.tail
         if (contexts.isEmpty) state = End
-        else contexts.top match {
+        else contexts.head match {
           case _: UnbuilderContext.ObjectContext[J] => state = InObject
           case _ => state = InArray
         }
@@ -80,7 +80,7 @@ class Unbuilder[J](facade: Facade[J]) {
       case Begin | InArray | InObject =>
         val (fields, names) = facade.extractObject(js)
         val context = UnbuilderContext.ObjectContext(fields, names)
-        contexts.push(context)
+        contexts ::= context
         state = InObject
         context.fields.size
       case End => stateError(End)
@@ -88,7 +88,7 @@ class Unbuilder[J](facade: Facade[J]) {
   def hasNextField: Boolean =
     state match {
       case InObject =>
-        contexts.top match {
+        contexts.head match {
           case ctx: UnbuilderContext.ObjectContext[J] => ctx.hasNext
           case x => deserializationError(s"Unexpected context: $x")
         }
@@ -97,7 +97,7 @@ class Unbuilder[J](facade: Facade[J]) {
   def nextField(): (String, J) =
     state match {
       case InObject =>
-        contexts.top match {
+        contexts.head match {
           case ctx: UnbuilderContext.ObjectContext[J] => ctx.next
           case x => deserializationError(s"Unexpected context: $x")
         }
@@ -110,7 +110,7 @@ class Unbuilder[J](facade: Facade[J]) {
   def lookupField(name: String): Option[J] =
     state match {
       case InObject =>
-        contexts.top match {
+        contexts.head match {
           case ctx: UnbuilderContext.ObjectContext[J] => ctx.fields.get(name)
           case x => deserializationError(s"Unexpected context: $x")
         }
@@ -123,9 +123,9 @@ class Unbuilder[J](facade: Facade[J]) {
   def endObject(): Unit =
     state match {
       case InObject =>
-        contexts.pop
+        contexts = contexts.tail
         if (contexts.isEmpty) state = End
-        else contexts.top match {
+        else contexts.head match {
           case _: UnbuilderContext.ObjectContext[J] => state = InObject
           case _ => state = InArray
         }
