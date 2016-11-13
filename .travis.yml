@@ -1,5 +1,5 @@
 language: scala
 script:
-  - sbt "+ test" "+ benchmark/jmh:run -i 10 -wi 3 -f1 -t1"
+  - sbt "so test" "so benchmark/jmh:run -i 10 -wi 3 -f1 -t1"
 jdk:
-  - oraclejdk7
+  - oraclejdk8
