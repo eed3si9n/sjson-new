@@ -22,7 +22,7 @@ trait CollectionFormats {
   /**
     * Supplies the JsonFormat for Lists.
    */
-  implicit def listFormat[A: JsonFormat] = new RootJsonFormat[List[A]] {
+  implicit def listFormat[A: JsonFormat]: RootJsonFormat[List[A]] = new RootJsonFormat[List[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
     def write[J](list: List[A], builder: Builder[J]): Unit =
       {
@@ -53,7 +53,7 @@ trait CollectionFormats {
   /**
     * Supplies the JsonFormat for Arrays.
    */
-  implicit def arrayFormat[A: JsonFormat: ClassManifest] = new RootJsonFormat[Array[A]] {
+  implicit def arrayFormat[A: JsonFormat: ClassManifest]: RootJsonFormat[Array[A]] = new RootJsonFormat[Array[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
     def write[J](array: Array[A], builder: Builder[J]): Unit =
       {
@@ -85,7 +85,7 @@ trait CollectionFormats {
     * Supplies the JsonFormat for Maps. The implicitly available JsonFormat for the key type K must
     * always write JsStrings, otherwise a [[sjsonnew.SerializationException]] will be thrown.
    */
-  implicit def mapFormat[K: JsonFormat, V: JsonFormat] = new RootJsonFormat[Map[K, V]] {
+  implicit def mapFormat[K: JsonFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
     lazy val keyFormat = implicitly[JsonFormat[K]]
     lazy val valueFormat = implicitly[JsonFormat[V]]
     def write[J](m: Map[K, V], builder: Builder[J]): Unit =
@@ -120,20 +120,20 @@ trait CollectionFormats {
 
   import collection.{immutable => imm}
 
-  implicit def immIterableFormat[T :JsonFormat]   = viaSeq[imm.Iterable[T], T](seq => imm.Iterable(seq :_*))
-  implicit def immSeqFormat[T :JsonFormat]        = viaSeq[imm.Seq[T], T](seq => imm.Seq(seq :_*))
-  implicit def immIndexedSeqFormat[T :JsonFormat] = viaSeq[imm.IndexedSeq[T], T](seq => imm.IndexedSeq(seq :_*))
-  implicit def immLinearSeqFormat[T :JsonFormat]  = viaSeq[imm.LinearSeq[T], T](seq => imm.LinearSeq(seq :_*))
-  implicit def immSetFormat[T :JsonFormat]        = viaSeq[imm.Set[T], T](seq => imm.Set(seq :_*))
-  implicit def vectorFormat[T :JsonFormat]        = viaSeq[Vector[T], T](seq => Vector(seq :_*))
+  implicit def immIterableFormat[T :JsonFormat]: RootJsonFormat[imm.Iterable[T]]     = viaSeq[imm.Iterable[T], T](seq => imm.Iterable(seq :_*))
+  implicit def immSeqFormat[T :JsonFormat]: RootJsonFormat[imm.Seq[T]]               = viaSeq[imm.Seq[T], T](seq => imm.Seq(seq :_*))
+  implicit def immIndexedSeqFormat[T :JsonFormat]: RootJsonFormat[imm.IndexedSeq[T]] = viaSeq[imm.IndexedSeq[T], T](seq => imm.IndexedSeq(seq :_*))
+  implicit def immLinearSeqFormat[T :JsonFormat]: RootJsonFormat[imm.LinearSeq[T]]   = viaSeq[imm.LinearSeq[T], T](seq => imm.LinearSeq(seq :_*))
+  implicit def immSetFormat[T :JsonFormat]: RootJsonFormat[imm.Set[T]]               = viaSeq[imm.Set[T], T](seq => imm.Set(seq :_*))
+  implicit def vectorFormat[T :JsonFormat]: RootJsonFormat[Vector[T]]                = viaSeq[Vector[T], T](seq => Vector(seq :_*))
 
   import collection._
 
-  implicit def iterableFormat[T :JsonFormat]   = viaSeq[Iterable[T], T](seq => Iterable(seq :_*))
-  implicit def seqFormat[T :JsonFormat]        = viaSeq[Seq[T], T](seq => Seq(seq :_*))
-  implicit def indexedSeqFormat[T :JsonFormat] = viaSeq[IndexedSeq[T], T](seq => IndexedSeq(seq :_*))
-  implicit def linearSeqFormat[T :JsonFormat]  = viaSeq[LinearSeq[T], T](seq => LinearSeq(seq :_*))
-  implicit def setFormat[T :JsonFormat]        = viaSeq[Set[T], T](seq => Set(seq :_*))
+  implicit def iterableFormat[T :JsonFormat]: RootJsonFormat[Iterable[T]]     = viaSeq[Iterable[T], T](seq => Iterable(seq :_*))
+  implicit def seqFormat[T :JsonFormat]: RootJsonFormat[Seq[T]]               = viaSeq[Seq[T], T](seq => Seq(seq :_*))
+  implicit def indexedSeqFormat[T :JsonFormat]: RootJsonFormat[IndexedSeq[T]] = viaSeq[IndexedSeq[T], T](seq => IndexedSeq(seq :_*))
+  implicit def linearSeqFormat[T :JsonFormat]: RootJsonFormat[LinearSeq[T]]   = viaSeq[LinearSeq[T], T](seq => LinearSeq(seq :_*))
+  implicit def setFormat[T :JsonFormat]: RootJsonFormat[Set[T]]               = viaSeq[Set[T], T](seq => Set(seq :_*))
 
   /**
     * A JsonFormat construction helper that creates a JsonFormat for an Iterable type I from a builder function
