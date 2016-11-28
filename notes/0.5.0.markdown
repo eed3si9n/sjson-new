@@ -1,0 +1,20 @@
+### Scala 2.12 bump
+
+Scala 2.12 bump. [#15][15] by [@xuwei-k][@xuwei-k]
+
+### flatUnionFormatN[U, A1, A2, ...]
+
+The `flatUnionFormatN[U, A1, A2, ...]("type")` functions assume that type `U` is the sealed parent trait
+of the type parameters `A1`, `A2, and encodes them by putting the simple type name
+(just the class name portion) into the specified `type` field along side the value fields.
+
+For example `case class Organization(name: String, value: Int) extends Contact`
+is encoded as:
+
+    {"type":"Organization","name":"Company","value":2}
+
+[@eed3si9n][@eed3si9n]
+
+  [15]: https://github.com/eed3si9n/sjson-new/pull/15
+  [@xuwei-k]: https://github.com/xuwei-k
+  [@eed3si9n]: https://github.com/eed3si9n

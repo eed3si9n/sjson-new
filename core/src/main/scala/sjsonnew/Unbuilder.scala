@@ -10,6 +10,7 @@ import UnbuilderState._
 class Unbuilder[J](facade: Facade[J]) {
   private var state: UnbuilderState = UnbuilderState.Begin
   private var contexts: List[UnbuilderContext[J]] = Nil
+  private var precontext: Option[UnbuilderPrecontext[J]] = None
 
   /** Read `Int` value to the current context. */
   def readInt(js: J): Int =
@@ -72,6 +73,34 @@ class Unbuilder[J](facade: Facade[J]) {
       case x => stateError(x)
     }
   def isInObject: Boolean = state == InObject
+
+  /** The unbuilder counterpart for beginPreObject.
+    * This is used to filter out the type field.
+    */
+  def beginPreObject(js: J): Int =
+    state match {
+      case Begin | InArray | InObject =>
+        val (fields, names) = facade.extractObject(js)
+        val context = UnbuilderContext.ObjectContext(fields, names)
+        contexts ::= context
+        precontext = Some(UnbuilderPrecontext(js, mutable.ArrayBuffer.empty))
+        state = InObject
+        context.fields.size
+      case End => stateError(End)
+    }
+
+  def endPreObject(): Unit =
+    state match {
+      case InObject =>
+        contexts = contexts.tail
+        if (contexts.isEmpty) state = Begin
+        else contexts.head match {
+          case _: UnbuilderContext.ObjectContext[J] => state = InObject
+          case _ => state = InArray
+        }
+      case x => stateError(x)
+    }
+
   /** Begin reading JSON object. Returns the size.
     * Call `nextField` n-times, and then call `endObject`.
     */
@@ -79,7 +108,14 @@ class Unbuilder[J](facade: Facade[J]) {
     state match {
       case Begin | InArray | InObject =>
         val (fields, names) = facade.extractObject(js)
-        val context = UnbuilderContext.ObjectContext(fields, names)
+        val context =
+          precontext match {
+            case Some(pre) if pre.js == js =>
+              precontext = None
+              val excludeKeys = pre.names.toSet
+              UnbuilderContext.ObjectContext(fields filterKeys { k => !excludeKeys(k) }, names diff excludeKeys.toVector)
+            case _ => UnbuilderContext.ObjectContext(fields, names)
+          }
         contexts ::= context
         state = InObject
         context.fields.size
@@ -110,6 +146,10 @@ class Unbuilder[J](facade: Facade[J]) {
   def lookupField(name: String): Option[J] =
     state match {
       case InObject =>
+        precontext match {
+          case Some(pre) => pre.names += name
+          case None => // do nothing
+        }
         contexts.head match {
           case ctx: UnbuilderContext.ObjectContext[J] => ctx.fields.get(name)
           case x => deserializationError(s"Unexpected context: $x")
@@ -178,3 +218,5 @@ private[sjsonnew] object UnbuilderContext {
     }
   }
 }
+
+private[sjsonnew] case class UnbuilderPrecontext[J](js: J, names: mutable.ArrayBuffer[String])

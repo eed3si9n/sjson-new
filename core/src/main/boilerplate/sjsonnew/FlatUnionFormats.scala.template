@@ -1,0 +1,48 @@
+package sjsonnew
+
+trait FlatUnionFormats {
+  private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
+
+  [#def flatUnionFormat1[U, [#A1 :JF: Manifest#]]: JF[U] =
+    flatUnionFormat1[U, [#A1#]]("type")#
+  ]
+  [#def flatUnionFormat1[U, [#A1 :JF: Manifest#]](typeFieldName: String): JF[U] = new JF[U] {
+    [#lazy val a1Format = implicitly[JF[A1]]#
+    ]
+
+    def write[J](u: U, builder: Builder[J]): Unit = {
+      builder.beginPreObject()
+      builder.addFieldName(typeFieldName)
+      builder.writeString(className(u.getClass))
+      builder.endPreObject()
+      u match {
+      [#  case x if implicitly[Manifest[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
+      ]
+      }
+    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): U =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginPreObject(js)
+          val typeName = unbuilder.lookupField(typeFieldName) match {
+            case Some(x) => unbuilder.readString(x)
+            case None    => deserializationError("Field not found: $type")
+          }
+          unbuilder.endPreObject()
+          val value = typeName match {
+          [#  case x if className(implicitly[Manifest[A1]].runtimeClass) == x => a1Format.read(Some(js), unbuilder)#
+          ]
+          }
+          value match { case u: U @unchecked => u }
+        case None => deserializationError("Expected union JsObject, but got None")
+      }
+  }#
+  ]
+
+  private def className[A](c: Class[A]): String =
+    try {
+      c.getSimpleName
+    } catch {
+      case e: InternalError => c.getName
+    }
+}

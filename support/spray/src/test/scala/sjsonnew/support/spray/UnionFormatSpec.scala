@@ -28,40 +28,69 @@ class UnionFormatsSpec extends Specification with BasicJsonProtocol {
   case class Orange() extends Fruit
   implicit object AppleJsonFormat extends JsonFormat[Apple] {
     def write[J](x: Apple, builder: Builder[J]): Unit =
-      builder.writeInt(0)
+      {
+        builder.beginObject()
+        builder.addField("x", 0)
+        builder.endObject()
+      }
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Apple =
       jsOpt match {
         case Some(js) =>
-          unbuilder.readInt(js) match {
-            case 0 => Apple()
-            case x => deserializationError(s"Unexpected value: $x")
+          val result = unbuilder.beginObject(js) match {
+            case 1 =>
+              val x = unbuilder.readField[Int]("x")
+              if (x == 0) Apple()
+              else deserializationError(s"Unexpected value: $x")
+            case x => deserializationError(s"Unexpected number of fields: $x")
           }
+          unbuilder.endObject()
+          result
         case None => deserializationError("Expected JsNumber but found None")
       }
   }
   implicit object OrangeJsonFormat extends JsonFormat[Orange] {
     def write[J](x: Orange, builder: Builder[J]): Unit =
-      builder.writeInt(1)
+      {
+        builder.beginObject()
+        builder.addField("x", 1)
+        builder.endObject()
+      }
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Orange =
       jsOpt match {
         case Some(js) =>
-          unbuilder.readInt(js) match {
-            case 1 => Orange()
-            case x => deserializationError(s"Unexpected value: $x")
+          val result = unbuilder.beginObject(js) match {
+            case 1 =>
+              val x = unbuilder.readField[Int]("x")
+              if (x == 1) Orange()
+              else deserializationError(s"Unexpected value: $x")
+            case x => deserializationError(s"Unexpected number of fields: $x")
           }
+          unbuilder.endObject()
+          result
         case None => deserializationError("Expected JsNumber but found None")
       }
   }
-  implicit val FruitFormat = unionFormat2[Fruit, Apple, Orange]
-
   val fruit: Fruit = Apple()
-  val fruitJson = JsObject("value" -> JsNumber(0), "type" -> JsString("Apple"))
   "The unionFormat" should {
+    implicit val FruitFormat = unionFormat2[Fruit, Apple, Orange]
+    val fruitJson = JsObject("value" ->  JsObject("x" -> JsNumber(0)), "type" -> JsString("Apple"))
     "convert a value of ADT to JObject" in {
       Converter.toJsonUnsafe(fruit) mustEqual fruitJson
     }
     "convert JObject back to ADT" in {
       Converter.fromJsonUnsafe[Fruit](fruitJson) mustEqual fruit
+    }
+  }
+
+  "The flatUnionFormat" should {
+    implicit val FruitFormat = flatUnionFormat2[Fruit, Apple, Orange]("type")
+    val fruitJson2 = JsObject("type" -> JsString("Apple"), "x" -> JsNumber(0))
+    "convert a value of ADT to JObject" in {
+      Converter.toJsonUnsafe(fruit) mustEqual fruitJson2
+    }
+    "convert JObject back to ADT" in {
+      // println(Converter.fromJsonUnsafe[Fruit](fruitJson2))
+      Converter.fromJsonUnsafe[Fruit](fruitJson2) mustEqual fruit
     }
   }
 }

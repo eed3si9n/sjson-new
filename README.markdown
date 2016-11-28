@@ -189,7 +189,7 @@ implicit val personIso = LList.iso(
 implicit val organizationIso = LList.iso(
   { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil },
   { in: String :*: Int :*: LNil => Organization(in.head, in.tail.head) })
-implicit val ContactFormat = unionFormat2[Contact, Person, Organization]
+implicit val ContactFormat = flatUnionFormat2[Contact, Person, Organization]("type")
 
 // Exiting paste mode, now interpreting.
 
@@ -197,11 +197,23 @@ scala> import sjsonnew.support.spray.Converter
 import sjsonnew.support.spray.Converter
 
 scala> Converter.toJson[Contact](Organization("Company", 2))
-res0: scala.util.Try[spray.json.JsValue] = Success({"value":{"name":"Company","value":2},"type":"Organization"})
+res0: scala.util.Try[spray.json.JsValue] = Success({"type":"Organization","name":"Company","value":2})
 ```
 
-The `unionFormatN[U, A1, A2, ...]` functions assume that type `U` is the sealed parent trait of the passed in types.
-In the JSON object this is encoded by putting the simple type name (just the class name portion) into `type` field.
+The `flatUnionFormatN[U, A1, A2, ...]("type")` functions assume that type `U` is the sealed parent trait
+of the type parameters `A1`, `A2, and encodes them by putting the simple type name
+(just the class name portion) into the specified `type` field along side the value fields as:
+
+```
+{"type":"Organization","name":"Company","value":2}
+```
+
+On the other hand, the `unionFormatN[U, A1, A2, ...]` functions encodes them 
+by putting the simple type name into `type` field, and the value in the `value` field:
+
+```
+{"value":{"name":"Company","value":2},"type":"Organization"}
+```
 
 ### Low-level API: Builder and Unbuilder
 
