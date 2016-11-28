@@ -5,10 +5,10 @@ import BuilderState._
 /**
  * Builder is an mutable structure to write JSON into.
  */
-class Builder[J](facade: Facade[J]) {
+class Builder[J](val facade: Facade[J]) {
   private var resultOpt: Option[J] = None
   private var _state: BuilderState = BuilderState.Begin
-  protected var contexts: List[FContext[J]] = Nil
+  protected var _contexts: List[FContext[J]] = Nil
   private var precontext: Option[FContext[J]] = None
 
   /** Write `Int` value to the current context. */
@@ -88,6 +88,9 @@ class Builder[J](facade: Facade[J]) {
 
   def state: BuilderState = _state
   private def state_=(newState: BuilderState) = _state = newState
+
+  def contexts: List[FContext[J]] = _contexts
+  protected def contexts_=(newContexts: List[FContext[J]]) = _contexts = newContexts
 
   /** Checks if the current state is `InObject` */
   def isInObject: Boolean = state == InObject
