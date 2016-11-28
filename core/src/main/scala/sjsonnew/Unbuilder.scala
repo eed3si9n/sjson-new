@@ -8,37 +8,37 @@ import UnbuilderState._
  * Builder is an mutable structure to write JSON into.
  */
 class Unbuilder[J](facade: Facade[J]) {
-  private var state: UnbuilderState = UnbuilderState.Begin
+  private var _state: UnbuilderState = UnbuilderState.Begin
   private var contexts: List[UnbuilderContext[J]] = Nil
   private var precontext: Option[UnbuilderPrecontext[J]] = None
 
   /** Read `Int` value to the current context. */
-  def readInt(js: J): Int =
-    readJ[Int](js, facade.extractInt)
+  def readInt(js: J): Int = readJ[Int](js, facade.extractInt)
+
   /** Read `Long` value to the current context. */
-  def readLong(js: J): Long =
-    readJ[Long](js, facade.extractLong)
+  def readLong(js: J): Long = readJ[Long](js, facade.extractLong)
+
   /** Read `Double` value to the current context. */
-  def readDouble(js: J): Double =
-    readJ[Double](js, facade.extractDouble)
+  def readDouble(js: J): Double = readJ[Double](js, facade.extractDouble)
+
   /** Read `Float` value to the current context. */
-  def readFloat(js: J): Float =
-    readJ[Float](js, facade.extractFloat)
+  def readFloat(js: J): Float = readJ[Float](js, facade.extractFloat)
+
   /** Read `BigDecimal` value to the current context. */
-  def readBigDecimal(js: J): BigDecimal =
-    readJ[BigDecimal](js, facade.extractBigDecimal)
+  def readBigDecimal(js: J): BigDecimal = readJ[BigDecimal](js, facade.extractBigDecimal)
+
   /** Read `Boolean` value to the current context. */
-  def readBoolean(js: J): Boolean =
-    readJ[Boolean](js, facade.extractBoolean)
+  def readBoolean(js: J): Boolean = readJ[Boolean](js, facade.extractBoolean)
+
   /** Read `String` value to the current context. */
-  def readString(js: J): String =
-    readJ[String](js, facade.extractString)
+  def readString(js: J): String = readJ[String](js, facade.extractString)
+
   /** Check if js is null */
-  def isJnull(js: J): Boolean =
-    facade.isJnull(js)
-  /** Check if js is null */
-  def isObject(js: J): Boolean =
-    facade.isObject(js)
+  def isJnull(js: J): Boolean = facade.isJnull(js)
+
+  /** Check if js is an object */
+  def isObject(js: J): Boolean = facade.isObject(js)
+
   /** Begin reading JSON array. Returns the size.
     * Call `nextElement` n-times, and then call `endArray`.
     */
@@ -51,6 +51,7 @@ class Unbuilder[J](facade: Facade[J]) {
         context.elements.size
       case End => stateError(End)
     }
+
   def nextElement: J =
     state match {
       case InArray =>
@@ -60,6 +61,7 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+
   /** End reading JSON array. Returns the size. */
   def endArray(): Unit =
     state match {
@@ -72,6 +74,10 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+
+  def state: UnbuilderState = _state
+  private def state_=(newState: UnbuilderState) = _state = newState
+
   def isInObject: Boolean = state == InObject
 
   /** The unbuilder counterpart for beginPreObject.
@@ -121,6 +127,7 @@ class Unbuilder[J](facade: Facade[J]) {
         context.fields.size
       case End => stateError(End)
     }
+
   def hasNextField: Boolean =
     state match {
       case InObject =>
@@ -130,6 +137,7 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+
   def nextField(): (String, J) =
     state match {
       case InObject =>
@@ -139,10 +147,9 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
-  def nextFieldWithJString(): (J, J) =
-    nextField match {
-      case (k, v) => (facade.jstring(k), v)
-    }
+
+  def nextFieldWithJString(): (J, J) = nextField match { case (k, v) => (facade.jstring(k), v) }
+
   def lookupField(name: String): Option[J] =
     state match {
       case InObject =>
@@ -156,8 +163,8 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
-  def readField[A: JsonFormat](name: String): A =
-    implicitly[JsonFormat[A]].read(lookupField(name), this)
+
+  def readField[A: JsonReader](name: String): A = jsonReader[A].read(lookupField(name), this)
 
   /** End reading JSON object. Returns the size. */
   def endObject(): Unit =
@@ -171,6 +178,7 @@ class Unbuilder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+
   private def readJ[A](js: J, f: J => A): A =
     state match {
       case Begin =>
@@ -185,11 +193,12 @@ class Unbuilder[J](facade: Facade[J]) {
         else f(js)
       case End => stateError(End)
     }
+
   private def stateError(x: UnbuilderState) = deserializationError(s"Unexpected builder state: $x")
 }
 
-private[sjsonnew] sealed trait UnbuilderState
-private[sjsonnew] object UnbuilderState {
+sealed trait UnbuilderState
+object UnbuilderState {
   case object Begin extends UnbuilderState
   case object End extends UnbuilderState
   case object InArray extends UnbuilderState

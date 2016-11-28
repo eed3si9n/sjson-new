@@ -1,7 +1,5 @@
 package sjsonnew
 
-import scala.collection.mutable
-
 import BuilderState._
 
 /**
@@ -9,29 +7,28 @@ import BuilderState._
  */
 class Builder[J](facade: Facade[J]) {
   private var resultOpt: Option[J] = None
-  private var state: BuilderState = BuilderState.Begin
+  private var _state: BuilderState = BuilderState.Begin
   protected var contexts: List[FContext[J]] = Nil
   private var precontext: Option[FContext[J]] = None
 
   /** Write `Int` value to the current context. */
-  def writeInt(x: Int): Unit =
-    writeJ(facade.jint(x))
+  def writeInt(x: Int): Unit = writeJ(facade.jint(x))
+
   /** Write `Long` value to the current context. */
-  def writeLong(x: Long): Unit =
-    writeJ(facade.jlong(x))
+  def writeLong(x: Long): Unit = writeJ(facade.jlong(x))
+
   /** Write `Double` value to the current context. */
-  def writeDouble(x: Double): Unit =
-    writeJ(facade.jdouble(x))
+  def writeDouble(x: Double): Unit = writeJ(facade.jdouble(x))
+
   /** Write `BigDecimal` value to the current context. */
-  def writeBigDecimal(x: BigDecimal): Unit =
-    writeJ(facade.jbigdecimal(x))
+  def writeBigDecimal(x: BigDecimal): Unit = writeJ(facade.jbigdecimal(x))
+
   /** Write `Boolean` value to the current context. */
-  def writeBoolean(x: Boolean): Unit =
-    if (x) writeJ(facade.jtrue())
-    else writeJ(facade.jfalse())
+  def writeBoolean(x: Boolean): Unit = if (x) writeJ(facade.jtrue()) else writeJ(facade.jfalse())
+
   /** Write null to the current context. */
-  def writeNull(): Unit =
-    writeJ(facade.jnull())
+  def writeNull(): Unit = writeJ(facade.jnull())
+
   /** Write `String` value to the current context. */
   def writeString(x: String): Unit =
     state match {
@@ -43,8 +40,8 @@ class Builder[J](facade: Facade[J]) {
       case _ => writeJ(facade.jstring(x))
     }
 
-  def addField[A](field: String, a: A)(implicit format: JsonFormat[A]): Unit =
-    format.addField(field, a, this)
+  def addField[A](field: String, a: A)(implicit format: JsonFormat[A]): Unit = format.addField(field, a, this)
+
   /** Write field name to the current context. */
   def addFieldName(field: String): Unit =
     state match {
@@ -68,6 +65,7 @@ class Builder[J](facade: Facade[J]) {
       case InObject => stateError(InObject) // expecting field name
       case End => stateError(End)
     }
+
   /** Ends the current array context.
     */
   def endArray(): Unit =
@@ -87,6 +85,10 @@ class Builder[J](facade: Facade[J]) {
         }
       case x => stateError(x)
     }
+
+  def state: BuilderState = _state
+  private def state_=(newState: BuilderState) = _state = newState
+
   /** Checks if the current state is `InObject` */
   def isInObject: Boolean = state == InObject
 
@@ -109,6 +111,7 @@ class Builder[J](facade: Facade[J]) {
       case InObject => stateError(InObject) // expecting field name
       case End => stateError(End)
     }
+
   /** Ends the current object context.
     */
   def endObject(): Unit =
@@ -177,12 +180,14 @@ class Builder[J](facade: Facade[J]) {
       case InObject => stateError(InObject)
       case End => stateError(End)
     }
+
   private def stateError(x: BuilderState) = serializationError(s"Unexpected builder state: $x")
+
   def result: Option[J] = resultOpt
 }
 
-private[sjsonnew] sealed trait BuilderState
-private[sjsonnew] object BuilderState {
+sealed trait BuilderState
+object BuilderState {
   case object Begin extends BuilderState
   case object End extends BuilderState
   case object InArray extends BuilderState
