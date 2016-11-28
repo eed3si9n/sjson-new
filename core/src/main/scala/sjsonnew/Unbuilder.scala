@@ -7,9 +7,9 @@ import UnbuilderState._
 /**
  * Builder is an mutable structure to write JSON into.
  */
-class Unbuilder[J](facade: Facade[J]) {
+class Unbuilder[J](val facade: Facade[J]) {
   private var _state: UnbuilderState = UnbuilderState.Begin
-  private var contexts: List[UnbuilderContext[J]] = Nil
+  private var _contexts: List[UnbuilderContext[J]] = Nil
   private var precontext: Option[UnbuilderPrecontext[J]] = None
 
   /** Read `Int` value to the current context. */
@@ -77,6 +77,9 @@ class Unbuilder[J](facade: Facade[J]) {
 
   def state: UnbuilderState = _state
   private def state_=(newState: UnbuilderState) = _state = newState
+
+  def contexts: List[UnbuilderContext[J]] = _contexts
+  private def contexts_=(newContexts: List[UnbuilderContext[J]]) = _contexts = newContexts
 
   def isInObject: Boolean = state == InObject
 
@@ -205,11 +208,13 @@ object UnbuilderState {
   case object InObject extends UnbuilderState
 }
 
-private[sjsonnew] trait UnbuilderContext[J]
-private[sjsonnew] object UnbuilderContext {
+trait UnbuilderContext[J]
+object UnbuilderContext {
   case class ObjectContext[J](fields: Map[String, J], names: Vector[String]) extends UnbuilderContext[J] {
     private val size = names.size
-    private var idx: Int = 0
+    private var _idx: Int = 0
+    def idx: Int = _idx
+    private def idx_=(newIdx: Int) = _idx = newIdx
     def hasNext: Boolean = idx < size
     def next: (String, J) = {
       val name = names(idx)
@@ -219,7 +224,11 @@ private[sjsonnew] object UnbuilderContext {
     }
   }
   case class ArrayContext[J](elements: Vector[J]) extends UnbuilderContext[J] {
-    private var idx: Int = 0
+    private val size = elements.size
+    private var _idx: Int = 0
+    def idx: Int = _idx
+    private def idx_=(newIdx: Int) = _idx = newIdx
+    def hasNext: Boolean = idx < size
     def next: J = {
       val x = elements(idx)
       idx = idx + 1
