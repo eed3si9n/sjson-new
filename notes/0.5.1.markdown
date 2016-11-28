@@ -1,0 +1,8 @@
+### fixes and enhacements
+
+- Fixes parsing booleans with SLIP-28 Scala JSON. [#19][19] by [@dwijnand][@dwijnand]
+- Exposes `Builder`/`Unbuilder` state for advanced usage. [#21][21] by [@dwijnand][@dwijnand]
+
+  [19]: https://github.com/eed3si9n/sjson-new/pull/19
+  [21]: https://github.com/eed3si9n/sjson-new/pull/21
+  [@dwijnand]: https://github.com/dwijnand
