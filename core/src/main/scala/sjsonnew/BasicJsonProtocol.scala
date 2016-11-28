@@ -28,6 +28,7 @@ trait BasicJsonProtocol
         with CollectionFormats
         with AdditionalFormats
         with UnionFormats
+        with FlatUnionFormats
         with IsoFormats
         with JavaExtraFormats
         with CalendarFormats

@@ -11,6 +11,7 @@ class Builder[J](facade: Facade[J]) {
   private var resultOpt: Option[J] = None
   private var state: BuilderState = BuilderState.Begin
   protected var contexts: List[FContext[J]] = Nil
+  private var precontext: Option[FContext[J]] = None
 
   /** Write `Int` value to the current context. */
   def writeInt(x: Int): Unit =
@@ -96,7 +97,13 @@ class Builder[J](facade: Facade[J]) {
   def beginObject(): Unit =
     state match {
       case Begin | InArray | InField =>
-        val context = facade.objectContext()
+        val context =
+          precontext match {
+            case Some(x) =>
+              precontext = None
+              x
+            case _       => facade.objectContext()
+          }
         contexts ::= context
         state = InObject
       case InObject => stateError(InObject) // expecting field name
@@ -118,6 +125,39 @@ class Builder[J](facade: Facade[J]) {
           if (contexts.head.isObj) state = InField
           else state = InArray
           writeJ(js)
+        }
+      case x => stateError(x)
+    }
+
+  /** Begins an offline JObject, which will later be used for beginObject().
+    * The builder state will be in `BuilderState.InObject`.
+    * Make pairs `addField("abc")` and `writeXXX` calls to make field entries,
+    * and end with `endObject`.
+    */
+  def beginPreObject(): Unit =
+    state match {
+      case Begin | InArray | InField =>
+        val context = facade.objectContext()
+        contexts ::= context
+        state = InObject
+      case InObject => stateError(InObject) // expecting field name
+      case End => stateError(End)
+    }
+
+  /** Ends the current object context.
+    */
+  def endPreObject(): Unit =
+    state match {
+      case InObject =>
+        val x = contexts.head
+        contexts = contexts.tail
+        precontext = Some(x)
+        if (contexts.isEmpty) {
+          state = Begin
+        }
+        else {
+          if (contexts.head.isObj) state = InField
+          else state = InArray
         }
       case x => stateError(x)
     }
