@@ -30,17 +30,7 @@ sealed trait LNil extends LList {
   override def find[A1: ClassManifest](n: String): Option[A1] = None
 }
 object LNil extends LNil {
-  implicit val singletonFormat: JsonFormat[LNil.type] = new JsonFormat[LNil.type] {
-    def write[J](x: LNil.type, builder: Builder[J]): Unit =
-      {
-        if (!builder.isInObject) {
-          builder.beginObject()
-        }
-        builder.endObject()
-      }
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LNil.type = LNil
-  }
-  implicit val lnilFormat: JsonFormat[LNil] =new JsonFormat[LNil] {
+  implicit val lnilFormat: JsonFormat[LNil] = new JsonFormat[LNil] {
     def write[J](x: LNil, builder: Builder[J]): Unit =
       {
         if (!builder.isInObject) {
