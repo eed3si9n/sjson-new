@@ -72,7 +72,7 @@ class UnionFormatsSpec extends Specification with BasicJsonProtocol {
   }
   val fruit: Fruit = Apple()
   "The unionFormat" should {
-    implicit val FruitFormat = unionFormat2[Fruit, Apple, Orange]
+    implicit val FruitFormat: JsonFormat[Fruit] = unionFormat2[Fruit, Apple, Orange]
     val fruitJson = JsObject("value" ->  JsObject("x" -> JsNumber(0)), "type" -> JsString("Apple"))
     "convert a value of ADT to JObject" in {
       Converter.toJsonUnsafe(fruit) mustEqual fruitJson
@@ -83,7 +83,7 @@ class UnionFormatsSpec extends Specification with BasicJsonProtocol {
   }
 
   "The flatUnionFormat" should {
-    implicit val FruitFormat = flatUnionFormat2[Fruit, Apple, Orange]("type")
+    implicit val FruitFormat: JsonFormat[Fruit] = flatUnionFormat2[Fruit, Apple, Orange]("type")
     val fruitJson2 = JsObject("type" -> JsString("Apple"), "x" -> JsNumber(0))
     "convert a value of ADT to JObject" in {
       Converter.toJsonUnsafe(fruit) mustEqual fruitJson2

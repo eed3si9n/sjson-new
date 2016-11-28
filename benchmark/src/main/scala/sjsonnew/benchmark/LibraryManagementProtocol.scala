@@ -5,8 +5,8 @@ import sbt.librarymanagement._
 import java.net.URL
 
 trait LibraryManagementProtocol extends BasicJsonProtocol {
-  implicit val configurationStringIso = IsoString.iso[Configuration](_.name, Configurations.config)
-  implicit val crossVersionStringIso = IsoString.iso[CrossVersion](
+  implicit val configurationStringIso: IsoString[Configuration] = IsoString.iso[Configuration](_.name, Configurations.config)
+  implicit val crossVersionStringIso: IsoString[CrossVersion] = IsoString.iso[CrossVersion](
     _ match {
       case CrossVersion.Disabled => "disabled"
       case x => x.toString

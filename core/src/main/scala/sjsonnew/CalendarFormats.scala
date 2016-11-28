@@ -22,7 +22,7 @@ import javax.xml.bind.DatatypeConverter
 trait CalendarFormats {
   self: IsoFormats =>
 
-  implicit val calendarStringIso = {
+  implicit val calendarStringIso: IsoString[Calendar] = {
     IsoString.iso[Calendar]( (c: Calendar) => DatatypeConverter.printDateTime(c),
       (s: String) => DatatypeConverter.parseDateTime(s))
   }

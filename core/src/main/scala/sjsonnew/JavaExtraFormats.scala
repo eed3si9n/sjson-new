@@ -32,13 +32,13 @@ trait JavaExtraFormats {
   implicit val javaBigDecimalFormat: JF[JBigDecimal] =
     project[JBigDecimal, BigDecimal](BigDecimal.apply, _.bigDecimal)
 
-  implicit val uuidStringIso = IsoString.iso[UUID](
+  implicit val uuidStringIso: IsoString[UUID] = IsoString.iso[UUID](
     _.toString, UUID.fromString)
-  implicit val uriStringIso = IsoString.iso[URI](
+  implicit val uriStringIso: IsoString[URI] = IsoString.iso[URI](
     _.toASCIIString, new URI(_))
-  implicit val urlStringIso = IsoString.iso[URL](
+  implicit val urlStringIso: IsoString[URL] = IsoString.iso[URL](
     _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
 
-  implicit val fileStringIso = IsoString.iso[File](
+  implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     _.toURI.toASCIIString, (s: String) => new File(new URI(s)))
 }
