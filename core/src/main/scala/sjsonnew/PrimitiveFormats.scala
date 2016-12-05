@@ -154,4 +154,20 @@ trait PrimitiveFormats {
         case None => deserializationError("Expected Symbol as JsString, but got None")
       }
   }
+
+  implicit val StringJsonKeyFormat: JsonKeyFormat[String]         = JsonKeyFormat(identity, identity)
+  implicit val SymbolJsonKeyFormat: JsonKeyFormat[Symbol]         = JsonKeyFormat(_.name, Symbol(_))
+
+  implicit val UnitJsonKeyFormat: JsonKeyFormat[Unit]             = JsonKeyFormat(_ => "\"\"", _ => ())
+  implicit val BooleanJsonKeyFormat: JsonKeyFormat[Unit]          = JsonKeyFormat(_.toString, _.toBoolean)
+  implicit val ByteJsonKeyFormat: JsonKeyFormat[Byte]             = JsonKeyFormat(_.toString, _.toByte)
+  implicit val ShortJsonKeyFormat: JsonKeyFormat[Short]           = JsonKeyFormat(_.toString, _.toShort)
+  implicit val CharJsonKeyFormat: JsonKeyFormat[Char]             = JsonKeyFormat(_.toString, _.head)
+  implicit val IntJsonKeyFormat: JsonKeyFormat[Int]               = JsonKeyFormat(_.toString, _.toInt)
+  implicit val LongJsonKeyFormat: JsonKeyFormat[Long]             = JsonKeyFormat(_.toString, _.toLong)
+  implicit val FloatJsonKeyFormat: JsonKeyFormat[Float]           = JsonKeyFormat(_.toString, _.toFloat)
+  implicit val DoubleJsonKeyFormat: JsonKeyFormat[Double]         = JsonKeyFormat(_.toString, _.toDouble)
+
+  implicit val BigDecimalJsonKeyFormat: JsonKeyFormat[BigDecimal] = JsonKeyFormat(_.toString, BigDecimal(_))
+  implicit val BigIntJsonKeyFormat: JsonKeyFormat[BigInt]         = JsonKeyFormat(_.toString, BigInt(_))
 }
