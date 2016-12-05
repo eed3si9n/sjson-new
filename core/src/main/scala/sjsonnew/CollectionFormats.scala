@@ -81,19 +81,16 @@ trait CollectionFormats {
       }
   }
 
-  /**
-    * Supplies the JsonFormat for Maps. The implicitly available JsonFormat for the key type K must
-    * always write JsStrings, otherwise a [[sjsonnew.SerializationException]] will be thrown.
-   */
-  implicit def mapFormat[K: JsonFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
-    lazy val keyFormat = implicitly[JsonFormat[K]]
+  /** Supplies the JsonFormat for Maps. */
+  implicit def mapFormat[K: JsonKeyFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
+    lazy val keyFormat = implicitly[JsonKeyFormat[K]]
     lazy val valueFormat = implicitly[JsonFormat[V]]
     def write[J](m: Map[K, V], builder: Builder[J]): Unit =
       {
         builder.beginObject()
         m foreach {
           case (k, v) =>
-            keyFormat.write(k, builder)
+            builder.writeString(keyFormat.write(k))
             valueFormat.write(v, builder)
         }
         builder.endObject()
@@ -109,8 +106,8 @@ trait CollectionFormats {
         case Some(js) =>
           val size = unbuilder.beginObject(js)
           val xs = (1 to size).toList map { x =>
-            val (k, v) = unbuilder.nextFieldWithJString
-            keyFormat.read(Some(k), unbuilder) -> valueFormat.read(Some(v), unbuilder)
+            val (k, v) = unbuilder.nextField
+            keyFormat.read(k) -> valueFormat.read(Some(v), unbuilder)
           }
           unbuilder.endObject
           Map(xs: _*)

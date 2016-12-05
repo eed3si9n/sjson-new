@@ -20,7 +20,7 @@ package support.spray
 
 import org.specs2.mutable._
 import java.util.Arrays
-import spray.json.{ JsArray, JsNumber, JsString, JsObject }
+import spray.json.{ JsArray, JsNumber, JsObject, JsString, JsValue }
 
 class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
   case class Person(name: String, value: List[Int], ary: Array[Int],
@@ -52,6 +52,25 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
   }
   val person = Person("x", Nil, Array(), Map(), Vector())
   val personJson = JsObject("name" -> JsString("x"))
+
+  case class Peep(name: String)
+  implicit object PeepFormat extends JsonFormat[Peep] {
+    def write[J](x: Peep, builder: Builder[J]) = {
+      builder.beginObject()
+      builder.addField("name", x.name)
+      builder.endObject()
+    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]) = jsOpt match {
+      case Some(js) =>
+        unbuilder.beginObject(js)
+        val name = unbuilder.readField[String]("name")
+        unbuilder.endObject()
+        Peep(name)
+      case None => deserializationError("Expected JsObject but found None")
+    }
+  }
+  implicit val PeepKeyFormat: JsonKeyFormat[Peep] = JsonKeyFormat(_.name, Peep)
+  val peep = Peep("x")
 
   "The listFormat" should {
     val list = List(1, 2, 3)
@@ -87,6 +106,7 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     "be able to convert a JsObject to a Map[String, Long]" in {
       Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
+    "round trip a Map[Peep, Int]" in assertRoundTrip(Map(peep -> 1))
     // "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
     //   Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Unexpected builder state: InObject"))
     // }
@@ -112,5 +132,11 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     "convert a JsArray of JsNumbers to a IndexedSeq[Int]" in {
       Converter.fromJsonUnsafe[collection.IndexedSeq[Int]](json) mustEqual seq
     }
+  }
+
+  def assertRoundTrip[A: JsonWriter: JsonReader](x: A) = {
+    val jValue: JsValue = Converter.toJsonUnsafe(x)
+    val y: A = Converter.fromJsonUnsafe[A](jValue)
+    x mustEqual y
   }
 }
