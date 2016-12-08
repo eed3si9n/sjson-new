@@ -35,4 +35,6 @@ trait IsoFormats {
         case None     => iso.from("")
       }
   }
+
+  implicit def isoStringKeyFormat[A](implicit z: IsoString[A]): JsonKeyFormat[A] = JsonKeyFormat(z.to, z.from)
 }
