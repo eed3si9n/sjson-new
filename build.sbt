@@ -73,6 +73,8 @@ lazy val supportMsgpack = support("msgpack").
     libraryDependencies += msgpackCore
   )
 
+lazy val supportMurmurhash = support("murmurhash")
+
 lazy val benchmark = (project in file("benchmark")).
   dependsOn(supportSpray, supportScalaJson, supportMsgpack).
   enablePlugins(JmhPlugin).
