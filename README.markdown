@@ -217,6 +217,8 @@ by putting the simple type name into `type` field, and the value in the `value` 
 {"value":{"name":"Company","value":2},"type":"Organization"}
 ```
 
+**BEWARE**: Both `unionFormatN` and `flatUnionFormatN` functions only support leaf types in `A1`, `A2`, etc, so if your ADT consists of multiple levels of traits, you need to expand them yourself to a flat list of concrete types.
+
 ### Low-level API: Builder and Unbuilder
 
 If you want to drop down to a more lower level JSON writing, for example, to encode something as JString, sjon-new offers Builder and Unbuilder. This is a procedural style API, and it's closer to the AST. For instance, `IntJsonFormat` is defined as follows:

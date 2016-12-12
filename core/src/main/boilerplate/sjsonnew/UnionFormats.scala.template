@@ -3,7 +3,8 @@ package sjsonnew
 trait UnionFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
-  [#def unionFormat1[U, [#A1 :JF: Manifest#]]: JF[U] = new JF[U] {
+  [#/** *BEWARE*: [# A1#] must be a concrete leaf type, and not an interface. */
+  def unionFormat1[U, [#A1 :JF: Manifest#]]: JF[U] = new JF[U] {
     [#lazy val a1Format = implicitly[JF[A1]]#
     ]
 
