@@ -5,7 +5,7 @@ import BuilderState._
 /**
  * Builder is an mutable structure to write JSON into.
  */
-class Builder[J](facade: Facade[J]) {
+class Builder[J](facade: BuilderFacade[J]) {
   private var resultOpt: Option[J] = None
   private var _state: BuilderState = BuilderState.Begin
   protected var contexts: List[FContext[J]] = Nil
