@@ -22,25 +22,13 @@ import HashUtil.hashLong
 import java.lang.{ Double => JDouble }
 import scala.util.hashing.MurmurHash3
 
-object Converter extends SupportConverter[Int] {
+object Hasher extends SupportHasher[Int] {
   private val nullHash = 0xc0
   private val falseHash = 0xc2
   private val trueHash = 0xc3
 
-  def hash[A](obj: A)(implicit writer: HashWriter[A]): Try[Int] =
-    Try(hashUnsafe(obj))
-  def hashUnsafe[A](obj: A)(implicit writer: HashWriter[A]): Int =
-    {
-      val builder = makeBuilder
-      writer.write(obj, builder)
-      builder.result match {
-        case Some(r) => r
-        case _       => facade.jnull()
-      }
-    }
-
-  implicit val facade: Facade[Int] = FacadeImpl
-  private object FacadeImpl extends SimpleFacade[Int] {
+  implicit val facade: BuilderFacade[Int] = FacadeImpl
+  private object FacadeImpl extends SimpleBuilderFacade[Int] {
     val jnull                 = nullHash
     val jfalse                = falseHash
     val jtrue                 = trueHash
@@ -51,20 +39,7 @@ object Converter extends SupportConverter[Int] {
     def jdouble(d: Double)    = hashLong(JDouble.doubleToRawLongBits(d))
     def jbigdecimal(d: BigDecimal) = jstring(d.toString)
     def jstring(s: String)    = MurmurHash3.stringHash(s)
-
     def jarray(vs: List[Int]): Int = MurmurHash3.seqHash(vs)
     def jobject(vs: Map[String, Int]): Int = MurmurHash3.mapHash(vs)
-    def isJnull(value: Int): Boolean = value == nullHash
-    def isObject(value: Int): Boolean = false
-    def extractInt(value: Int): Int = extractError
-    def extractLong(value: Int): Long = extractError
-    def extractFloat(value: Int): Float = extractError
-    def extractDouble(value: Int): Double = extractError
-    def extractBigDecimal(value: Int): BigDecimal = extractError
-    def extractBoolean(value: Int): Boolean = extractError
-    def extractString(value: Int): String = extractError
-    def extractArray(value: Int): Vector[Int] = extractError
-    def extractObject(value: Int): (Map[String, Int], Vector[String]) = extractError
-    private def extractError: Nothing = sys.error("Murmurhash is a one-way hash, and cannot deserialize back to the object.")
   }
 }

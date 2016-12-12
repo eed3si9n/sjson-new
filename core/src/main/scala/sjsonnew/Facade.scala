@@ -25,13 +25,13 @@ package sjsonnew
 // https://github.com/non/jawn/blob/5f03ff5d9bccb483f6fd87d8e79cdb697f8794b6/parser/src/main/scala/jawn/Facade.scala
 
 /**
- * Facade is a type class that describes how JSON AST elements of
- * type J can be constructed, and how value can be extracted.
+ * BuilderFacade is a type class that describes how JSON AST elements of
+ * type J can be constructed.
  *
- * Facade[J] also uses FContext[J] instances, so implementors will
+ * BuilderFacade[J] also uses FContext[J] instances, so implementors will
  * usually want to define both.
  */
-trait Facade[J] {
+trait BuilderFacade[J] {
   def singleContext(): FContext[J]
   def arrayContext(): FContext[J]
   def objectContext(): FContext[J]
@@ -46,18 +46,8 @@ trait Facade[J] {
   def jint(i: Int): J
   def jlong(l: Long): J
   def jstring(s: String): J
-  def isJnull(value: J): Boolean
-  def isObject(value: J): Boolean
-  def extractInt(value: J): Int
-  def extractLong(value: J): Long
-  def extractFloat(value: J): Float
-  def extractDouble(value: J): Double
-  def extractBigDecimal(value: J): BigDecimal
-  def extractBoolean(value: J): Boolean
-  def extractString(value: J): String
-  def extractArray(value: J): Vector[J]
-  def extractObject(value: J): (Map[String, J], Vector[String])
 }
+
 
 /**
  * FContext is used to construct nested JSON values.
@@ -72,3 +62,30 @@ trait FContext[J] {
   def finish: J
   def isObj: Boolean
 }
+
+/**
+ * ExtractorFacade is a type class that describes how JSON AST elements of
+ * type J can be extracted.
+ */
+trait ExtractorFacade[J] {
+  def isJnull(value: J): Boolean
+  def isObject(value: J): Boolean
+  def extractInt(value: J): Int
+  def extractLong(value: J): Long
+  def extractFloat(value: J): Float
+  def extractDouble(value: J): Double
+  def extractBigDecimal(value: J): BigDecimal
+  def extractBoolean(value: J): Boolean
+  def extractString(value: J): String
+  def extractArray(value: J): Vector[J]
+  def extractObject(value: J): (Map[String, J], Vector[String])
+}
+
+/**
+ * Facade is a type class that describes how JSON AST elements of
+ * type J can be constructed, and how value can be extracted.
+ *
+ * Facade[J] also uses FContext[J] instances, so implementors will
+ * usually want to define both.
+ */
+trait Facade[J] extends BuilderFacade[J] with ExtractorFacade[J]
