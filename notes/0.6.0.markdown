@@ -1,0 +1,39 @@
+### JsonKeyFormat
+
+The `JsonFormat` instances for `Map` collections are now derived from
+`K: JsonKeyFormat` and `V: JsonFormat` where `JsonKeyFormat` represents datatypes that
+can be used a key such as `String` and `Int`.
+
+[#26][26] by [@dwijnand][@dwijnand]
+
+### Murmurhash support
+
+sjson-new adds a facility for write-only backends for hashing.
+As a reference implementation we've added Murmurhash support.
+
+    scala> import sjsonnew._, LList.:*:
+
+    scala> import BasicJsonProtocol._
+
+    scala> case class Person(name: String, value: Int)
+
+    scala> implicit val personIso = LList.iso(
+             { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
+             { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
+
+    scala> import sjsonnew.support.murmurhash.Hasher
+
+    scala> Hasher.hash[Person](Person("Foo", 1))
+    res0: scala.util.Try[Int] = Success(1133802554)
+
+  [#28][28] by [@eed3si9n][@eed3si9n]
+
+### Other minor enhancements and fixes
+
+- Adds `JavaPrimitiveFormats` for boxed primitives. [#33][33] by [@eed3si9n][@eed3si9n]
+
+  [26]: https://github.com/eed3si9n/sjson-new/pull/26
+  [28]: https://github.com/eed3si9n/sjson-new/pull/28
+  [33]: https://github.com/eed3si9n/sjson-new/pull/33
+  [@dwijnand]: https://github.com/dwijnand
+  [@eed3si9n]: https://github.com/eed3si9n
