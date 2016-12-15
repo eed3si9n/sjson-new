@@ -30,6 +30,7 @@ trait BasicJsonProtocol
         with UnionFormats
         with FlatUnionFormats
         with IsoFormats
+        with JavaPrimitiveFormats
         with JavaExtraFormats
         with CalendarFormats
         with ImplicitHashWriters
