@@ -159,7 +159,7 @@ trait PrimitiveFormats {
   implicit val SymbolJsonKeyFormat: JsonKeyFormat[Symbol]         = JsonKeyFormat(_.name, Symbol(_))
 
   implicit val UnitJsonKeyFormat: JsonKeyFormat[Unit]             = JsonKeyFormat(_ => "\"\"", _ => ())
-  implicit val BooleanJsonKeyFormat: JsonKeyFormat[Unit]          = JsonKeyFormat(_.toString, _.toBoolean)
+  implicit val BooleanJsonKeyFormat: JsonKeyFormat[Boolean]       = JsonKeyFormat(_.toString, _.toBoolean)
   implicit val ByteJsonKeyFormat: JsonKeyFormat[Byte]             = JsonKeyFormat(_.toString, _.toByte)
   implicit val ShortJsonKeyFormat: JsonKeyFormat[Short]           = JsonKeyFormat(_.toString, _.toShort)
   implicit val CharJsonKeyFormat: JsonKeyFormat[Char]             = JsonKeyFormat(_.toString, _.head)
