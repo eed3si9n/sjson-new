@@ -34,6 +34,8 @@ class HListFormatSpec extends FlatSpec {
   it should "String.fromJsonStr[Peep] correctly" in assert(bobJsonStr.fromJsonStr[Peep] === bob)
   it should "Peep.jsonRoundTrip correctly"       in assertRoundTrip(bob)
 
+  it should "HList.jsonRoundTrip correctly" in assertRoundTrip(bob :+: Peep("Amy", 22) :+: HNil)
+
   private def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonRoundTrip)
 
   implicit class AnyOps[A: JsonWriter](val _x: A) {
