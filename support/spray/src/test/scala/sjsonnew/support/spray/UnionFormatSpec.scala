@@ -25,7 +25,8 @@ import LList._
 class UnionFormatsSpec extends Specification with BasicJsonProtocol {
   sealed trait Fruit
   case class Apple() extends Fruit
-  case class Orange() extends Fruit
+  sealed trait Citrus extends Fruit
+  case class Orange() extends Citrus
   implicit object AppleJsonFormat extends JsonFormat[Apple] {
     def write[J](x: Apple, builder: Builder[J]): Unit =
       {
