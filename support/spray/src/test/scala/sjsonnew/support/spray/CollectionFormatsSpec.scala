@@ -107,9 +107,15 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
       Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
     }
     "round trip a Map[Peep, Int]" in assertRoundTrip(Map(peep -> 1))
-    // "throw an Exception when trying to serialize a map whose key are not serialized to JsStrings" in {
-    //   Converter.toJsonUnsafe(Map(1 -> "a")) must throwA(new SerializationException("Unexpected builder state: InObject"))
-    // }
+    "round trip a Map[Unit, Int]" in assertRoundTrip(Map(() -> 1))
+    "round trip a Map[Boolean, Int]" in assertRoundTrip(Map(true -> 1))
+    "round trip a Map[Byte, Int]" in assertRoundTrip(Map(1.toByte -> 1))
+    "round trip a Map[Short, Int]" in assertRoundTrip(Map(1.toShort -> 1))
+    "round trip a Map[Char, Int]" in assertRoundTrip(Map('c' -> 1))
+    "round trip a Map[Int, Int]" in assertRoundTrip(Map(1 -> 1))
+    "round trip a Map[Long, Int]" in assertRoundTrip(Map(7563661897011259335L -> 1))
+    "round trip a Map[Float, Int]" in assertRoundTrip(Map(4.2f -> 1))
+    "round trip a Map[Double, Int]" in assertRoundTrip(Map(4.2 -> 1))
   }
 
   "The immutableSetFormat" should {
