@@ -1,0 +1,10 @@
+### scalajson: Fix unsafe.JObject parse ordering
+
+In the scalajson support module, fix a bug in parsing `unsafe.JObject` - instead of an interim `mutable.Map` use
+an `ArrayBuffer`.
+
+[#35][35] by [@dwijnand][@dwijnand]
+
+  [35]: https://github.com/eed3si9n/sjson-new/pull/35
+  [@eed3si9n]: https://github.com/eed3si9n
+  [@dwijnand]: https://github.com/dwijnand
