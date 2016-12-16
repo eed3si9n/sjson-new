@@ -24,11 +24,5 @@ class ScalaJsonSpec extends FlatSpec {
   "false" should "round-trip" in assertRoundTrip(false)
   "true" should "round-trip" in assertRoundTrip(true)
 
-  def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = {
-    val jValue1: JValue = Converter.toJson(x).get
-    val jsonString: String = CompactPrinter(jValue1)
-    val jValue2: JValue = Parser.parseUnsafe(jsonString)
-    val y: A = Converter.fromJson[A](jValue2).get
-    assert(x === y)
-  }
+  private def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonRoundTrip)
 }
