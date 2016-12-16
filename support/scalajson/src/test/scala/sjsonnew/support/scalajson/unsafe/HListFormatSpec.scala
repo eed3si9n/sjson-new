@@ -6,17 +6,19 @@ import scala.json.ast.unsafe._
 import BasicJsonProtocol._
 import org.scalatest._
 
-class HListFormatSpec extends FlatSpec {
-  case class Peep(name: String, age: Int)
-
-  import HList.:+:
+case class Peep(name: String, age: Int)
+object Peep {
+  import HList._
   implicit val PeepFormat: JsonFormat[Peep] = {
     project[Peep, String :+: Int :+: HNil](
       p => p.name :+: p.age :+: (HNil: HNil),
       { case name :+: age :+: HNil => Peep(name, age) }
     )
   }
+}
 
+class HListFormatSpec extends FlatSpec {
+  import HList._
   val bob = Peep("Bob", 23)
   val bobJson = JArray(JString("Bob"), JNumber(23))
   val bobJsonStr = """["Bob",23]"""
