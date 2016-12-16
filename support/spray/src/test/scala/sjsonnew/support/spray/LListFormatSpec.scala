@@ -46,5 +46,15 @@ class LListFormatsSpec extends Specification with BasicJsonProtocol {
     "convert a nested JObject to list" in {
       Converter.fromJsonUnsafe[(Int :*: LNil) :*: LNil](nestedObj) mustEqual nested
     }
+
+    val obj2 = JsObject("f" -> JsString("foo"))
+    val nested2Obj = JsObject("b" -> obj, "c" -> obj2)
+
+    val list2 = ("f", "foo") :*: LNil
+    val nested2 = ("b", list) :*: ("c", list2) :*: LNil
+
+    "convert a 2 nested JObjects to list" in {
+      Converter.fromJsonUnsafe[(Int :*: LNil) :*: (String :*: LNil) :*: LNil](nested2Obj) mustEqual nested2
+    }
   }
 }
