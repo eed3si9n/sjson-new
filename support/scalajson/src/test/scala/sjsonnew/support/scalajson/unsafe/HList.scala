@@ -3,53 +3,61 @@ package support.scalajson
 package unsafe
 
 sealed trait HList {
+  import HList._
   override def toString = this match {
-    case HNil        => "HNil"
+    case x: HNil     => "HNil"
     case HCons(h, t) => s"($h) :+: $t"
   }
 }
-
-sealed trait HNil extends HList
-object HNil extends HNil
-
-final case class HCons[H, T <: HList](head: H, tail: T) extends HList
 
 object HList {
   type :+:[H, T <: HList] = HCons[H, T]
   val :+: = HCons
 
+  // Hide the HHil to make sure that the return type of HNil is HNil, not HNil.type
+  private val hnil0 = new HNil {}
+  val HNil: HNil = hnil0
+  sealed trait HNil extends HList
+
+  final case class HCons[H, T <: HList](head: H, tail: T) extends HList
+
+  private implicit def mkTuple2[A1, A2](value: A1 :+: A2 :+: HNil) =
+    (value.head, value.tail.head)
+  private implicit def mkTuple3[A1, A2, A3](value: A1 :+: A2 :+: A3 :+: HNil) =
+    (value.head, value.tail.head, value.tail.tail.head)
   implicit class HListOps[T <: HList](val _l: T) extends AnyVal {
     def :+:[H](h: H): H :+: T = HCons(h, _l)
   }
+  import BasicJsonProtocol._
 
-  implicit val lnilFormat1: JsonFormat[HNil] = forHNil(HNil)
-  implicit val lnilFormat2: JsonFormat[HNil.type] = forHNil(HNil)
-
-  private def forHNil[A <: HNil](hnil: A): JsonFormat[A] = new JsonFormat[A] {
-    def write[J](x: A, builder: Builder[J]): Unit = {
-      if (builder.state != BuilderState.InArray) builder.beginArray()
-      builder.endArray()
-    }
-
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = {
-      if (unbuilder.state == UnbuilderState.InArray) unbuilder.endArray()
-      hnil
-    }
-  }
-
-  implicit def hconsFormat[H, T <: HList](implicit hf: JsonFormat[H], tf: JsonFormat[T]): JsonFormat[H :+: T] =
-    new JsonFormat[H :+: T] {
-      def write[J](hcons: H :+: T, builder: Builder[J]) = {
-        if (builder.state != BuilderState.InArray) builder.beginArray()
-        hf.write(hcons.head, builder)
-        tf.write(hcons.tail, builder)
-      }
-
-      def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]) = jsOpt match {
-        case None => HCons(hf.read(None, unbuilder), tf.read(None, unbuilder))
-        case Some(js) =>
-          if (unbuilder.state != UnbuilderState.InArray) unbuilder.beginArray(js)
-          HCons(hf.read(Some(unbuilder.nextElement), unbuilder), tf.read(Some(js), unbuilder))
-      }
-    }
+  implicit def hlist1Format[A1: JsonFormat]: JsonFormat[A1 :+: HNil] =
+    project[A1 :+: HNil, A1](
+      (value: A1 :+: HNil) => { value.head },
+      (a1: A1) => { HCons(a1, HNil) }
+    )
+  implicit def hlist2Format[A1: JsonFormat, A2: JsonFormat]: JsonFormat[A1 :+: A2 :+: HNil] =
+    project[A1 :+: A2 :+: HNil, (A1, A2)](
+      (value: A1 :+: A2 :+: HNil) => {
+        val x0t = value
+        val x1 = x0t.head
+        val x1t = value.tail
+        val x2 = x1t.head
+        (x1, x2)
+      },
+      (t: (A1, A2) ) => { HCons(t._1, HCons(t._2, HNil)) }
+    )
+  implicit def hlist3Format[A1: JsonFormat, A2: JsonFormat, A3: JsonFormat]:
+    JsonFormat[A1 :+: A2 :+: A3 :+: HNil] =
+    project[A1 :+: A2 :+: A3 :+: HNil, (A1, A2, A3)](
+      (value: A1 :+: A2 :+: A3 :+: HNil) => {
+        val x0t = value
+        val x1 = x0t.head
+        val x1t = value.tail
+        val x2 = x1t.head
+        val x2t = x1t.tail
+        val x3 = x2t.head
+        (x1, x2, x3)
+      },
+      (t: (A1, A2, A3) ) => { HCons(t._1, HCons(t._2, HCons(t._3, HNil))) }
+    )
 }

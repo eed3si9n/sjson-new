@@ -24,11 +24,25 @@ class ScalaJsonSpec extends FlatSpec {
   "false" should "round-trip" in assertRoundTrip(false)
   "true" should "round-trip" in assertRoundTrip(true)
 
-  def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = {
-    val jValue1: JValue = Converter.toJson(x).get
-    val jsonString: String = CompactPrinter(jValue1)
-    val jValue2: JValue = Parser.parseUnsafe(jsonString)
-    val y: A = Converter.fromJson[A](jValue2).get
-    assert(x === y)
-  }
+  case class Peep(name: String, age: Int)
+
+  import LList.:*:
+  type PeepRepr = String :*: Int :*: LNil
+
+  implicit val PeepIso: IsoLList.Aux[Peep, PeepRepr] = LList.iso(
+    { p: Peep => ("name", p.name) :*: ("age", p.age) :*: LNil },
+    { in: PeepRepr => Peep(in.head, in.tail.head) }
+  )
+
+  val bob = Peep("Bob", 23)
+  val bobJson = JObject(JField("name", JString("Bob")), JField("age", JNumber(23)))
+  val bobJsonStr = """{"name":"Bob","age":23}"""
+
+  it should "Peep.toJson correctly"              in assert(bob.toJson === bobJson)
+  it should "Peep.toJsonStr correctly"           in assert(bob.toJsonStr === bobJsonStr)
+  it should "String.toJson correctly"            in assert(bobJsonStr.toJson === bobJson)
+  it should "String.fromJsonStr[Peep] correctly" in assert(bobJsonStr.fromJsonStr[Peep] === bob)
+  it should "Peep.jsonRoundTrip correctly"       in assertRoundTrip(bob)
+
+  private def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonRoundTrip)
 }
