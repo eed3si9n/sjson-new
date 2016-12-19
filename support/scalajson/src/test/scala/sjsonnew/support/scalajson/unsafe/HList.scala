@@ -18,8 +18,12 @@ object HList {
   type :+:[H, T <: HList] = HCons[H, T]
   val :+: = HCons
 
-  implicit class HListOps[T <: HList](val _l: T) extends AnyVal {
-    def :+:[H](h: H): H :+: T = HCons(h, _l)
+  implicit class HNilOps(val _l: HNil) extends AnyVal {
+    def :+:[H](h: H): H :+: HNil = HCons(h, _l)
+  }
+
+  implicit class HConsOps[H, T <: HList](val _l: HCons[H, T]) extends AnyVal {
+    def :+:[G](g: G): G :+: H :+: T = HCons(g, _l)
   }
 
   implicit val lnilFormat1: JsonFormat[HNil] = forHNil(HNil)
