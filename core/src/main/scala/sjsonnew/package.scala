@@ -20,6 +20,9 @@ package object sjsonnew {
 
   def jsonReader[A](implicit reader: JsonReader[A]): JsonReader[A] = reader
   def jsonWriter[A](implicit writer: JsonWriter[A]): JsonWriter[A] = writer
+
+  type LNil = LList.LNil0
+  val LNil = LList.LNil0
 }
 
 package sjsonnew {

@@ -174,14 +174,23 @@ class MsgpackSpec extends FlatSpec with BasicJsonProtocol {
   lazy val a1 = ("a", 1) :*: LNil
   lazy val ba1 = ("b", a1) :*: LNil
   lazy val a1Message = fromHex(
-    "81 " +    // Fix map for 1 entry
+    "82 " +    // Fix map for 2 entry
+    "A7 24 66 69 65 6C 64 73 " + // string of length 7, "$fields"
+    "91 " + // array with single item
+    "A1 61 " + // string of length 1, "a" (0x61)
     "A1 61 " + // string of length 1, "a" (0x61)
     "01"       // 1
     )
   lazy val ba1Message = fromHex(
-    "81 " +    // Fix map for 1 entry
+    "82 " +    // Fix map for 1 entry
+    "A7 24 66 69 65 6C 64 73 " + // string of length 7, "$fields"
+    "91 " + // array with single item
     "A1 62 " + // string of length 1, "b" (0x62)
-    "81 " +    // Fix map for 1 entry
+    "A1 62 " + // string of length 1, "b" (0x62)
+    "82 " +    // Fix map for 1 entry
+    "A7 24 66 69 65 6C 64 73 " + // string of length 7, "$fields"
+    "91 " + // array with single item
+    "A1 61" +  // string of length 1, "a" (0x61)
     "A1 61" +  // string of length 1, "a" (0x61)
     "01"       // 1
     )

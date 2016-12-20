@@ -21,18 +21,25 @@ sealed trait LList {
   def find[A1: ClassManifest](n: String): Option[A1]
   def fieldNames: List[String]
 }
-sealed trait LNil extends LList {
-  import LList.:*:
-  def :*:[A1: JsonFormat: ClassManifest](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
 
-  override def toString: String = "LNil"
-  override def find[A1: ClassManifest](n: String): Option[A1] = None
-  override def fieldNames: List[String] = Nil
+object LList extends LListFormats {
+  type :*:[A1, A2 <: LList] = LCons[A1, A2]
+  val :*: = LCons
+  def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
+    IsoLList.iso[A, R0](to0, from0)
+  // This is so the return type of LNil becomes LNil, instead of LNil.type.
+  val LNil0: LNil0 = new LNil0 {}
+  sealed trait LNil0 extends LList {
+    def :*:[A1: JsonFormat: ClassManifest](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
+
+    override def toString: String = "LNil"
+    override def find[A1: ClassManifest](n: String): Option[A1] = None
+    override def fieldNames: List[String] = Nil
+  }
 }
 
 final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
   import LList.:*:
-  // type Wrap[F[_]] = F[A1] :*: A2#Wrap[F]
   def :*:[B1: JsonFormat: ClassManifest](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
   override def toString: String = s"($name, $head) :*: $tail"
   override def find[B1: ClassManifest](n: String): Option[B1] =
@@ -41,14 +48,6 @@ final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](n
   override def fieldNames: List[String] = name :: tail.fieldNames
 }
 
-object LList extends LListFormats {
-  type :*:[A1, A2 <: LList] = LCons[A1, A2]
-  val :*: = LCons
-  def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
-    IsoLList.iso[A, R0](to0, from0)
-  // This is so the return type of LNil becomes LNil, instead of LNil.type.
-  val LNil: LNil = new LNil {}
-}
 
 trait LListFormats {
   import BasicJsonProtocol._
@@ -66,7 +65,7 @@ trait LListFormats {
         if (unbuilder.isInObject) {
           unbuilder.endObject()
         }
-        LList.LNil
+        LList.LNil0
       }
   }
   private val fieldNamesField = "$fields"
