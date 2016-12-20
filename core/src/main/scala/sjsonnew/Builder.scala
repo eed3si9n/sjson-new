@@ -140,8 +140,11 @@ class Builder[J](facade: BuilderFacade[J]) {
   def beginPreObject(): Unit =
     state match {
       case Begin | InArray | InField =>
-        val context = facade.objectContext()
-        contexts ::= context
+        val p = precontext match {
+          case Some(x) => x
+          case None    => facade.objectContext()
+        }
+        contexts ::= p
         state = InObject
       case InObject => stateError(InObject) // expecting field name
       case End => stateError(End)

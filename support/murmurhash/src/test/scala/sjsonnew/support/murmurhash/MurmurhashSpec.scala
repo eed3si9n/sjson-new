@@ -101,5 +101,5 @@ class MurmurhashSpec extends FlatSpec with BasicJsonProtocol {
   lazy val emptyHash = -1609326920
   lazy val a1 = ("a", 1) :*: LNil
   lazy val ba1 = ("b", a1) :*: LNil
-  lazy val a1Hash = -521317128
+  lazy val a1Hash = 1371594665
 }
