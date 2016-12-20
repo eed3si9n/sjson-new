@@ -18,16 +18,16 @@ package sjsonnew
 
 /** Heterogeneous list with labels. */
 sealed trait LList {
-  // type Wrap[F[_]] <: LList
   def find[A1: ClassManifest](n: String): Option[A1]
+  def fieldNames: List[String]
 }
 sealed trait LNil extends LList {
   import LList.:*:
-  // type Wrap[F[_]] = LNil
   def :*:[A1: JsonFormat: ClassManifest](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
 
   override def toString: String = "LNil"
   override def find[A1: ClassManifest](n: String): Option[A1] = None
+  override def fieldNames: List[String] = Nil
 }
 object LNil extends LNil {
   implicit val singletonFormat: JsonFormat[LNil.type] = forLNil[LNil.type](LNil)
@@ -59,14 +59,20 @@ final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](n
   override def find[B1: ClassManifest](n: String): Option[B1] =
     if (name == n && implicitly[ClassManifest[A1]] == implicitly[ClassManifest[B1]]) Option(head match { case x: B1 @unchecked => x })
     else tail.find[B1](n)
+  override def fieldNames: List[String] = name :: tail.fieldNames
 }
 object LCons {
+  import BasicJsonProtocol._
+  private val fieldNamesField = "$fields"
   implicit def lconsFormat[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
     val a1Format = implicitly[JsonFormat[A1]]
     val a2Format = implicitly[JsonFormat[A2]]
     def write[J](x: LCons[A1, A2], builder: Builder[J]): Unit =
       {
         if (!builder.isInObject) {
+          builder.beginPreObject()
+          builder.addField(fieldNamesField, x.fieldNames)
+          builder.endPreObject()
           builder.beginObject()
         }
         builder.addField(x.name, x.head)(a1Format)
@@ -76,12 +82,24 @@ object LCons {
       jsOpt match {
         case Some(js) =>
           if (!unbuilder.isInObject) {
-            unbuilder.beginObject(js)
+            unbuilder.beginPreObject(js)
+            val fieldNames = unbuilder.lookupField(fieldNamesField) match {
+              case Some(x) => implicitly[JsonFormat[List[String]]].read(Some(x), unbuilder)
+              case None    => deserializationError("Field not found: $fieldNamesField")
+            }
+            unbuilder.endPreObject()
+            val n = unbuilder.beginObject(js, Some(fieldNames.toVector))
           }
           if (unbuilder.hasNextField) {
             val (name, x) = unbuilder.nextField
             if (unbuilder.isObject(x)) {
-              unbuilder.beginObject(x)
+              unbuilder.beginPreObject(x)
+              val fieldNames = unbuilder.lookupField(fieldNamesField) match {
+                case Some(x) => implicitly[JsonFormat[List[String]]].read(Some(x), unbuilder)
+                case None    => deserializationError("Field not found: $fieldNamesField")
+              }
+              unbuilder.endPreObject()
+              unbuilder.beginObject(x, Some(fieldNames.toVector))
             }
             val elem = a1Format.read(Some(x), unbuilder)
             val tail = a2Format.read(Some(js), unbuilder)

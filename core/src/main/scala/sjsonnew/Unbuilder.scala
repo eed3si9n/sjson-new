@@ -110,11 +110,11 @@ class Unbuilder[J](facade: Facade[J]) {
   /** Begin reading JSON object. Returns the size.
     * Call `nextField` n-times, and then call `endObject`.
     */
-  def beginObject(js: J): Int =
+  def beginObject(js: J, fieldNames: Option[Vector[String]]): Int =
     state match {
       case Begin | InArray | InObject =>
         val (fields, names) = facade.extractObject(js)
-        val context =
+        val context0 =
           precontext match {
             case Some(pre) if pre.js == js =>
               precontext = None
@@ -122,11 +122,21 @@ class Unbuilder[J](facade: Facade[J]) {
               UnbuilderContext.ObjectContext(fields filterKeys { k => !excludeKeys(k) }, names diff excludeKeys.toVector)
             case _ => UnbuilderContext.ObjectContext(fields, names)
           }
+        val context =
+          fieldNames match {
+            case Some(fn) => context0.copy(names = fn)
+            case _        => context0
+          }
         contexts ::= context
         state = InObject
         context.fields.size
       case End => stateError(End)
     }
+
+  /** Begin reading JSON object. Returns the size.
+    * Call `nextField` n-times, and then call `endObject`.
+    */
+  def beginObject(js: J): Int = beginObject(js, None)
 
   def hasNextField: Boolean =
     state match {

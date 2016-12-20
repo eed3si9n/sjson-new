@@ -27,10 +27,10 @@ class LListFormatsSpec extends Specification with BasicJsonProtocol {
   "The llistFormat" should {
     val empty = LNil
     val emptyObject = JsObject()
-    val list = ("a", 1) :*: LNil
-    val obj = JsObject("a" -> JsNumber(1))
+    val list = ("Z", 2) :*: ("a", 1) :*: LNil
+    val obj = JsObject("$fields" -> JsArray(JsString("Z"), JsString("a")), "Z" -> JsNumber(2), "a" -> JsNumber(1))
     val nested = ("b", list) :*: LNil
-    val nestedObj = JsObject("b" -> obj)
+    val nestedObj = JsObject("$fields" -> JsArray(JsString("b")), "b" -> obj)
     "convert an empty list to JObject" in {
       Converter.toJsonUnsafe(empty) mustEqual emptyObject
     }
@@ -41,10 +41,10 @@ class LListFormatsSpec extends Specification with BasicJsonProtocol {
       Converter.toJsonUnsafe(nested) mustEqual nestedObj
     }
     "convert a JObject to list" in {
-      Converter.fromJsonUnsafe[Int :*: LNil](obj) mustEqual list
+      Converter.fromJsonUnsafe[Int :*: Int :*: LNil](obj) mustEqual list
     }
     "convert a nested JObject to list" in {
-      Converter.fromJsonUnsafe[(Int :*: LNil) :*: LNil](nestedObj) mustEqual nested
+      Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: LNil](nestedObj) mustEqual nested
     }
 
     val obj2 = JsObject("f" -> JsString("foo"))

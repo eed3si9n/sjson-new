@@ -36,13 +36,17 @@ class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
     { in: String :*: Option[Int] :*: LNil => Organization(
       in.find[String]("name").get,
       in.find[Option[Int]]("value").flatten) })
-  implicit val ContactFormat: JsonFormat[Contact] = unionFormat2[Contact, Person, Organization]
+  implicit val ContactFormat: JsonFormat[Contact] = flatUnionFormat2[Contact, Person, Organization]("$type")
   val p1 = Person("Alice", Some(1))
-  val personJs = JsObject("name" -> JsString("Alice"), "value" -> JsNumber(1))
+  val personJs = JsObject("$fields" -> JsArray(JsString("name"), JsString("value")),
+    "name" -> JsString("Alice"), "value" -> JsNumber(1))
   val c1: Contact = Organization("Company", None)
   val contactJs =
-    JsObject("value" -> JsObject("name" -> JsString("Company")),
-      "type" -> JsString("Organization"))
+    JsObject(
+      "$type" -> JsString("Organization"),
+      "$fields" -> JsArray(JsString("name"), JsString("value")),
+      "name" -> JsString("Company")
+    )
   "The isomorphism from a custom type to LList" should {
     "convert from value to JObject" in {
       Converter.toJsonUnsafe(p1) mustEqual personJs
