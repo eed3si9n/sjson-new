@@ -35,8 +35,9 @@ class ScalaJsonSpec extends FlatSpec {
   )
 
   val bob = Peep("Bob", 23)
-  val bobJson = JObject(JField("name", JString("Bob")), JField("age", JNumber(23)))
-  val bobJsonStr = """{"name":"Bob","age":23}"""
+  val bobJson = JObject(JField("$fields", JArray(JString("name"), JString("age"))),
+    JField("name", JString("Bob")), JField("age", JNumber(23)))
+  val bobJsonStr = """{"$fields":["name","age"],"name":"Bob","age":23}"""
 
   it should "Peep.toJson correctly"              in assert(bob.toJson === bobJson)
   it should "Peep.toJsonStr correctly"           in assert(bob.toJsonStr === bobJsonStr)
