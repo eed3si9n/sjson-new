@@ -29,27 +29,6 @@ sealed trait LNil extends LList {
   override def find[A1: ClassManifest](n: String): Option[A1] = None
   override def fieldNames: List[String] = Nil
 }
-object LNil extends LNil {
-  implicit val singletonFormat: JsonFormat[LNil.type] = forLNil[LNil.type](LNil)
-  implicit val lnilFormat: JsonFormat[LNil] = forLNil[LNil](LNil)
-
-  private def forLNil[A <: LNil](lnil: A): JsonFormat[A] = new JsonFormat[A] {
-    def write[J](x: A, builder: Builder[J]): Unit =
-      {
-        if (!builder.isInObject) {
-          builder.beginObject()
-        }
-        builder.endObject()
-      }
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
-      {
-        if (unbuilder.isInObject) {
-          unbuilder.endObject()
-        }
-        lnil
-      }
-  }
-}
 
 final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
   import LList.:*:
@@ -61,8 +40,35 @@ final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](n
     else tail.find[B1](n)
   override def fieldNames: List[String] = name :: tail.fieldNames
 }
-object LCons {
+
+object LList extends LListFormats {
+  type :*:[A1, A2 <: LList] = LCons[A1, A2]
+  val :*: = LCons
+  def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
+    IsoLList.iso[A, R0](to0, from0)
+  // This is so the return type of LNil becomes LNil, instead of LNil.type.
+  val LNil: LNil = new LNil {}
+}
+
+trait LListFormats {
   import BasicJsonProtocol._
+
+  implicit val lnilFormat: JsonFormat[LNil] = new JsonFormat[LNil] {
+    def write[J](x: LNil, builder: Builder[J]): Unit =
+      {
+        if (!builder.isInObject) {
+          builder.beginObject()
+        }
+        builder.endObject()
+      }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LNil =
+      {
+        if (unbuilder.isInObject) {
+          unbuilder.endObject()
+        }
+        LList.LNil
+      }
+  }
   private val fieldNamesField = "$fields"
   implicit def lconsFormat[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
     val a1Format = implicitly[JsonFormat[A1]]
@@ -112,11 +118,4 @@ object LCons {
           LCons("*", elem, tail)
       }
   }
-}
-
-object LList {
-  type :*:[A1, A2 <: LList] = LCons[A1, A2]
-  val :*: = LCons
-  def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
-    IsoLList.iso[A, R0](to0, from0)
 }
