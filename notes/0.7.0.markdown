@@ -1,0 +1,16 @@
+### SLIP-28 Scala JSON: Fix unsafe.JObject parse ordering
+
+In the SLIP-28 Scala JSON support module, fix a bug in parsing `unsafe.JObject` - instead of an interim `mutable.Map` use
+an `ArrayBuffer`.
+
+[#35][35] by [@dwijnand][@dwijnand]
+
+### fixes and enhancements
+
+- Write out field names for LList as `$fields` so it does not depend on the implementation of AST. [#40][40] by [@eed3si9n][@eed3si9n]
+- Define `LNil` as a value so its type is `LNil` instead of `LNil.type`.
+
+  [35]: https://github.com/eed3si9n/sjson-new/pull/35
+  [40]: https://github.com/eed3si9n/sjson-new/pull/40
+  [@eed3si9n]: https://github.com/eed3si9n
+  [@dwijnand]: https://github.com/dwijnand
