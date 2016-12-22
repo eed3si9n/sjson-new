@@ -1,7 +1,6 @@
 ### SLIP-28 Scala JSON: Fix unsafe.JObject parse ordering
 
-In the SLIP-28 Scala JSON support module, fix a bug in parsing `unsafe.JObject` - instead of an interim `mutable.Map` use
-an `ArrayBuffer`.
+sjson-new 0.7.0 fixes the parsing of SLIP-28 Scala JSON "unsafe" AST by preserving the insersion order -- instead of an interim `mutable.Map` it will now use an `ArrayBuffer`.
 
 [#35][35] by [@dwijnand][@dwijnand]
 
