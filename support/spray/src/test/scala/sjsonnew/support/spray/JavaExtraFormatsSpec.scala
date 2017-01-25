@@ -19,11 +19,32 @@ package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import org.specs2.mutable._
-import java.util.UUID
+import java.util.{ UUID, Optional }
 import java.net.{ URI, URL }
 import java.io.File
 
 class JavaExtraFormatsSpec extends Specification with BasicJsonProtocol {
+  case class Person(name: Optional[String], value: Optional[Int])
+  implicit object PersonFormat extends JsonFormat[Person] {
+    def write[J](x: Person, builder: Builder[J]): Unit = {
+      builder.beginObject()
+      builder.addField("name", x.name)
+      builder.addField("value", x.value)
+      builder.endObject()
+    }
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val name = unbuilder.readField[Optional[String]]("name")
+          val value = unbuilder.readField[Optional[Int]]("value")
+          unbuilder.endObject()
+          Person(name, value)
+        case None =>
+          deserializationError("Expected JsObject but found None")
+      }
+  }
+
   "The uuidStringIso" should {
     val uuid = UUID.fromString("abc220ea-2a01-11e6-b67b-9e71128cae77")
     "convert a UUID to JsString" in {
@@ -61,6 +82,24 @@ class JavaExtraFormatsSpec extends Specification with BasicJsonProtocol {
     }
     "convert the JsString back to the URI" in {
       Converter.fromJsonUnsafe[File](JsString("file:/tmp/")) mustEqual f
+    }
+  }
+
+  "The optionalFormat" should {
+    "convert Optional.empty to JsNull" in {
+      Converter.toJsonUnsafe(Optional.empty[Int]) mustEqual JsNull
+    }
+    "convert JsNull to None" in {
+      Converter.fromJsonUnsafe[Optional[Int]](JsNull) mustEqual Optional.empty[Int]
+    }
+    "convert Some(Hello) to JsString(Hello)" in {
+      Converter.toJsonUnsafe(Optional.of("Hello")) mustEqual JsString("Hello")
+    }
+    "convert JsString(Hello) to Some(Hello)" in {
+      Converter.fromJsonUnsafe[Optional[String]](JsString("Hello")) mustEqual Optional.of("Hello")
+    }
+    "omit None fields" in {
+      Converter.toJsonUnsafe(Person(Optional.empty[String], Optional.empty[Int])) mustEqual JsObject()
     }
   }
 }

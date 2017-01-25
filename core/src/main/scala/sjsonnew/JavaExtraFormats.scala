@@ -16,7 +16,7 @@
 
 package sjsonnew
 
-import java.util.UUID
+import java.util.{ UUID, Optional }
 import java.net.{ URI, URL }
 import java.io.File
 import java.math.{ BigInteger, BigDecimal => JBigDecimal }
@@ -41,4 +41,24 @@ trait JavaExtraFormats {
 
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     _.toURI.toASCIIString, (s: String) => new File(new URI(s)))
+
+  implicit def optionalFormat[A :JF]: JF[Optional[A]] = new OptionalFormat[A]
+  final class OptionalFormat[A :JF] extends JF[Optional[A]] {
+    lazy val elemFormat = implicitly[JF[A]]
+    def write[J](o: Optional[A], builder: Builder[J]): Unit =
+      if (o.isPresent) elemFormat.write(o.get, builder)
+      else builder.writeNull
+    override def addField[J](name: String, o: Optional[A], builder: Builder[J]): Unit =
+      if (o.isPresent) {
+        builder.addFieldName(name)
+        write(o, builder)
+      } else ()
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Optional[A] =
+      jsOpt match {
+        case Some(js) =>
+          if (unbuilder.isJnull(js)) Optional.empty[A]
+          else Optional.ofNullable(elemFormat.read(jsOpt, unbuilder))
+        case None => Optional.empty[A]
+      }
+  }
 }
