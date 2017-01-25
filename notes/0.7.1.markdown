@@ -1,0 +1,3 @@
+### fixes and enhacements
+
+- Adds `java.util.Optional` support.
