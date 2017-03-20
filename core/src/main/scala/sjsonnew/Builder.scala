@@ -40,7 +40,7 @@ class Builder[J](facade: BuilderFacade[J]) {
       case _ => writeJ(facade.jstring(x))
     }
 
-  def addField[A](field: String, a: A)(implicit format: JsonFormat[A]): Unit = format.addField(field, a, this)
+  def addField[A](field: String, a: A)(implicit writer: JsonWriter[A]): Unit = writer.addField(field, a, this)
 
   /** Write field name to the current context. */
   def addFieldName(field: String): Unit =
