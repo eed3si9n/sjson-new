@@ -18,6 +18,8 @@
 
 package sjsonnew
 
+import scala.reflect.ClassTag
+
 trait CollectionFormats {
   /**
     * Supplies the JsonFormat for Lists.
@@ -53,7 +55,7 @@ trait CollectionFormats {
   /**
     * Supplies the JsonFormat for Arrays.
    */
-  implicit def arrayFormat[A: JsonFormat: ClassManifest]: RootJsonFormat[Array[A]] = new RootJsonFormat[Array[A]] {
+  implicit def arrayFormat[A: JsonFormat: ClassTag]: RootJsonFormat[Array[A]] = new RootJsonFormat[Array[A]] {
     lazy val elemFormat = implicitly[JsonFormat[A]]
     def write[J](array: Array[A], builder: Builder[J]): Unit =
       {
