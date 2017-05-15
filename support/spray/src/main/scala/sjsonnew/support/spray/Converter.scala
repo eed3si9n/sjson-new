@@ -76,8 +76,11 @@ object Converter extends SupportConverter[JsValue] {
       value match {
         case x: JsObject =>
           val fields = x.fields
-          val names = (x.fields map { case (k, v) => k }).toVector
-          (fields, names)
+          val vectorBuilder = Vector.newBuilder[String]
+          for (field <- fields) {
+            vectorBuilder += field._1
+          }
+          (fields, vectorBuilder.result())
         case x => deserializationError("Expected Map as JsObject, but got " + x)
       }
   }

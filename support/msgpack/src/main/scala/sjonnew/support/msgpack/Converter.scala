@@ -18,7 +18,6 @@ package sjsonnew
 package support.msgpack
 
 import scala.util.Try
-import scala.collection.mutable
 import org.msgpack.core.MessagePack
 import org.msgpack.value._
 import java.io.{ InputStream, OutputStream }
@@ -71,15 +70,21 @@ object Converter extends SupportConverter[Value] {
     def jstring(s: String)    = ValueFactory.newString(s)
 
     def jarray(vs: List[Value]): Value =
-      {
-        import scala.collection.JavaConverters._
-        ValueFactory.newArray(vs.asJava)
+      ValueFactory.newArray(vs.toArray[Value], true)
+
+    def jobject(vs: Map[String, Value]): Value = {
+      val expectedSize = vs.size * 2
+      val valueArray = new Array[Value](expectedSize)
+      var index = 0
+      for (kv <- vs) {
+        val keyString = ValueFactory.newString(kv._1)
+        valueArray(index) = keyString
+        index += 1
+        valueArray(index) = kv._2
+        index += 1
       }
-    def jobject(vs: Map[String, Value]): Value =
-      {
-        import scala.collection.JavaConverters._
-        ValueFactory.newMap((vs map { case (k, v) => (ValueFactory.newString(k), v) }).asJava)
-      }
+      ValueFactory.newMap(valueArray, true)
+    }
 
     def isJnull(value: Value): Boolean =
       value.getValueType match {
@@ -135,18 +140,28 @@ object Converter extends SupportConverter[Value] {
     def extractArray(value: Value): Vector[Value] =
       value.getValueType match {
         case ValueType.ARRAY =>
-          import scala.collection.JavaConverters._
-          value.asArrayValue.asScala.toVector
+          val array = value.asArrayValue().iterator()
+          val vectorBuilder = Vector.newBuilder[Value]
+          while (array.hasNext) {
+            vectorBuilder += array.next()
+          }
+          vectorBuilder.result()
         case _ => deserializationError("Expected List as Array, but got " + value)
       }
     def extractObject(value: Value): (Map[String, Value], Vector[String]) =
       value.getValueType match {
         case ValueType.MAP =>
-          import scala.collection.JavaConverters._
-          val fs = value.asMapValue.map.asScala
-          val names = (fs map { case (k, v) => k.toString }).toVector
-          val fields = fs map { case (k, v) => (k.toString, v) }
-          (fields.toMap, names)
+          val map = value.asMapValue.map
+          val vectorBuilder = Vector.newBuilder[String]
+          val mapBuilder = Map.newBuilder[String, Value]
+          val it = map.entrySet().iterator
+          while (it.hasNext) {
+            val entry = it.next()
+            val keyString = entry.getKey.asStringValue.asString
+            vectorBuilder += keyString
+            mapBuilder += (keyString -> entry.getValue)
+          }
+          (mapBuilder.result(), vectorBuilder.result())
         case _ => deserializationError("Expected Map as MMap, but got " + value)
       }
   }
