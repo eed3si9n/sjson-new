@@ -34,5 +34,6 @@ trait BasicJsonProtocol
         with JavaExtraFormats
         with CalendarFormats
         with ImplicitHashWriters
+        with CaseClassFormats
 
 object BasicJsonProtocol extends BasicJsonProtocol
