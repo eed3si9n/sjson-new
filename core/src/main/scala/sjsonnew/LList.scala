@@ -16,9 +16,11 @@
 
 package sjsonnew
 
+import scala.reflect.ClassTag
+
 /** Heterogeneous list with labels. */
 sealed trait LList {
-  def find[A1: ClassManifest](n: String): Option[A1]
+  def find[A1: ClassTag](n: String): Option[A1]
   def fieldNames: List[String]
 }
 
@@ -30,20 +32,20 @@ object LList extends LListFormats {
   // This is so the return type of LNil becomes LNil, instead of LNil.type.
   val LNil0: LNil0 = new LNil0 {}
   sealed trait LNil0 extends LList {
-    def :*:[A1: JsonFormat: ClassManifest](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
+    def :*:[A1: JsonFormat: ClassTag](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
 
     override def toString: String = "LNil"
-    override def find[A1: ClassManifest](n: String): Option[A1] = None
+    override def find[A1: ClassTag](n: String): Option[A1] = None
     override def fieldNames: List[String] = Nil
   }
 }
 
-final case class LCons[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
+final case class LCons[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
   import LList.:*:
-  def :*:[B1: JsonFormat: ClassManifest](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
+  def :*:[B1: JsonFormat: ClassTag](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
   override def toString: String = s"($name, $head) :*: $tail"
-  override def find[B1: ClassManifest](n: String): Option[B1] =
-    if (name == n && implicitly[ClassManifest[A1]] == implicitly[ClassManifest[B1]]) Option(head match { case x: B1 @unchecked => x })
+  override def find[B1: ClassTag](n: String): Option[B1] =
+    if (name == n && implicitly[ClassTag[A1]] == implicitly[ClassTag[B1]]) Option(head match { case x: B1 @unchecked => x })
     else tail.find[B1](n)
   override def fieldNames: List[String] = name :: tail.fieldNames
 }
@@ -69,7 +71,7 @@ trait LListFormats {
       }
   }
   private val fieldNamesField = "$fields"
-  implicit def lconsFormat[A1: JsonFormat: ClassManifest, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
+  implicit def lconsFormat[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] = new JsonFormat[LCons[A1, A2]] {
     val a1Format = implicitly[JsonFormat[A1]]
     val a2Format = implicitly[JsonFormat[A2]]
     def write[J](x: LCons[A1, A2], builder: Builder[J]): Unit =
