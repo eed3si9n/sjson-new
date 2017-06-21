@@ -21,13 +21,11 @@ package sjsonnew
 trait TupleFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
-  [#implicit def tuple1Format[[#A1 :JF#]]: JF[Tuple1[[#A1#]]] = new RootJsonFormat[Tuple1[[#A1#]]] {
-    [#lazy val a1Format = implicitly[JF[A1]]#
-    ]
+  [#implicit def tuple1Format[[#A1#]](implicit [#A1: JF[A1]#]): JF[Tuple1[[#A1#]]] = new RootJsonFormat[Tuple1[[#A1#]]] {
 
     def write[J](t: Tuple1[[#A1#]], builder: Builder[J]): Unit = {
       builder.beginArray()
-      [#a1Format.write(t._1, builder)#
+      [#A1.write(t._1, builder)#
       ]
       builder.endArray()
     }
@@ -37,11 +35,11 @@ trait TupleFormats {
           unbuilder.beginArray(js)
           [#val a1 = unbuilder.nextElement#
           ]
-          val xs = Tuple1([#a1Format.read(Some(a1), unbuilder)#])
+          val xs = Tuple1([#A1.read(Some(a1), unbuilder)#])
           unbuilder.endArray()
           xs
         case None =>
-          val xs = Tuple1([#a1Format.read(None, unbuilder)#])
+          val xs = Tuple1([#A1.read(None, unbuilder)#])
           xs
       }
   }#
