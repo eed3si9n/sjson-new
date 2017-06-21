@@ -16,14 +16,93 @@
 
 package sjsonnew
 
-import java.util.{Date, TimeZone, Calendar}
-import javax.xml.bind.DatatypeConverter
+import java.util.{ Calendar, GregorianCalendar }
+import java.time._
+import java.time.format.DateTimeFormatter
 
 trait CalendarFormats {
   self: IsoFormats =>
 
+  private val utc: ZoneId = ZoneId.of("UTC")
+
+  /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
   implicit val calendarStringIso: IsoString[Calendar] = {
-    IsoString.iso[Calendar]( (c: Calendar) => DatatypeConverter.printDateTime(c),
-      (s: String) => DatatypeConverter.parseDateTime(s))
+    IsoString.iso[Calendar]( (c: Calendar) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        // https://docs.oracle.com/javase/tutorial/datetime/iso/legacy.html
+        val i = c.toInstant
+        val tz = c.getTimeZone.toZoneId
+        val zdt = ZonedDateTime.ofInstant(i, tz)
+        zdt.format(datetimefmt)
+      },
+      (s: String) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val datefmt = DateTimeFormatter.ISO_DATE
+        val zdt = if (s contains "T") ZonedDateTime.parse(s, datetimefmt)         
+                  else {
+                    val ld = LocalDate.parse(s, datefmt)
+                    ld.atStartOfDay(utc)
+                  }
+        GregorianCalendar.from(zdt)
+      })
+  }
+
+  /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
+  implicit val instantStringIso: IsoString[Instant] = {
+    IsoString.iso[Instant]( (i: Instant) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val zdt = ZonedDateTime.ofInstant(i, utc)
+        zdt.format(datetimefmt)
+      },
+      (s: String) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val zdt = ZonedDateTime.parse(s, datetimefmt)
+        zdt.toInstant
+      })
+  }
+
+  /**
+   * As far as I know, the output this produces is not ISO 8601 compilant.
+   * It appends timezone designator e.g. 1999-01-01T00:00:00.001Z[UTC],
+   * which is used to identify the ZoneId, which denotes the local summer time rules etc.
+   */
+  implicit val zonedDateTimeStringIso: IsoString[ZonedDateTime] =
+    IsoString.iso[ZonedDateTime]( (zdt: ZonedDateTime) => {
+      val datetimefmt = DateTimeFormatter.ISO_DATE_TIME
+      zdt.format(datetimefmt)
+    },
+    (s: String) => {
+      val datetimefmt = DateTimeFormatter.ISO_DATE_TIME
+      val datefmt = DateTimeFormatter.ISO_DATE
+      if (s contains "T") {
+        ZonedDateTime.parse(s, datetimefmt)         
+      } else {
+        val ld = LocalDate.parse(s, datefmt)
+        ld.atStartOfDay(utc)
+      }
+    })
+
+  /** This output is ISO 8601 compilant, e.g. 1999-01-01 */
+  implicit val localDateStringIso: IsoString[LocalDate] = {
+    IsoString.iso[LocalDate]( (ld: LocalDate) => {
+        val datetimefmt = DateTimeFormatter.ISO_LOCAL_DATE
+        ld.format(datetimefmt)
+      },
+      (s: String) => {
+        val datetimefmt = DateTimeFormatter.ISO_LOCAL_DATE
+        LocalDate.parse(s, datetimefmt)
+      })
+  }
+
+  /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001 */
+  implicit val localDateTimeStringIso: IsoString[LocalDateTime] = {
+    IsoString.iso[LocalDateTime]( (ld: LocalDateTime) => {
+        val datetimefmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        ld.format(datetimefmt)
+      },
+      (s: String) => {
+        val datetimefmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        LocalDateTime.parse(s, datetimefmt)
+      })
   }
 }
