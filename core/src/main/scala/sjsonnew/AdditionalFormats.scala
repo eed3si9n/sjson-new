@@ -113,4 +113,33 @@ trait AdditionalFormats {
     def write[J](obj: T, builder: Builder[J]): Unit = fu.write(f1(obj), builder)
   }
 
+  /**
+   * A `JsonReader` that can read an instance of `B` by using a `JsonReader` for `A`.
+   */
+  def mapReader[A, B](f: A => B)(implicit ev: JsonReader[A]): JsonReader[B] = new JsonReader[B] {
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): B =
+      f(ev.read(jsOpt, unbuilder))
+  }
+
+  /**
+   * A `JsonWriter` that can read an instance of `B` by using a `JsonWriter` for `A`.
+   */
+  def contramapWriter[A, B](f: B => A)(implicit ev: JsonWriter[A]): JsonWriter[B] = new JsonWriter[B] {
+    def write[J](obj: B, builder: Builder[J]): Unit =
+      ev.write(f(obj), builder)
+  }
+
+  /**
+   * A `JsonKeyReader` that can read an instance of `B` by using a `JsonKeyReader` for `A`.
+   */
+  def mapKeyReader[A, B](f: A => B)(implicit ev: JsonKeyReader[A]): JsonKeyReader[B] = new JsonKeyReader[B] {
+    def read(key: String): B = f(ev.read(key))
+  }
+
+  /**
+   * A `JsonKeyWriter` that can read an instance of `B` by using a `JsonKeyWriter` for `A`.
+   */
+  def contramapKeyWriter[A, B](f: B => A)(implicit ev: JsonKeyWriter[A]): JsonKeyWriter[B] = new JsonKeyWriter[B] {
+    def write(key: B): String = ev.write(f(key))
+  }
 }
