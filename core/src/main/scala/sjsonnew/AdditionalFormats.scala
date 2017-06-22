@@ -39,7 +39,7 @@ trait AdditionalFormats {
   /**
    * Turns a JsonWriter into a JsonFormat that throws an UnsupportedOperationException for reads.
    */
-  def lift[A](writer: JsonWriter[A]) = new JsonFormat[A] {
+  def liftFormat[A](writer: JsonWriter[A]) = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       throw new UnsupportedOperationException("JsonReader implementation missing")
@@ -48,13 +48,13 @@ trait AdditionalFormats {
   /**
    * Turns a RootJsonWriter into a RootJsonFormat that throws an UnsupportedOperationException for reads.
    */
-  def lift[A](writer: RootJsonWriter[A]): RootJsonFormat[A] =
-    rootFormat(lift(writer: JsonWriter[A]))
+  def liftFormat[A](writer: RootJsonWriter[A]): RootJsonFormat[A] =
+    rootFormat(liftFormat(writer: JsonWriter[A]))
 
   /**
    * Turns a JsonReader into a JsonFormat that throws an UnsupportedOperationException for writes.
    */
-  def lift[A <: AnyRef](reader: JsonReader[A]) = new JsonFormat[A] {
+  def liftFormat[A <: AnyRef](reader: JsonReader[A]) = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit =
       throw new UnsupportedOperationException("No JsonWriter[" + obj.getClass + "] available")
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = reader.read(jsOpt, unbuilder)
@@ -63,8 +63,8 @@ trait AdditionalFormats {
   /**
    * Turns a RootJsonReader into a RootJsonFormat that throws an UnsupportedOperationException for writes.
    */
-  def lift[A <: AnyRef](reader: RootJsonReader[A]): RootJsonFormat[A] =
-    rootFormat(lift(reader: JsonReader[A]))
+  def liftFormat[A <: AnyRef](reader: RootJsonReader[A]): RootJsonFormat[A] =
+    rootFormat(liftFormat(reader: JsonReader[A]))
 
   /**
    * Lazy wrapper around serialization. Useful when you want to serialize (mutually) recursive structures.
@@ -108,7 +108,7 @@ trait AdditionalFormats {
   /**
    * A `JsonFormat` that can read and write an instance of `T` by using a `JsonFormat` for `U`.
    */
-  def project[T, U](f1: T => U, f2: U => T)(implicit fu: JsonFormat[U]): JsonFormat[T] = new JsonFormat[T] {
+  def projectFormat[T, U](f1: T => U, f2: U => T)(implicit fu: JsonFormat[U]): JsonFormat[T] = new JsonFormat[T] {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): T = f2(fu.read(jsOpt, unbuilder))
     def write[J](obj: T, builder: Builder[J]): Unit = fu.write(f1(obj), builder)
   }

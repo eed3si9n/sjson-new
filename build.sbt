@@ -22,7 +22,7 @@ lazy val root = (project in file(".")).
       developers := List(
         Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
       ),
-      version := "0.7.1",
+      version := "0.8.0-SNAPSHOT",
       isSnapshot := (isSnapshot or version(_ endsWith "-SNAPSHOT")).value,
       crossScalaVersions := Seq("2.10.6", "2.11.8", scala212),
       scalaVersion := "2.11.8",

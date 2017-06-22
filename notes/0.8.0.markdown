@@ -1,0 +1,3 @@
+### fixes and enhacements
+
+- Rename `project` and `lift` to `projectFormat` and `liftProject` respectively. Fixes #41 by @eed3si9n
