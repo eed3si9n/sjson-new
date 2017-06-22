@@ -11,10 +11,12 @@ package object unsafe {
   }
   implicit class AnyOps2[A: JsonWriter : JsonReader](val _x: A) {
     def jsonRoundTrip: A = _x.toJson.toJsonStr.toJson.fromJson[A]
+    def jsonPrettyRoundTrip: A = _x.toJson.toPrettyStr.toJson.fromJson[A]
   }
 
   implicit class JValueOps(val _j: JValue) extends AnyVal {
     def toJsonStr: String          = CompactPrinter(_j)
+    def toPrettyStr: String        = PrettyPrinter(_j)
     def fromJson[A: JsonReader]: A = Converter fromJsonUnsafe[A] _j
 
     // scala.json.ast.unsafe doesn't have good toStrings
