@@ -47,7 +47,7 @@ class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
     }
 
     "convert the JsString back to the ZonedDateTime" in {
-      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00Z[UTC]")).toInstant mustEqual zdt.toInstant
+      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00Z[UTC]")) mustEqual zdt
     }
 
     "convert a ZonedDateTime with milliseconds to JsString" in {
@@ -55,7 +55,7 @@ class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
     }
 
     "convert the JsString back to the ZonedDateTime with milliseconds" in {
-      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")).toInstant mustEqual millis.toInstant
+      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) mustEqual millis
     }
 
     "convert an Instant to JsString" in {
