@@ -24,8 +24,13 @@ import annotation.implicitNotFound
   * Provides the JSON deserialization for type A.
  */
 @implicitNotFound(msg = "Cannot find JsonReader or JsonFormat type class for ${A}")
-trait JsonReader[A] {
+trait JsonReader[A] { self =>
   def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A
+  def map[B](f: A => B): JsonReader[B] =
+    new JsonReader[B] {
+      def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): B =
+        f(self.read(jsOpt, unbuilder))
+    }
 }
 
 /**
