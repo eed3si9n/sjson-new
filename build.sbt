@@ -1,8 +1,8 @@
 import Dependencies._
 
 val scala210 = "2.10.6"
-val scala211 = "2.11.8"
-val scala212 = "2.12.1"
+val scala211 = "2.11.11"
+val scala212 = "2.12.2"
 
 lazy val root = (project in file(".")).
   aggregate(core, // shapeless, shapelessTest,
@@ -24,8 +24,8 @@ lazy val root = (project in file(".")).
       ),
       version := "0.8.0-SNAPSHOT",
       isSnapshot := (isSnapshot or version(_ endsWith "-SNAPSHOT")).value,
-      crossScalaVersions := Seq("2.10.6", "2.11.8", scala212),
-      scalaVersion := "2.11.8",
+      crossScalaVersions := Seq(scala210, scala211, scala212),
+      scalaVersion := scala212,
       description := "A Scala library for JSON (de)serialization",
       licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
       publishTo := {
