@@ -26,7 +26,7 @@ trait JavaPrimitiveFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
   implicit lazy val JIntegerJsonFormat: JsonFormat[JInteger] =
-    project(
+    projectFormat(
       (x: JInteger) => if (x == null) None else Some(x: Int),
       (x: Option[Int]) => {
         x match {
@@ -37,7 +37,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JLongJsonFormat: JsonFormat[JLong] =
-    project(
+    projectFormat(
       (x: JLong) => if (x == null) None else Some(x: Long),
       (x: Option[Long]) => {
         x match {
@@ -48,7 +48,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JFloatJsonFormat: JsonFormat[JFloat] =
-    project(
+    projectFormat(
       (x: JFloat) => if (x == null) None else Some(x: Float),
       (x: Option[Float]) => {
         x match {
@@ -59,7 +59,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JDoubleJsonFormat: JsonFormat[JDouble] =
-    project(
+    projectFormat(
       (x: JDouble) => if (x == null) None else Some(x: Double),
       (x: Option[Double]) => {
         x match {
@@ -70,7 +70,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JByteJsonFormat: JsonFormat[JByte] =
-    project(
+    projectFormat(
       (x: JByte) => if (x == null) None else Some(x: Byte),
       (x: Option[Byte]) => {
         x match {
@@ -81,7 +81,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JShortJsonFormat: JsonFormat[JShort] =
-    project(
+    projectFormat(
       (x: JShort) => if (x == null) None else Some(x: Short),
       (x: Option[Short]) => {
         x match {
@@ -92,7 +92,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JBooleanJsonFormat: JsonFormat[JBoolean] =
-    project(
+    projectFormat(
       (x: JBoolean) => if (x == null) None else Some(x: Boolean),
       (x: Option[Boolean]) => {
         x match {
@@ -103,7 +103,7 @@ trait JavaPrimitiveFormats {
     )
 
   implicit lazy val JCharacterJsonFormat: JsonFormat[JCharacter] =
-    project(
+    projectFormat(
       (x: JCharacter) => if (x == null) None else Some(x: Char),
       (x: Option[Char]) => {
         x match {

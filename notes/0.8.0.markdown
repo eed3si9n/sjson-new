@@ -1,0 +1,18 @@
+### Fixes with compatibility implications
+
+- Renames `project` and `lift` to `projectFormat` and `liftProject` respectively. #41 by @eed3si9n
+- Uses `ClassTag` instead of `ClassManifest`. #13 by @xuwei-k
+- Makes `Builder#addField` only require a `JsonWriter`. #46 by @dwijnand
+
+### Improvements
+
+- case class support. #52 by @xuwei-k
+- Refactor `TupleFormats`. #53 by @xuwei-k
+- JDK 8 time support. #54 by @eed3si9n
+- Pretty printer for Scala JSON. #57 by @eed3si9n
+- `Throwable` support. #56 by @eed3si9n
+- Adds `mapReader`, `contramapWriter`, `mapKeyReader`, and `contramapKeyWriter`. #49, #50, #51, #58
+
+### Bug fixes
+
+- Fixes benchmark for Msgpack. #48 by @jvican

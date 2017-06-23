@@ -27,10 +27,10 @@ trait JavaExtraFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
   implicit val javaBigIntegerFormat: JF[BigInteger] =
-    project[BigInteger, BigInt](BigInt.apply, _.bigInteger)
+    projectFormat[BigInteger, BigInt](BigInt.apply, _.bigInteger)
 
   implicit val javaBigDecimalFormat: JF[JBigDecimal] =
-    project[JBigDecimal, BigDecimal](BigDecimal.apply, _.bigDecimal)
+    projectFormat[JBigDecimal, BigDecimal](BigDecimal.apply, _.bigDecimal)
 
   implicit val uuidStringIso: IsoString[UUID] = IsoString.iso[UUID](
     _.toString, UUID.fromString)

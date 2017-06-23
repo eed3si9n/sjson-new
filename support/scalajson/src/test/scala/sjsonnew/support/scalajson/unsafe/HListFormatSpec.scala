@@ -11,7 +11,7 @@ class HListFormatSpec extends FlatSpec {
 
   import HList.:+:
   implicit val PeepFormat: JsonFormat[Peep] = {
-    project[Peep, String :+: Int :+: HNil](
+    projectFormat[Peep, String :+: Int :+: HNil](
       p => p.name :+: p.age :+: HNil,
       { case name :+: age :+: HNil => Peep(name, age) }
     )
