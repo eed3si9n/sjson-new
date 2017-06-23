@@ -32,12 +32,17 @@ trait JsonReader[A] {
   * Provides the JSON serialization for type A.
  */
 @implicitNotFound(msg = "Cannot find JsonWriter or JsonFormat type class for ${A}")
-trait JsonWriter[A] {
+trait JsonWriter[A] { self =>
   def write[J](obj: A, builder: Builder[J]): Unit
   def addField[J](name: String, obj: A, builder: Builder[J]): Unit =
     {
       builder.addFieldName(name)
       write(obj, builder)
+    }
+  def contramap[B](f: B => A): JsonWriter[B] =
+    new JsonWriter[B] {
+      def write[J](obj: B, builder: Builder[J]): Unit =
+        self.write(f(obj), builder)
     }
 }
 
