@@ -108,9 +108,9 @@ class GzipSprayBenchmark
 }
 
 class ScalaJsonBenchmark
-    extends JsonBenchmark[scala.json.ast.unsafe.JValue](
+    extends JsonBenchmark[scalajson.ast.unsafe.JValue](
       sjsonnew.support.scalajson.unsafe.Converter) {
-  import scala.json.ast.unsafe._
+  import scalajson.ast.unsafe._
   import sjsonnew.support.scalajson.unsafe.{CompactPrinter, Parser}
   lazy val testFile: File = file("target") / "test-scalajson.json"
   def saveToFile(js: JValue, f: File): Unit =
@@ -120,10 +120,10 @@ class ScalaJsonBenchmark
 }
 
 class GzipScalaJsonBenchmark
-    extends JsonBenchmark[scala.json.ast.unsafe.JValue](
+    extends JsonBenchmark[scalajson.ast.unsafe.JValue](
       sjsonnew.support.scalajson.unsafe.Converter) {
   import java.io.{OutputStreamWriter, StringWriter}
-  import scala.json.ast.unsafe._
+  import scalajson.ast.unsafe._
   import sjsonnew.support.scalajson.unsafe.{CompactPrinter, Parser}
   lazy val testFile: File = file("target") / "test-scalajson.json.gz"
   def saveToFile(js: JValue, f: File): Unit =
