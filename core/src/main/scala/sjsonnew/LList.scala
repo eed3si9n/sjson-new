@@ -88,26 +88,20 @@ trait LListFormats {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LCons[A1, A2] =
       jsOpt match {
         case Some(js) =>
-          if (!unbuilder.isInObject) {
-            unbuilder.beginPreObject(js)
+          def objectPreamble(x: J) = {
+            unbuilder.beginPreObject(x)
+            val jf = implicitly[JsonFormat[List[String]]]
             val fieldNames = unbuilder.lookupField(fieldNamesField) match {
-              case Some(x) => implicitly[JsonFormat[List[String]]].read(Some(x), unbuilder)
+              case Some(x) => jf.read(Some(x), unbuilder)
               case None    => deserializationError(s"Field not found: $fieldNamesField")
             }
             unbuilder.endPreObject()
-            val n = unbuilder.beginObject(js, Some(fieldNames.toVector))
+            unbuilder.beginObject(x, Some(fieldNames.toVector))
           }
+          if (!unbuilder.isInObject) objectPreamble(js)
           if (unbuilder.hasNextField) {
             val (name, x) = unbuilder.nextField
-            if (unbuilder.isObject(x)) {
-              unbuilder.beginPreObject(x)
-              val fieldNames = unbuilder.lookupField(fieldNamesField) match {
-                case Some(x) => implicitly[JsonFormat[List[String]]].read(Some(x), unbuilder)
-                case None    => deserializationError(s"Field not found: $fieldNamesField")
-              }
-              unbuilder.endPreObject()
-              unbuilder.beginObject(x, Some(fieldNames.toVector))
-            }
+            if (unbuilder.isObject(x)) objectPreamble(x)
             val elem = a1Format.read(Some(x), unbuilder)
             val tail = a2Format.read(Some(js), unbuilder)
             LCons(name, elem, tail)
