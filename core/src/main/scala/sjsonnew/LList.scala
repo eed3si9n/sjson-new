@@ -90,13 +90,13 @@ trait LListFormats {
         case Some(js) =>
           def objectPreamble(x: J) = {
             unbuilder.beginPreObject(x)
-            val jf = implicitly[JsonFormat[List[String]]]
+            val jf = implicitly[JsonFormat[Vector[String]]]
             val fieldNames = unbuilder.lookupField(fieldNamesField) match {
               case Some(x) => jf.read(Some(x), unbuilder)
               case None    => deserializationError(s"Field not found: $fieldNamesField")
             }
             unbuilder.endPreObject()
-            unbuilder.beginObject(x, Some(fieldNames.toVector))
+            unbuilder.beginObject(x, Some(fieldNames))
           }
           if (!unbuilder.isInObject) objectPreamble(js)
           if (unbuilder.hasNextField) {
