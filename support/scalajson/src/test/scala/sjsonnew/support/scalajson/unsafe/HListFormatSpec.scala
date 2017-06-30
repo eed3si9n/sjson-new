@@ -2,7 +2,7 @@ package sjsonnew
 package support.scalajson
 package unsafe
 
-import scala.json.ast.unsafe._
+import scalajson.ast.unsafe._
 import BasicJsonProtocol._
 import org.scalatest._
 

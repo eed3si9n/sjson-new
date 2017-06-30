@@ -19,7 +19,7 @@ package sjsonnew
 package support.scalajson.unsafe
 
 import java.lang.StringBuilder
-import scala.json.ast.unsafe._
+import scalajson.ast.unsafe._
 
 /**
   * A JsonPrinter that produces compact JSON source without any superfluous whitespace.
