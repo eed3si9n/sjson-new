@@ -35,16 +35,20 @@ class ScalaJsonSpec extends FlatSpec {
   )
 
   val bob = Peep("Bob", 23)
+
   val bobJson = JObject(JField("$fields", JArray(JString("name"), JString("age"))),
     JField("name", JString("Bob")), JField("age", JNumber(23)))
-  val bobJsonStr = """{"$fields":["name","age"],"name":"Bob","age":23}"""
 
-  it should "Peep.toJson correctly"              in assert(bob.toJson === bobJson)
-  it should "Peep.toJsonStr correctly"           in assert(bob.toJsonStr === bobJsonStr)
-  it should "String.toJson correctly"            in assert(bobJsonStr.toJson === bobJson)
-  it should "String.fromJsonStr[Peep] correctly" in assert(bobJsonStr.fromJsonStr[Peep] === bob)
-  it should "Peep.jsonRoundTrip correctly"       in assertRoundTrip(bob)
-  it should "Peep.jsonPrettyRoundTrip correctly" in assertPrettyRoundTrip(bob)
+  val bobJsonStr              = """{"$fields":["name","age"],"name":"Bob","age":23}"""
+  val bobJsonStrMixedFields   = """{"$fields":["name","age"],"age":23,"name":"Bob"}"""
+
+  it should "Peep.toJson correctly"                             in assert(bob.toJson === bobJson)
+  it should "Peep.toJsonStr correctly"                          in assert(bob.toJsonStr === bobJsonStr)
+  it should "String.toJson correctly"                           in assert(bobJsonStr.toJson === bobJson)
+  it should "String.fromJsonStr[Peep] correctly"                in assert(bobJsonStr.fromJsonStr[Peep] === bob)
+  it should "String.fromJsonStr[Peep] mixed fields correctly"   in assert(bobJsonStrMixedFields.fromJsonStr[Peep] === bob)
+  it should "Peep.jsonRoundTrip correctly"                      in assertRoundTrip(bob)
+  it should "Peep.jsonPrettyRoundTrip correctly"                in assertPrettyRoundTrip(bob)
 
   private def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonRoundTrip)
   private def assertPrettyRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonPrettyRoundTrip)
