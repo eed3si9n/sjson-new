@@ -2,7 +2,7 @@
 
 [ScalaJSON](https://github.com/mdedetrich/scalajson), formerly SLIP-28 JSON proposal, is graduating the incubation and has changed the Maven coordinate to `"org.scala-lang.platform" %% "scalajson"`.
 
-sjson-new 0.8.0-M2 provides codec support for the latest ScalaJSON 1.0.0-M2.
+sjson-new 0.8.0-M2 provides codec support for the latest ScalaJSON 1.0.0-M2, as well as Jawn binding for parsing and pretty/compact printers.
 
 ### Fixes with compatibility implications
 
