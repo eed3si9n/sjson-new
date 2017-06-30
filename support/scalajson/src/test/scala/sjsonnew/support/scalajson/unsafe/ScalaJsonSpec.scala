@@ -41,12 +41,14 @@ class ScalaJsonSpec extends FlatSpec {
 
   val bobJsonStr              = """{"$fields":["name","age"],"name":"Bob","age":23}"""
   val bobJsonStrMixedFields   = """{"$fields":["name","age"],"age":23,"name":"Bob"}"""
+  val bobJsonStrWithoutFields = """{"name":"Bob","age":23}"""
 
   it should "Peep.toJson correctly"                             in assert(bob.toJson === bobJson)
   it should "Peep.toJsonStr correctly"                          in assert(bob.toJsonStr === bobJsonStr)
   it should "String.toJson correctly"                           in assert(bobJsonStr.toJson === bobJson)
   it should "String.fromJsonStr[Peep] correctly"                in assert(bobJsonStr.fromJsonStr[Peep] === bob)
   it should "String.fromJsonStr[Peep] mixed fields correctly"   in assert(bobJsonStrMixedFields.fromJsonStr[Peep] === bob)
+  it should "String.fromJsonStr[Peep] without fields correctly" in assert(bobJsonStrWithoutFields.fromJsonStr[Peep] === bob)
   it should "Peep.jsonRoundTrip correctly"                      in assertRoundTrip(bob)
   it should "Peep.jsonPrettyRoundTrip correctly"                in assertPrettyRoundTrip(bob)
 
