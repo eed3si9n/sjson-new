@@ -92,7 +92,7 @@ trait LListFormats {
             unbuilder.beginPreObject(js)
             val fieldNames = unbuilder.lookupField(fieldNamesField) match {
               case Some(x) => implicitly[JsonFormat[List[String]]].read(Some(x), unbuilder)
-              case None    => deserializationError("Field not found: $fieldNamesField")
+              case None    => deserializationError(s"Field not found: $fieldNamesField")
             }
             unbuilder.endPreObject()
             val n = unbuilder.beginObject(js, Some(fieldNames.toVector))
@@ -103,7 +103,7 @@ trait LListFormats {
               unbuilder.beginPreObject(x)
               val fieldNames = unbuilder.lookupField(fieldNamesField) match {
                 case Some(x) => implicitly[JsonFormat[List[String]]].read(Some(x), unbuilder)
-                case None    => deserializationError("Field not found: $fieldNamesField")
+                case None    => deserializationError(s"Field not found: $fieldNamesField")
               }
               unbuilder.endPreObject()
               unbuilder.beginObject(x, Some(fieldNames.toVector))
