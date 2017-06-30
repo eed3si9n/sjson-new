@@ -2,7 +2,7 @@ package sjsonnew
 package support.scalajson.unsafe
 
 import scala.collection.mutable
-import scala.json.ast.unsafe._
+import scalajson.ast.unsafe._
 
 object Converter extends SupportConverter[JValue] {
   implicit val facade: Facade[JValue] = FacadeImpl
@@ -61,29 +61,29 @@ object Converter extends SupportConverter[JValue] {
       }
     def extractInt(value: JValue): Int =
       value match {
-        case x: JNumber => x.to[Int]
+        case x: JNumber => x.value.toInt
         case x => deserializationError("Expected Int as JNumber, but got " + x)
       }
     def extractLong(value: JValue): Long =
       value match {
-        case x: JNumber => x.to[Long]
+        case x: JNumber => x.value.toLong
         case x => deserializationError("Expected Long as JNumber, but got " + x)
       }
     def extractFloat(value: JValue): Float =
       value match {
-        case x: JNumber => x.to[Float]
+        case x: JNumber => x.value.toFloat
         case JNull      => Float.NaN
         case x => deserializationError("Expected Float as JNumber, but got " + x)
       }
     def extractDouble(value: JValue): Double =
       value match {
-        case x: JNumber => x.to[Double]
+        case x: JNumber => x.value.toDouble
         case JNull      => Double.NaN
         case x => deserializationError("Expected Double as JNumber, but got " + x)
       }
     def extractBigDecimal(value: JValue): BigDecimal =
       value match {
-        case x: JNumber => x.to[BigDecimal]
+        case x: JNumber => BigDecimal(x.value)
         case x => deserializationError("Expected BigDecimal as JNumber, but got " + x)
       }
     def extractBoolean(value: JValue): Boolean =

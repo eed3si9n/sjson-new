@@ -1,7 +1,7 @@
 package sjsonnew
 package support.scalajson
 
-import scala.json.ast.unsafe._
+import scalajson.ast.unsafe._
 import org.scalactic._
 
 package object unsafe {
@@ -19,7 +19,7 @@ package object unsafe {
     def toPrettyStr: String        = PrettyPrinter(_j)
     def fromJson[A: JsonReader]: A = Converter fromJsonUnsafe[A] _j
 
-    // scala.json.ast.unsafe doesn't have good toStrings
+    // scalajson.ast.unsafe doesn't have good toStrings
     def to_s: String = _j match {
       case JNull          => "JNull"
       case JString(value) => s"JString($value)"
