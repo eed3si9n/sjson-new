@@ -28,6 +28,9 @@ trait CaseClassFormats {
   [2..22#def caseClass[[#K1: K#], [#A1: JF#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])])([#key1: K1#]): JF[Z] =
     caseClass1[[#K1#], [#A1#], Z](applyFunc, unapplyFunc)([#key1#])
 
+  def caseClassArray[[#A1: JF#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])]): JF[Z] =
+    caseClassArray1[[#A1#], Z](applyFunc, unapplyFunc)
+
   def caseClass1[[#K1#], [#A1#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])])([#key1: K1#])(implicit [#A1: JF[A1]#], [#K1: K[K1]#]): JF[Z] = new JsonFormat[Z] {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Z = jsOpt match {
       case Some(js) =>
@@ -74,9 +77,6 @@ trait CaseClassFormats {
         }
     }
   }
-
-  def caseClassArray[[#A1: JF#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])]): JF[Z] =
-    caseClassArray1[[#A1#], Z](applyFunc, unapplyFunc)
-  #
+#
   ]
 }
