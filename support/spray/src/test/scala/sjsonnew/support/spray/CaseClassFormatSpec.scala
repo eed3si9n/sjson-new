@@ -54,4 +54,33 @@ class CaseClassFormatsSpec extends Specification with BasicJsonProtocol {
     }
   }
 
+  private case class Uno(a: Int)
+  private val x = Uno(42)
+
+  "case class with 1 field" should {
+    implicit val jf = BasicJsonProtocol.caseClass(Uno.apply _, Uno.unapply _)("a")
+
+    val json = JsObject("a" -> JsNumber(42))
+
+    "convert case cass -> JsObject" in {
+      Converter.toJsonUnsafe(x) mustEqual json
+    }
+    "convert JsObject -> case class" in {
+      Converter.fromJsonUnsafe[Uno](json) mustEqual x
+    }
+  }
+
+  "case class with 1 field" should {
+    implicit val jf = BasicJsonProtocol.caseClassArray(Uno.apply _, Uno.unapply _)
+
+    val json = JsArray(JsNumber(42))
+
+    "convert case class -> JsArray" in {
+      Converter.toJsonUnsafe(x) mustEqual json
+    }
+    "convert JsArray -> case class" in {
+      Converter.fromJsonUnsafe[Uno](json) mustEqual x
+    }
+  }
+
 }

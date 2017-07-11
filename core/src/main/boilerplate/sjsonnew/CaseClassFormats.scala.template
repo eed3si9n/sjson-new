@@ -25,8 +25,62 @@ trait CaseClassFormats {
   private[this] type K[A] = JsonKeyWriter[A]
 
 
+  // The 1-arity case. Hand-rolled because of sbt/sbt-boilerplate#23
+
+  def caseClass[K1: K, A1: JF, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: K1): JF[Z] =
+    caseClass1[K1, A1, Z](applyFunc, unapplyFunc)(key1)
+
+  def caseClassArray[A1: JF, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1]): JF[Z] =
+    caseClassArray1[A1, Z](applyFunc, unapplyFunc)
+
+  def caseClass1[K1, A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: K1)(
+      implicit A1: JF[A1], K1: K[K1]
+  ): JF[Z] =
+    new JsonFormat[Z] {
+      def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Z = jsOpt match {
+        case None     => deserializationError("Expected JsObject but found None")
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val z = applyFunc(unbuilder.readField[A1](K1.write(key1)))
+          unbuilder.endObject()
+          z
+      }
+
+      def write[J](obj: Z, builder: Builder[J]): Unit = {
+        val t = unapplyFunc(obj).get
+        builder.beginObject()
+        builder.addField(K1.write(key1), t)
+        builder.endObject()
+      }
+    }
+
+  def caseClassArray1[A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(implicit A1: JF[A1]): JF[Z] =
+    new JsonFormat[Z] {
+      def write[J](t: Z, builder: Builder[J]): Unit = {
+        val x = unapplyFunc(t).get
+        builder.beginArray()
+        A1.write(x, builder)
+        builder.endArray()
+      }
+
+      def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Z =
+        jsOpt match {
+          case None     => applyFunc(A1.read(None, unbuilder))
+          case Some(js) =>
+            unbuilder.beginArray(js)
+            val a1 = unbuilder.nextElement
+            val xs = applyFunc(A1.read(Some(a1), unbuilder))
+            unbuilder.endArray()
+            xs
+        }
+    }
+
+
   [2..22#def caseClass[[#K1: K#], [#A1: JF#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])])([#key1: K1#]): JF[Z] =
     caseClass1[[#K1#], [#A1#], Z](applyFunc, unapplyFunc)([#key1#])
+
+  def caseClassArray[[#A1: JF#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])]): JF[Z] =
+    caseClassArray1[[#A1#], Z](applyFunc, unapplyFunc)
 
   def caseClass1[[#K1#], [#A1#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])])([#key1: K1#])(implicit [#A1: JF[A1]#], [#K1: K[K1]#]): JF[Z] = new JsonFormat[Z] {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Z = jsOpt match {
@@ -40,7 +94,7 @@ trait CaseClassFormats {
       case None =>
         deserializationError("Expected JsObject but found None")
     }
-   
+
     def write[J](obj: Z, builder: Builder[J]): Unit = {
       val t = unapplyFunc(obj).get
       builder.beginObject()
@@ -74,9 +128,6 @@ trait CaseClassFormats {
         }
     }
   }
-
-  def caseClassArray[[#A1: JF#], Z](applyFunc: ([#A1#]) => Z, unapplyFunc: Z => Option[([#A1#])]): JF[Z] =
-    caseClassArray1[[#A1#], Z](applyFunc, unapplyFunc)
-  #
+#
   ]
 }
