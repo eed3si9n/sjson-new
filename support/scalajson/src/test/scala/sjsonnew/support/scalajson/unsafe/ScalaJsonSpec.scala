@@ -29,10 +29,9 @@ class ScalaJsonSpec extends FlatSpec {
   import LList.:*:
   type PeepRepr = String :*: Int :*: LNil
 
-  implicit val PeepIso: IsoLList.Aux[Peep, PeepRepr] = LList.iso(
-    { p: Peep => ("name", p.name) :*: ("age", p.age) :*: LNil },
-    { in: PeepRepr => Peep(in.head, in.tail.head) }
-  )
+  implicit val PeepIso: IsoLList.Aux[Peep, PeepRepr] = LList.iso2(
+    { p: Peep => ("name", p.name) :*: ("age", p.age) :*: LNil })
+    { in => Peep(in.head, in.tail.head) }
 
   val bob = Peep("Bob", 23)
 

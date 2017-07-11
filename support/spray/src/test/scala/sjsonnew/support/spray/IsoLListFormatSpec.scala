@@ -26,17 +26,20 @@ class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
   case class Person(name: String, value: Option[Int]) extends Contact
   case class Organization(name: String, value: Option[Int]) extends Contact
 
-  implicit val personIso: IsoLList.Aux[Person, String :*: Option[Int] :*: LNil] = LList.iso(
-    { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
-    { in: String :*: Option[Int] :*: LNil => Person(
+  implicit val personIso: IsoLList.Aux[Person, String :*: Option[Int] :*: LNil] = LList.iso2(
+    { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil })
+    { in => Person(
       in.find[String]("name").get,
-      in.find[Option[Int]]("value").flatten) })
-  implicit val organizationIso: IsoLList.Aux[Organization, String :*: Option[Int] :*: LNil] = LList.iso(
-    { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil },
-    { in: String :*: Option[Int] :*: LNil => Organization(
+      in.find[Option[Int]]("value").flatten) }
+
+  implicit val organizationIso: IsoLList.Aux[Organization, String :*: Option[Int] :*: LNil] = LList.iso2(
+    { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil })
+    { in => Organization(
       in.find[String]("name").get,
-      in.find[Option[Int]]("value").flatten) })
+      in.find[Option[Int]]("value").flatten) }
+
   implicit val ContactFormat: JsonFormat[Contact] = flatUnionFormat2[Contact, Person, Organization]("$type")
+
   val p1 = Person("Alice", Some(1))
   val personJs = JsObject("$fields" -> JsArray(JsString("name"), JsString("value")),
     "name" -> JsString("Alice"), "value" -> JsNumber(1))

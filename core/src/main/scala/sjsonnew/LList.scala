@@ -27,8 +27,13 @@ sealed trait LList {
 object LList extends LListFormats {
   type :*:[A1, A2 <: LList] = LCons[A1, A2]
   val :*: = LCons
+
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
     IsoLList.iso[A, R0](to0, from0)
+
+  def iso2[A, R0 <: LList: JsonFormat](to0: A => R0)(from0: R0 => A): IsoLList.Aux[A, R0] =
+    IsoLList.iso[A, R0](to0, from0)
+
   // This is so the return type of LNil becomes LNil, instead of LNil.type.
   val LNil0: LNil0 = new LNil0 {}
   sealed trait LNil0 extends LList {
