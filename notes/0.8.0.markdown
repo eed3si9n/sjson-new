@@ -18,7 +18,11 @@ To avoid runtime errors in the future, sjson-new 0.8.0-M3 provides codec support
 - Pretty printer for Scala JSON. #57 by @eed3si9n
 - `Throwable` support. #56 by @eed3si9n
 - Adds `mapReader`, `contramapWriter`, `mapKeyReader`, and `contramapKeyWriter`. #49, #50, #51, #58
+- Adds support to LList's JsonFormat to read objects with a `$fields` field. #61 by @dwijnand
+- Adds Tuple1 support to the case class support. #62 by @dwijnand
+- Adds `LList.iso2` as an alternative to `LList.so` that uses multiple parameter groups to drive type inference. #63 by @dwijnand
 
 ### Bug fixes
 
 - Fixes benchmark for Msgpack. #48 by @jvican
+- Fixes deserialization error message in LList's JsonFormat. #61 by @dwijnand
