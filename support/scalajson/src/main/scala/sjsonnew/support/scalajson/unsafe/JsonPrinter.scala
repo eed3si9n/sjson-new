@@ -20,7 +20,7 @@ package support.scalajson.unsafe
 
 import annotation.tailrec
 import java.lang.{StringBuilder => JStringBuilder}
-import scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe._
 
 /**
   * A JsonPrinter serializes a JSON AST to a String.

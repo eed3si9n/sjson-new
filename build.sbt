@@ -4,13 +4,13 @@ val scala210 = "2.10.6"
 val scala211 = "2.11.11"
 val scala212 = "2.12.2"
 
-lazy val root = (project in file(".")).
-  aggregate(core, // shapeless, shapelessTest,
+lazy val root = (project in file("."))
+  .aggregate(core, // shapeless, shapelessTest,
     supportSpray,
     supportScalaJson,
     supportMsgpack,
-    supportMurmurhash).
-  settings(
+    supportMurmurhash)
+  .settings(
     name := "sjson new",
     noPublish,
     inThisBuild(List(
@@ -44,18 +44,18 @@ val noPublish = List(
   publishArtifact in Compile := false
 )
 
-lazy val core = project.
-  enablePlugins(BoilerplatePlugin).
-  settings(
+lazy val core = project
+  .enablePlugins(BoilerplatePlugin)
+  .settings(
     name := "sjson new core",
     libraryDependencies ++= testDependencies,
     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
   )
 
 def support(n: String) =
-  Project(id = n, base = file(s"support/$n")).
-    dependsOn(core).
-    settings(
+  Project(id = n, base = file(s"support/$n"))
+    .dependsOn(core)
+    .settings(
       name := s"sjson-new-$n",
       libraryDependencies ++= testDependencies,
       scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
@@ -66,22 +66,22 @@ lazy val supportSpray = support("spray").
     libraryDependencies += sprayJson
   )
 
-lazy val supportScalaJson = support("scalajson").
-  settings(
+lazy val supportScalaJson = support("scalajson")
+  .settings(
     libraryDependencies ++= Seq(scalaJson, jawnParser)
   )
 
-lazy val supportMsgpack = support("msgpack").
-  settings(
+lazy val supportMsgpack = support("msgpack")
+  .settings(
     libraryDependencies += msgpackCore
   )
 
 lazy val supportMurmurhash = support("murmurhash")
 
-lazy val benchmark = (project in file("benchmark")).
-  dependsOn(supportSpray, supportScalaJson, supportMsgpack).
-  enablePlugins(JmhPlugin).
-  settings(
+lazy val benchmark = (project in file("benchmark"))
+  .dependsOn(supportSpray, supportScalaJson, supportMsgpack)
+  .enablePlugins(JmhPlugin)
+  .settings(
     libraryDependencies ++= Seq(jawnSpray, lm),
     crossScalaVersions -= scala212,
     javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),

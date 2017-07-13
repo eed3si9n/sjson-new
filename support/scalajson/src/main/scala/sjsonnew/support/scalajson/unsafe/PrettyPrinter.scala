@@ -20,7 +20,7 @@ package support.scalajson.unsafe
 
 import java.lang.StringBuilder
 import annotation.tailrec
-import scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe._
 
 /**
   * A JsonPrinter that produces a nicely readable JSON source.
