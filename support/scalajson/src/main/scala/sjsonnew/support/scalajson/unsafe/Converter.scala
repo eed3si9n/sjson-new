@@ -2,7 +2,7 @@ package sjsonnew
 package support.scalajson.unsafe
 
 import scala.collection.mutable
-import scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe._
 
 object Converter extends SupportConverter[JValue] {
   implicit val facade: Facade[JValue] = FacadeImpl

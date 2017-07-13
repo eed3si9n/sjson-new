@@ -1,7 +1,7 @@
 package sjsonnew
 package support.scalajson.unsafe
 
-import scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe._
 import scala.collection.mutable.ArrayBuffer
 import jawn.{ Facade, FContext, SupportParser }
 

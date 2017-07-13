@@ -1,7 +1,7 @@
 package sjsonnew
 package support.scalajson
 
-import scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe._
 import org.scalactic._
 
 package object unsafe {

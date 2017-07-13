@@ -9,7 +9,7 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % "3.0.1" % "test"
   )
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.2"
-  lazy val scalaJson = "org.scala-lang.platform" %% "scalajson" % "1.0.0-M2"
+  lazy val scalaJson = "com.eed3si9n" %% "shaded-scalajson" % "1.0.0-M4"
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.11"
   lazy val jawnVersion = "0.10.4"
   lazy val jawnParser = "org.spire-math" %% "jawn-parser" % jawnVersion

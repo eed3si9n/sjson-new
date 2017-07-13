@@ -1,7 +1,7 @@
 package sjsonnew
 package support.scalajson.unsafe
 
-import scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe._
 
 import org.scalatest.FlatSpec
 
