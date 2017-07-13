@@ -161,7 +161,7 @@ defined class Person
 
 scala> implicit val personIso = LList.iso(
          { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
-         { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
+         { case (_, name) :*: (_, value) :*: LNil => Person(name, value) })
 personIso: sjsonnew.IsoLList.Aux[Person,sjsonnew.LList.:*:[String,sjsonnew.LList.:*:[Int,sjsonnew.LNil]]] = sjsonnew.IsoLList$$anon$1@4140e9d0
 
 scala> import sjsonnew.support.spray.Converter
@@ -193,10 +193,10 @@ case class Organization(name: String, value: Int) extends Contact
 
 implicit val personIso = LList.iso(
   { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil },
-  { in: String :*: Int :*: LNil => Person(in.head, in.tail.head) })
+  { case (_, name) :*: (_, value) :*: LNil => Person(name, value) })
 implicit val organizationIso = LList.iso(
   { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil },
-  { in: String :*: Int :*: LNil => Organization(in.head, in.tail.head) })
+  { case (_, name) :*: (_, value) :*: LNil => Organization(name, value) })
 implicit val ContactFormat = flatUnionFormat2[Contact, Person, Organization]("type")
 
 // Exiting paste mode, now interpreting.
