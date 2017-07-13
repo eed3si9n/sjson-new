@@ -26,7 +26,12 @@ sealed trait LList {
 
 object LList extends LListFormats {
   type :*:[A1, A2 <: LList] = LCons[A1, A2]
-  val :*: = LCons
+  object :*: {
+    def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2): A1 :*: A2 =
+      LCons(name, head, tail)
+
+    def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] = Some((x.name -> x.head, x.tail))
+  }
 
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
     IsoLList.iso[A, R0](to0, from0)
