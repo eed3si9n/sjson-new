@@ -1,8 +1,8 @@
 ### ScalaJSON support
 
-[ScalaJSON](https://github.com/mdedetrich/scalajson), formerly SLIP-28 JSON proposal, is graduating the incubation and has changed the Maven coordinate to `"org.scala-lang.platform" %% "scalajson"`.
+[ScalaJSON](https://github.com/mdedetrich/scalajson), formerly SLIP-28 JSON proposal, is graduating the incubation, and changed it group id (organization). However, it is still in development and final 1.0 is not out yet.
 
-sjson-new 0.8.0-M2 provides codec support for the latest ScalaJSON 1.0.0-M2, as well as Jawn binding for parsing and pretty/compact printers.
+To avoid runtime errors in the future, sjson-new 0.8.0-M3 provides codec support for a shaded release of ScalaJSON 1.0.0-M4, as well as Jawn binding for parsing and pretty/compact printers.
 
 ### Fixes with compatibility implications
 
