@@ -18,7 +18,7 @@ package sjsonnew
 
 import scala.reflect.ClassTag
 
-/** Heterogeneous list with labels. */
+/** Heterogeneous list (of json serializable stuff) with labels. */
 sealed trait LList {
   def find[A1: ClassTag](n: String): Option[A1]
   def fieldNames: List[String]
