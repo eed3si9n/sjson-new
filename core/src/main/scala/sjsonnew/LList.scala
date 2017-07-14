@@ -36,7 +36,8 @@ object LList extends LListFormats {
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
     IsoLList.iso[A, R0](to0, from0)
 
-  def iso2[A, R0 <: LList: JsonFormat](to0: A => R0)(from0: R0 => A): IsoLList.Aux[A, R0] =
+  /** Curried iso for type inference. */
+  def isoCurried[A, R0 <: LList: JsonFormat](to0: A => R0)(from0: R0 => A): IsoLList.Aux[A, R0] =
     IsoLList.iso[A, R0](to0, from0)
 
   // This is so the return type of LNil becomes LNil, instead of LNil.type.

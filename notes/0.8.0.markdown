@@ -20,7 +20,7 @@ To avoid runtime errors in the future, sjson-new 0.8.0-M3 provides codec support
 - Adds `mapReader`, `contramapWriter`, `mapKeyReader`, and `contramapKeyWriter`. #49, #50, #51, #58
 - Adds support to LList's JsonFormat to read objects with a `$fields` field. #61 by @dwijnand
 - Adds Tuple1 support to the case class support. #62 by @dwijnand
-- Adds `LList.iso2` as an alternative to `LList.iso` that uses multiple parameter groups to drive type inference. #63 by @dwijnand
+- Adds `LList.isoCurried(to0: A => R0)(from0: R0 => A)` as an alternative to `LList.iso(to0: A => R0, from0: R0 => A)` that uses multiple parameter groups to drive type inference. #63 by @dwijnand
 - Redefines `:*:.unapply` so it mirrors the `:*:` operator. #67 by @dwijnand
 
 ### Bug fixes
