@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import scala.reflect.ClassTag
+
 package object sjsonnew {
   def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
   def serializationError(msg: String) = throw new SerializationException(msg)
@@ -23,6 +25,13 @@ package object sjsonnew {
 
   type LNil = LList.LNil0
   val LNil = LList.LNil0
+  type :*:[A1, A2 <: LList] = LCons[A1, A2]
+  object :*: {
+    def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2): A1 :*: A2 =
+      LCons(name, head, tail)
+
+    def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] = Some((x.name -> x.head, x.tail))
+  }
 }
 
 package sjsonnew {

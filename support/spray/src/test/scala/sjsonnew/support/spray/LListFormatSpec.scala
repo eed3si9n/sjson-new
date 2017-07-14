@@ -20,7 +20,6 @@ package support.spray
 import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
-import LList._
 
 class LListFormatsSpec extends Specification with BasicJsonProtocol {
 

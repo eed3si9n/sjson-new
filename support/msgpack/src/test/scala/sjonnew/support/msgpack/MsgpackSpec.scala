@@ -19,7 +19,6 @@ package support.msgpack
 
 import org.scalatest.FlatSpec
 import BUtil._
-import LList._
 
 class MsgpackSpec extends FlatSpec with BasicJsonProtocol {
   "The IntJsonFormat" should "convert an Int to an int message" in {
