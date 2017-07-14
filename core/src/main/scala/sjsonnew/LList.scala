@@ -25,13 +25,9 @@ sealed trait LList {
 }
 
 object LList extends LListFormats {
+  @deprecated("Switch to the type alias in the sjsonnew root package", "0.8.0")
   type :*:[A1, A2 <: LList] = LCons[A1, A2]
-  object :*: {
-    def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2): A1 :*: A2 =
-      LCons(name, head, tail)
-
-    def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] = Some((x.name -> x.head, x.tail))
-  }
+  final val :*: = sjsonnew.:*:
 
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
     IsoLList.iso[A, R0](to0, from0)
@@ -42,7 +38,7 @@ object LList extends LListFormats {
   // This is so the return type of LNil becomes LNil, instead of LNil.type.
   val LNil0: LNil0 = new LNil0 {}
   sealed trait LNil0 extends LList {
-    def :*:[A1: JsonFormat: ClassTag](labelled: (String, A1)): A1 :*: LNil = LCons(labelled._1, labelled._2, this)
+    def :*:[A1: JsonFormat: ClassTag](labelled: (String, A1)): LCons[A1, LNil] = LCons(labelled._1, labelled._2, this)
 
     override def toString: String = "LNil"
     override def find[A1: ClassTag](n: String): Option[A1] = None
@@ -51,7 +47,6 @@ object LList extends LListFormats {
 }
 
 final case class LCons[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
-  import LList.:*:
   def :*:[B1: JsonFormat: ClassTag](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
   override def toString: String = s"($name, $head) :*: $tail"
   override def find[B1: ClassTag](n: String): Option[B1] =
@@ -60,6 +55,12 @@ final case class LCons[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: 
   override def fieldNames: List[String] = name :: tail.fieldNames
 }
 
+object :*: {
+  def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2): A1 :*: A2 =
+    LCons(name, head, tail)
+
+  def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] = Some((x.name -> x.head, x.tail))
+}
 
 trait LListFormats {
   import BasicJsonProtocol._

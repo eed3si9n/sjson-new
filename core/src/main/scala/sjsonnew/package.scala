@@ -23,6 +23,7 @@ package object sjsonnew {
 
   type LNil = LList.LNil0
   val LNil = LList.LNil0
+  type :*:[A1, A2 <: LList] = LCons[A1, A2]
 }
 
 package sjsonnew {

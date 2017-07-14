@@ -26,7 +26,6 @@ class ScalaJsonSpec extends FlatSpec {
 
   case class Peep(name: String, age: Int)
 
-  import LList.:*:
   type PeepRepr = String :*: Int :*: LNil
 
   implicit val PeepIso: IsoLList.Aux[Peep, PeepRepr] = LList.iso(

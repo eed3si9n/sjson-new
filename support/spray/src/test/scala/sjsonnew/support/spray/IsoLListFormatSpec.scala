@@ -18,7 +18,6 @@ package sjsonnew
 package support.spray
 
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
-import LList._
 import org.specs2.mutable.Specification
 
 class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
