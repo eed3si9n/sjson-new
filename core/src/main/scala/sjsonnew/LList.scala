@@ -55,13 +55,6 @@ final case class LCons[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: 
   override def fieldNames: List[String] = name :: tail.fieldNames
 }
 
-object :*: {
-  def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2): A1 :*: A2 =
-    LCons(name, head, tail)
-
-  def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] = Some((x.name -> x.head, x.tail))
-}
-
 trait LListFormats {
   import BasicJsonProtocol._
 
