@@ -32,12 +32,6 @@ trait CollectionFormats {
         list foreach { x => elemFormat.write(x, builder) }
         builder.endArray()
       }
-    override def addField[J](name: String, xs: List[A], builder: Builder[J]): Unit =
-      if (xs.isEmpty) ()
-      else {
-        builder.addFieldName(name)
-        write(xs, builder)
-      }
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): List[A] =
       jsOpt match {
         case Some(js) =>
@@ -62,12 +56,6 @@ trait CollectionFormats {
         builder.beginArray()
         array foreach { x => elemFormat.write(x, builder) }
         builder.endArray()
-      }
-    override def addField[J](name: String, xs: Array[A], builder: Builder[J]): Unit =
-      if (xs.isEmpty) ()
-      else {
-        builder.addFieldName(name)
-        write(xs, builder)
       }
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Array[A] =
       jsOpt match {
@@ -96,12 +84,6 @@ trait CollectionFormats {
             valueFormat.write(v, builder)
         }
         builder.endObject()
-      }
-    override def addField[J](name: String, m: Map[K, V], builder: Builder[J]): Unit =
-      if (m.isEmpty) ()
-      else {
-        builder.addFieldName(name)
-        write(m, builder)
       }
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Map[K, V] =
       jsOpt match {
@@ -145,12 +127,6 @@ trait CollectionFormats {
         builder.beginArray()
         iterable foreach { x => elemFormat.write(x, builder) }
         builder.endArray()
-      }
-    override def addField[J](name: String, xs: I, builder: Builder[J]): Unit =
-      if (xs.isEmpty) ()
-      else {
-        builder.addFieldName(name)
-        write(xs, builder)
       }
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): I =
       jsOpt match {
