@@ -101,8 +101,8 @@ trait LListFormats {
             if (!unbuilder.isInObject) objectPreamble(js)
             if (unbuilder.hasNextField) {
               val (name, x) = unbuilder.nextField
-              if (unbuilder.isObject(x)) objectPreamble(x)
-              val elem = a1Format.read(Some(x), unbuilder)
+              if (x != null && unbuilder.isObject(x)) objectPreamble(x)
+              val elem = a1Format.read(Option(x), unbuilder)
               val tail = a2Format.read(Some(js), unbuilder)
               LCons(name, elem, tail)
             }
