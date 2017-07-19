@@ -44,12 +44,17 @@ val noPublish = List(
   publishArtifact in Compile := false
 )
 
+val mimaSettings = Def settings (
+  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % "0.8.0-M4")
+)
+
 lazy val core = project
   .enablePlugins(BoilerplatePlugin)
   .settings(
     name := "sjson new core",
     libraryDependencies ++= testDependencies,
-    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+    mimaSettings
   )
 
 def support(n: String) =
@@ -58,7 +63,8 @@ def support(n: String) =
     .settings(
       name := s"sjson-new-$n",
       libraryDependencies ++= testDependencies,
-      scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8")
+      scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+      mimaSettings
     )
 
 lazy val supportSpray = support("spray").
