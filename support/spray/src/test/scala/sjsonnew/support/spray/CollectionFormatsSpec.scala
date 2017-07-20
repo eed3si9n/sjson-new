@@ -51,7 +51,13 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
       }
   }
   val person = Person("x", Nil, Array(), Map(), Vector())
-  val personJson = JsObject("name" -> JsString("x"))
+  val personJson = JsObject(
+    "name" -> JsString("x"),
+    "value" -> JsArray(),
+    "ary" -> JsArray(),
+    "m" -> JsObject(),
+    "vs" -> JsArray()
+  )
 
   case class Peep(name: String)
   implicit object PeepFormat extends JsonFormat[Peep] {
