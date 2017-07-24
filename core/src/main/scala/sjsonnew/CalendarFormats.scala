@@ -26,6 +26,32 @@ trait CalendarFormats {
   private val utc: ZoneId = ZoneId.of("UTC")
 
   /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
+  implicit val offsetDateTimeStringIso: IsoString[OffsetDateTime] = {
+    IsoString.iso[OffsetDateTime]( (odt: OffsetDateTime) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        odt.format(datetimefmt)
+      },
+      (s: String) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        OffsetDateTime.parse(s, datetimefmt)
+      })
+  }
+
+  /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
+  implicit val instantStringIso: IsoString[Instant] = {
+    IsoString.iso[Instant]( (i: Instant) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val odt = OffsetDateTime.ofInstant(i, utc)
+        odt.format(datetimefmt)
+      },
+      (s: String) => {
+        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val odt = OffsetDateTime.parse(s, datetimefmt)
+        odt.toInstant
+      })
+  }
+
+  /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
   implicit val calendarStringIso: IsoString[Calendar] = {
     IsoString.iso[Calendar]( (c: Calendar) => {
         val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
@@ -44,20 +70,6 @@ trait CalendarFormats {
                     ld.atStartOfDay(utc)
                   }
         GregorianCalendar.from(zdt)
-      })
-  }
-
-  /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
-  implicit val instantStringIso: IsoString[Instant] = {
-    IsoString.iso[Instant]( (i: Instant) => {
-        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        val zdt = ZonedDateTime.ofInstant(i, utc)
-        zdt.format(datetimefmt)
-      },
-      (s: String) => {
-        val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        val zdt = ZonedDateTime.parse(s, datetimefmt)
-        zdt.toInstant
       })
   }
 

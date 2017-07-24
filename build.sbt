@@ -45,8 +45,18 @@ val noPublish = List(
 )
 
 val mimaSettings = Def settings (
-  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % "0.8.0-M4")
+  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % "0.8.0-M4"),
+  mimaBinaryIssueFilters ++= ignoredABIProblems
 )
+
+val ignoredABIProblems = {
+  import com.typesafe.tools.mima.core._
+  import com.typesafe.tools.mima.core.ProblemFilters._
+  Seq(
+    exclude[ReversedMissingMethodProblem]("sjsonnew.CalendarFormats.offsetDateTimeStringIso"),
+    exclude[ReversedMissingMethodProblem]("sjsonnew.CalendarFormats.sjsonnew$CalendarFormats$_setter_$offsetDateTimeStringIso_=")
+  )
+}
 
 lazy val core = project
   .enablePlugins(BoilerplatePlugin)
