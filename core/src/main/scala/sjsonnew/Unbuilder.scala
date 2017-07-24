@@ -223,7 +223,7 @@ private[sjsonnew] object UnbuilderContext {
     def hasNext: Boolean = idx < size
     def next: (String, J) = {
       val name = names(idx)
-      val x = fields(names(idx))
+      val x = fields.getOrElse(names(idx), null.asInstanceOf[J])
       idx = idx + 1
       (name, x)
     }
