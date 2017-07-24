@@ -146,6 +146,8 @@ object Converter extends SupportConverter[Value] {
             vectorBuilder += array.next()
           }
           vectorBuilder.result()
+        case ValueType.NIL =>
+          Vector()
         case _ => deserializationError("Expected List as Array, but got " + value)
       }
     def extractObject(value: Value): (Map[String, Value], Vector[String]) =
@@ -162,6 +164,8 @@ object Converter extends SupportConverter[Value] {
             mapBuilder += (keyString -> entry.getValue)
           }
           (mapBuilder.result(), vectorBuilder.result())
+        case ValueType.NIL =>
+          (Map.empty, Vector.empty)
         case _ => deserializationError("Expected Map as MMap, but got " + value)
       }
   }
