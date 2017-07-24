@@ -152,7 +152,12 @@ class Unbuilder[J](facade: Facade[J]) {
     state match {
       case InObject =>
         contexts.head match {
-          case ctx: UnbuilderContext.ObjectContext[J] => ctx.next
+          case ctx: UnbuilderContext.ObjectContext[J] =>
+            // Encode elided field as JNull.
+            ctx.next match {
+              case (k, Some(v)) => (k, v)
+              case (k, None)    => (k, facade.jnull())
+            }
           case x => deserializationError(s"Unexpected context: $x")
         }
       case x => stateError(x)
@@ -221,9 +226,10 @@ private[sjsonnew] object UnbuilderContext {
     private val size = names.size
     private var idx: Int = 0
     def hasNext: Boolean = idx < size
-    def next: (String, J) = {
+    def next: (String, Option[J]) = {
       val name = names(idx)
-      val x = fields.getOrElse(names(idx), null.asInstanceOf[J])
+      // nulls and empty collections are elided, so it won't show up.
+      val x: Option[J] = fields.get(names(idx))
       idx = idx + 1
       (name, x)
     }

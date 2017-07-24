@@ -101,9 +101,11 @@ trait LListFormats {
             if (!unbuilder.isInObject) objectPreamble(js)
             if (unbuilder.hasNextField) {
               val (name, x) = unbuilder.nextField
-              if (x != null && unbuilder.isObject(x)) objectPreamble(x)
-              val elem = a1Format.read(Option(x), unbuilder)
-              val tail = a2Format.read(Some(js), unbuilder)
+              if (unbuilder.isObject(x)) objectPreamble(x)
+              // Elided fields are encoded as JNull in Unbuilder.
+              val optX = if (unbuilder.isJnull(x)) None else Option(x)
+              val elem = a1Format.read(optX, unbuilder)
+              val tail = a2Format.read(Option(js), unbuilder)
               LCons(name, elem, tail)
             }
             else deserializationError(s"Unexpected end of object: $js")
