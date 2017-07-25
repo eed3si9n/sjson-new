@@ -17,7 +17,7 @@ package object unsafe {
   implicit class JValueOps(val _j: JValue) extends AnyVal {
     def toJsonStr: String          = CompactPrinter(_j)
     def toPrettyStr: String        = PrettyPrinter(_j)
-    def fromJson[A: JsonReader]: A = Converter fromJsonUnsafe[A] _j
+    def fromJson[A: JsonReader]: A = Converter.fromJsonUnsafe[A](_j)
 
     // scalajson.ast.unsafe doesn't have good toStrings
     def to_s: String = _j match {
