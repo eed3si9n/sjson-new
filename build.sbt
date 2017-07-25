@@ -11,9 +11,10 @@ lazy val root = (project in file("."))
     supportMsgpack,
     supportMurmurhash)
   .settings(
+    commonSettings,
     name := "sjson new",
     noPublish,
-    inThisBuild(List(
+    inThisBuild(Def settings (
       organization := "com.eed3si9n",
       organizationName := "eed3si9n",
       organizationHomepage := Some(url("http://eed3si9n.com/")),
@@ -24,8 +25,7 @@ lazy val root = (project in file("."))
       ),
       version := "0.8.0-SNAPSHOT",
       isSnapshot := (isSnapshot or version(_ endsWith "-SNAPSHOT")).value,
-      crossScalaVersions := Seq(scala210, scala211, scala212),
-      scalaVersion := scala212,
+      scalaVersionSettings,
       description := "A Scala library for JSON (de)serialization",
       licenses := Seq("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
       publishTo := {
@@ -35,6 +35,14 @@ lazy val root = (project in file("."))
       }
     ))
   )
+
+// WORKAROUND https://github.com/sbt/sbt/issues/3353
+val scalaVersionSettings = Def settings (
+  crossScalaVersions := Seq(scala210, scala211, scala212),
+  scalaVersion := scala212
+)
+
+val commonSettings = scalaVersionSettings
 
 val noPublish = List(
   publish := {},
@@ -51,6 +59,7 @@ val mimaSettings = Def settings (
 lazy val core = project
   .enablePlugins(BoilerplatePlugin)
   .settings(
+    commonSettings,
     name := "sjson new core",
     libraryDependencies ++= testDependencies,
     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
@@ -61,6 +70,7 @@ def support(n: String) =
   Project(id = n, base = file(s"support/$n"))
     .dependsOn(core)
     .settings(
+      commonSettings,
       name := s"sjson-new-$n",
       libraryDependencies ++= testDependencies,
       scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
@@ -88,6 +98,7 @@ lazy val benchmark = (project in file("benchmark"))
   .dependsOn(supportSpray, supportScalaJson, supportMsgpack)
   .enablePlugins(JmhPlugin)
   .settings(
+    // commonSettings, // TODO: Fix running benchmarks on all target versions
     libraryDependencies ++= Seq(jawnSpray, lm),
     crossScalaVersions -= scala212,
     javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
