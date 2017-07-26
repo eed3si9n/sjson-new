@@ -81,6 +81,9 @@ trait AdditionalFormats {
   def rootFormat[A](format: JsonFormat[A]) = new RootJsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = format.write(obj, builder)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = format.read(jsOpt, unbuilder)
+
+    override def addField[J](name: String, obj: A, builder: Builder[J]) =
+      format.addField(name, obj, builder)
   }
 
   /**
@@ -111,6 +114,9 @@ trait AdditionalFormats {
   def projectFormat[T, U](f1: T => U, f2: U => T)(implicit fu: JsonFormat[U]): JsonFormat[T] = new JsonFormat[T] {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): T = f2(fu.read(jsOpt, unbuilder))
     def write[J](obj: T, builder: Builder[J]): Unit = fu.write(f1(obj), builder)
+
+    override def addField[J](name: String, obj: T, builder: Builder[J]) =
+      fu.addField(name, f1(obj), builder)
   }
 
   /**

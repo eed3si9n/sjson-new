@@ -20,68 +20,13 @@ package sjsonnew
 
 import scala.reflect.ClassTag
 
-trait CollectionFormats {
-  /**
-    * Supplies the JsonFormat for Lists.
-   */
-  implicit def listFormat[A: JsonFormat]: RootJsonFormat[List[A]] = new RootJsonFormat[List[A]] {
-    lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](list: List[A], builder: Builder[J]): Unit =
-      {
-        builder.beginArray()
-        list foreach { x => elemFormat.write(x, builder) }
-        builder.endArray()
-      }
-    override def addField[J](name: String, xs: List[A], builder: Builder[J]): Unit =
-      if (xs.isEmpty) ()
-      else {
-        builder.addFieldName(name)
-        write(xs, builder)
-      }
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): List[A] =
-      jsOpt match {
-        case Some(js) =>
-          val size = unbuilder.beginArray(js)
-          val xs = (1 to size).toList map { x =>
-            val elem = unbuilder.nextElement
-            elemFormat.read(Some(elem), unbuilder)
-          }
-          unbuilder.endArray
-          xs
-        case None => Nil
-      }
-  }
+trait CollectionFormats { self: AdditionalFormats =>
+  /** Supplies the JsonFormat for Lists. */
+  implicit def listFormat[A: JsonFormat]: RootJsonFormat[List[A]] = viaSeq[List[A], A](_.toList)
 
-  /**
-    * Supplies the JsonFormat for Arrays.
-   */
-  implicit def arrayFormat[A: JsonFormat: ClassTag]: RootJsonFormat[Array[A]] = new RootJsonFormat[Array[A]] {
-    lazy val elemFormat = implicitly[JsonFormat[A]]
-    def write[J](array: Array[A], builder: Builder[J]): Unit =
-      {
-        builder.beginArray()
-        array foreach { x => elemFormat.write(x, builder) }
-        builder.endArray()
-      }
-    override def addField[J](name: String, xs: Array[A], builder: Builder[J]): Unit =
-      if (xs.isEmpty) ()
-      else {
-        builder.addFieldName(name)
-        write(xs, builder)
-      }
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Array[A] =
-      jsOpt match {
-        case Some(js) =>
-          val size = unbuilder.beginArray(js)
-          val xs = (1 to size).toList map { x =>
-            val elem = unbuilder.nextElement
-            elemFormat.read(Some(elem), unbuilder)
-          }
-          unbuilder.endArray
-          xs.toArray
-        case None => Array()
-      }
-  }
+  /** Supplies the JsonFormat for Arrays. */
+  implicit def arrayFormat[A: JsonFormat: ClassTag]: RootJsonFormat[Array[A]] =
+    rootFormat(projectFormat[Array[A], List[A]](_.toList, _.toArray)(listFormat[A]))
 
   /** Supplies the JsonFormat for Maps. */
   implicit def mapFormat[K: JsonKeyFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
@@ -107,7 +52,7 @@ trait CollectionFormats {
       jsOpt match {
         case Some(js) =>
           val size = unbuilder.beginObject(js)
-          val xs = (1 to size).toList map { x =>
+          val xs = (1 to size).toList map { _ =>
             val (k, v) = unbuilder.nextFieldOpt
             keyFormat.read(k) -> valueFormat.read(v, unbuilder)
           }
@@ -156,7 +101,7 @@ trait CollectionFormats {
       jsOpt match {
         case Some(js) =>
           val size = unbuilder.beginArray(js)
-          val xs = (1 to size).toList map { x =>
+          val xs = (1 to size).toList map { _ =>
             val elem = unbuilder.nextElement
             elemFormat.read(Some(elem), unbuilder)
           }
