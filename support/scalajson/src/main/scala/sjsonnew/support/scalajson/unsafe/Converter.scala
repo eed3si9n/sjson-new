@@ -100,6 +100,7 @@ object Converter extends SupportConverter[JValue] {
     def extractArray(value: JValue): Vector[JValue] =
       value match {
         case JArray(elements) => elements.toVector
+        case JNull            => Vector.empty
         case x => deserializationError("Expected List as JArray, but got " + x)
       }
     def extractObject(value: JValue): (Map[String, JValue], Vector[String]) =
@@ -108,6 +109,8 @@ object Converter extends SupportConverter[JValue] {
           val names = (fs map { case JField(k, v) => k }).toVector
           val fields = Map((fs map { case JField(k, v) => (k, v) }): _*)
           (fields, names)
+        case JNull =>
+          (Map.empty, Vector.empty)
         case x => deserializationError("Expected Map as JsObject, but got " + x)
       }
   }

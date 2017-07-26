@@ -108,8 +108,8 @@ trait CollectionFormats {
         case Some(js) =>
           val size = unbuilder.beginObject(js)
           val xs = (1 to size).toList map { x =>
-            val (k, v) = unbuilder.nextField
-            keyFormat.read(k) -> valueFormat.read(Some(v), unbuilder)
+            val (k, v) = unbuilder.nextFieldOpt
+            keyFormat.read(k) -> valueFormat.read(v, unbuilder)
           }
           unbuilder.endObject
           Map(xs: _*)

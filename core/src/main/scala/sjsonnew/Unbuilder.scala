@@ -148,7 +148,7 @@ class Unbuilder[J](facade: Facade[J]) {
       case x => stateError(x)
     }
 
-  def nextField(): (String, J) =
+  def nextFieldOpt(): (String, Option[J]) =
     state match {
       case InObject =>
         contexts.head match {
@@ -158,7 +158,23 @@ class Unbuilder[J](facade: Facade[J]) {
       case x => stateError(x)
     }
 
-  def nextFieldWithJString(): (J, J) = nextField match { case (k, v) => (facade.jstring(k), v) }
+  def nextFieldOptWithJString(): (J, Option[J]) =
+    nextFieldOpt() match {
+      case (k, v) => (facade.jstring(k), v)
+    }
+
+  @deprecated("Use nextFieldOpt that returns (String, Option[J]). nextField uses JNull to encode elided fields.", "0.8.0")
+  def nextField(): (String, J) =
+    nextFieldOpt() match {
+      case (k, Some(v)) => (k, v)
+      case (k, None)    => (k, facade.jnull())
+    }
+
+  @deprecated("Use nextFieldOpt that returns (J, Option[J]). nextFieldOptWithJString uses JNull to encode elided fields.", "0.8.0")
+  def nextFieldWithJString(): (J, J) =
+    nextField match {
+      case (k, v) => (facade.jstring(k), v)
+    }
 
   def lookupField(name: String): Option[J] =
     state match {
@@ -221,9 +237,10 @@ private[sjsonnew] object UnbuilderContext {
     private val size = names.size
     private var idx: Int = 0
     def hasNext: Boolean = idx < size
-    def next: (String, J) = {
+    def next: (String, Option[J]) = {
       val name = names(idx)
-      val x = fields(names(idx))
+      // nulls and empty collections are elided, so it won't show up.
+      val x: Option[J] = fields.get(names(idx))
       idx = idx + 1
       (name, x)
     }

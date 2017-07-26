@@ -70,6 +70,7 @@ object Converter extends SupportConverter[JsValue] {
     def extractArray(value: JsValue): Vector[JsValue] =
       value match {
         case JsArray(elements) => elements
+        case JsNull            => Vector.empty
         case x => deserializationError("Expected List as JsArray, but got " + x)
       }
     def extractObject(value: JsValue): (Map[String, JsValue], Vector[String]) =
@@ -81,6 +82,8 @@ object Converter extends SupportConverter[JsValue] {
             vectorBuilder += field._1
           }
           (fields, vectorBuilder.result())
+        case JsNull =>
+          (Map.empty, Vector.empty)
         case x => deserializationError("Expected Map as JsObject, but got " + x)
       }
   }
