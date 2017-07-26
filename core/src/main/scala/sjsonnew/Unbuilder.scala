@@ -148,22 +148,33 @@ class Unbuilder[J](facade: Facade[J]) {
       case x => stateError(x)
     }
 
-  def nextField(): (String, J) =
+  def nextFieldOpt(): (String, Option[J]) =
     state match {
       case InObject =>
         contexts.head match {
-          case ctx: UnbuilderContext.ObjectContext[J] =>
-            // Encode elided field as JNull.
-            ctx.next match {
-              case (k, Some(v)) => (k, v)
-              case (k, None)    => (k, facade.jnull())
-            }
+          case ctx: UnbuilderContext.ObjectContext[J] => ctx.next
           case x => deserializationError(s"Unexpected context: $x")
         }
       case x => stateError(x)
     }
 
-  def nextFieldWithJString(): (J, J) = nextField match { case (k, v) => (facade.jstring(k), v) }
+  def nextFieldOptWithJString(): (J, Option[J]) =
+    nextFieldOpt() match {
+      case (k, v) => (facade.jstring(k), v)
+    }
+
+  @deprecated("Use nextFieldOpt that returns (String, Option[J]). nextField uses JNull to encode elided fields.", "0.8.0")
+  def nextField(): (String, J) =
+    nextFieldOpt() match {
+      case (k, Some(v)) => (k, v)
+      case (k, None)    => (k, facade.jnull())
+    }
+
+  @deprecated("Use nextFieldOpt that returns (J, Option[J]). nextFieldOptWithJString uses JNull to encode elided fields.", "0.8.0")
+  def nextFieldWithJString(): (J, J) =
+    nextField match {
+      case (k, v) => (facade.jstring(k), v)
+    }
 
   def lookupField(name: String): Option[J] =
     state match {
