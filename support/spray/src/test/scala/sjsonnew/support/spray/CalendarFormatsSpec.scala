@@ -25,10 +25,12 @@ import java.time._
 class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
   "The dateStringIso" should {
     // JDK 8 / Joda dates
+    val odt = OffsetDateTime.of(1999, 1, 1, 0, 0, 0, 0, ZoneOffset.of("Z"))
+    val omillis = odt.plusNanos(1000 * 1000)
     val zdt = ZonedDateTime.of(1999, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
-    val millis = zdt.plusNanos(1000 * 1000)
+    val zmillis = zdt.plusNanos(1000 * 1000)
     // zoneless instant in time
-    val inst = millis.toInstant
+    val inst = omillis.toInstant
     val ld = LocalDate.of(1999, 1, 1)
     val ldt = LocalDateTime.of(1999, 1, 1, 0, 0, 0, 1000 * 1000)
 
@@ -42,6 +44,22 @@ class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
     milliseconds.set(1999, 1, 1, 0, 0, 0)
     milliseconds.set(Calendar.MILLISECOND, 1)
 
+    "convert a OffsetDateTime to JsString" in {
+      Converter.toJsonUnsafe(odt) mustEqual JsString("1999-01-01T00:00:00Z")
+    }
+
+    "convert the JsString back to the OffsetDateTime" in {
+      Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00Z")) mustEqual odt
+    }
+
+    "convert a OffsetDateTime with milliseconds to JsString" in {
+      Converter.toJsonUnsafe(omillis) mustEqual JsString("1999-01-01T00:00:00.001Z")
+    }
+
+    "convert the JsString back to the OffsetDateTime with milliseconds" in {
+      Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00.001Z")) mustEqual omillis
+    }
+
     "convert a ZonedDateTime to JsString" in {
       Converter.toJsonUnsafe(zdt) mustEqual JsString("1999-01-01T00:00:00Z[UTC]")
     }
@@ -51,11 +69,11 @@ class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
     }
 
     "convert a ZonedDateTime with milliseconds to JsString" in {
-      Converter.toJsonUnsafe(millis) mustEqual JsString("1999-01-01T00:00:00.001Z[UTC]")
+      Converter.toJsonUnsafe(zmillis) mustEqual JsString("1999-01-01T00:00:00.001Z[UTC]")
     }
 
     "convert the JsString back to the ZonedDateTime with milliseconds" in {
-      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) mustEqual millis
+      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) mustEqual zmillis
     }
 
     "convert an Instant to JsString" in {
