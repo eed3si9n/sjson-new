@@ -23,7 +23,7 @@ lazy val root = (project in file("."))
       developers := List(
         Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
       ),
-      version := "0.8.0-SNAPSHOT",
+      version := "0.8.1-SNAPSHOT",
       isSnapshot := (isSnapshot or version(_ endsWith "-SNAPSHOT")).value,
       scalaVersionSettings,
       description := "A Scala library for JSON (de)serialization",
