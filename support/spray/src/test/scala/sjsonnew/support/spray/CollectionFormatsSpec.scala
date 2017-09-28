@@ -51,7 +51,13 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
       }
   }
   val person = Person("x", Nil, Array(), Map(), Vector())
-  val personJson = JsObject("name" -> JsString("x"))
+  val personJson = JsObject(
+    "name" -> JsString("x"),
+    "value" -> JsArray(),
+    "ary" -> JsArray(),
+    "m" -> JsObject(),
+    "vs" -> JsArray()
+  )
 
   case class Peep(name: String)
   implicit object PeepFormat extends JsonFormat[Peep] {
@@ -81,7 +87,7 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
     "convert a JsArray of JsNumbers to a List[Int]" in {
       Converter.fromJsonUnsafe[List[Int]](json) mustEqual list
     }
-    "omit Nil fields" in {
+    "not omit Nil fields" in {
       Converter.toJsonUnsafe(person) mustEqual personJson
     }
   }

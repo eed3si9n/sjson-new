@@ -16,8 +16,8 @@ final class LListFormatSpec extends FlatSpec {
 
   val foo        = Foo(Nil)
   val fooLList   = "xs" -> List.empty[String] :*: LNil
-  val fooJson    = JObject(JField("$fields", JArray(JString("xs"))))
-  val fooJsonStr = """{"$fields":["xs"]}"""
+  val fooJson    = JObject(JField("$fields", JArray(JString("xs"))), JField("xs", JArray()))
+  val fooJsonStr = """{"$fields":["xs"],"xs":[]}"""
 
   it should "Foo -> LList"        in assert((isoLList to foo) === fooLList)
   it should "Foo -> JSON"         in assert(foo.toJson === fooJson)

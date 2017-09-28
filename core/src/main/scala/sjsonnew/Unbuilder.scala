@@ -239,8 +239,7 @@ private[sjsonnew] object UnbuilderContext {
     def hasNext: Boolean = idx < size
     def next: (String, Option[J]) = {
       val name = names(idx)
-      // nulls and empty collections are elided, so it won't show up.
-      val x: Option[J] = fields.get(names(idx))
+      val x = fields.get(names(idx))
       idx = idx + 1
       (name, x)
     }

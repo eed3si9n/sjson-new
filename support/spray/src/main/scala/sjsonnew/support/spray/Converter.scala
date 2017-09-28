@@ -82,8 +82,7 @@ object Converter extends SupportConverter[JsValue] {
             vectorBuilder += field._1
           }
           (fields, vectorBuilder.result())
-        case JsNull =>
-          (Map.empty, Vector.empty)
+        case JsNull => (Map.empty, Vector.empty)
         case x => deserializationError("Expected Map as JsObject, but got " + x)
       }
   }
