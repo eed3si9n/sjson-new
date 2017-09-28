@@ -164,8 +164,7 @@ object Converter extends SupportConverter[Value] {
             mapBuilder += (keyString -> entry.getValue)
           }
           (mapBuilder.result(), vectorBuilder.result())
-        case ValueType.NIL =>
-          (Map.empty, Vector.empty)
+        case ValueType.NIL => (Map.empty, Vector.empty)
         case _ => deserializationError("Expected Map as MMap, but got " + value)
       }
   }
