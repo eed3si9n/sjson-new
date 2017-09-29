@@ -1,0 +1,8 @@
+
+### Don't elide empty collections
+
+Prior to 0.8.1, sjon-new elided the fields whose values are empty values.
+This behavior caused some problems, so 0.8.1 changes this behavior,
+and empty `Vector[A]` etc will now serialize as an empty JArray `[]`.
+
+This fix was contributed as #83 by @dwijnand
