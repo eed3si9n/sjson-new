@@ -67,7 +67,7 @@ lazy val core = project
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
       // private[this] final val
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.JavaExtraFormats.sjsonnew$JavaExtraFormats$$fileScheme")
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.JavaExtraFormats.sjsonnew$JavaExtraFormats$$FileScheme")
     )
   )
 
