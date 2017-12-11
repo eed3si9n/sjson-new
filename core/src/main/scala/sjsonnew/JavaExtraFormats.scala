@@ -39,14 +39,14 @@ trait JavaExtraFormats {
   implicit val urlStringIso: IsoString[URL] = IsoString.iso[URL](
     _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
 
-  private[this] final val fileScheme = "file"
+  private[this] final val FileScheme = "file"
 
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     (f: File) => {
       if (f.isAbsolute) {
         f.toPath.toUri.toASCIIString
       } else {
-        new URI(fileScheme, normalizeName(f.getPath), null).toASCIIString
+        new URI(null, normalizeName(f.getPath), null).toASCIIString
       }
     },
     (s: String) => uriToFile(new URI(s)))
@@ -57,11 +57,15 @@ trait JavaExtraFormats {
   }
 
   private[this] def uriToFile(uri: URI): File = {
-    assert(
-      uri.getScheme == fileScheme,
-      "Expected protocol to be '" + fileScheme + "' in URI " + uri
-    )
     val part = uri.getSchemeSpecificPart
+    // scheme might be omitted for relative URI reference.
+    assert(
+      Option(uri.getScheme) match {
+        case None | Some(FileScheme) => true
+        case _                       => false
+      },
+      s"Expected protocol to be '$FileScheme' or empty in URI $uri"
+    )
     Option(uri.getAuthority) match {
       case None if part startsWith "/" => new File(uri)
       case _                           =>
