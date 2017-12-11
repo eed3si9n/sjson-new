@@ -40,7 +40,7 @@ trait JavaExtraFormats {
     _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
 
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
-    _.toURI.toASCIIString, (s: String) => new File(new URI(s)))
+    _.toPath.toUri.toASCIIString, (s: String) => new File(new URI(s)))
 
   implicit def optionalFormat[A :JF]: JF[Optional[A]] = new OptionalFormat[A]
   final class OptionalFormat[A :JF] extends JF[Optional[A]] {

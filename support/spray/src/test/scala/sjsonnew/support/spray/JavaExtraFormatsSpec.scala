@@ -78,10 +78,10 @@ class JavaExtraFormatsSpec extends Specification with BasicJsonProtocol {
   "The fileStringIso" should {
     val f = new File("/tmp")
     "convert a File to JsString" in {
-      Converter.toJsonUnsafe(f) mustEqual JsString("file:/tmp/")
+      Converter.toJsonUnsafe(f) mustEqual JsString("file:///tmp/")
     }
     "convert the JsString back to the URI" in {
-      Converter.fromJsonUnsafe[File](JsString("file:/tmp/")) mustEqual f
+      Converter.fromJsonUnsafe[File](JsString("file:///tmp/")) mustEqual f
     }
   }
 
