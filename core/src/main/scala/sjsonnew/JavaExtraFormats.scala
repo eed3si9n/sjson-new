@@ -39,8 +39,36 @@ trait JavaExtraFormats {
   implicit val urlStringIso: IsoString[URL] = IsoString.iso[URL](
     _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
 
+  private[this] final val fileScheme = "file"
+
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
-    _.toURI.toASCIIString, (s: String) => new File(new URI(s)))
+    (f: File) => {
+      if (f.isAbsolute) {
+        f.toPath.toUri.toASCIIString
+      } else {
+        new URI(fileScheme, normalizeName(f.getPath), null).toASCIIString
+      }
+    },
+    (s: String) => uriToFile(new URI(s)))
+
+  private[this] def normalizeName(name: String) = {
+    val sep = File.separatorChar
+    if (sep == '/') name else name.replace(sep, '/')
+  }
+
+  private[this] def uriToFile(uri: URI): File = {
+    assert(
+      uri.getScheme == fileScheme,
+      "Expected protocol to be '" + fileScheme + "' in URI " + uri
+    )
+    val part = uri.getSchemeSpecificPart
+    Option(uri.getAuthority) match {
+      case None if part startsWith "/" => new File(uri)
+      case _                           =>
+        if (!(part startsWith "/") && (part contains ":")) new File("//" + part)
+        else new File(part)
+    }
+  }
 
   implicit def optionalFormat[A :JF]: JF[Optional[A]] = new OptionalFormat[A]
   final class OptionalFormat[A :JF] extends JF[Optional[A]] {

@@ -1,4 +1,5 @@
 import Dependencies._
+import com.typesafe.tools.mima.core._
 
 val scala210 = "2.10.6"
 val scala211 = "2.11.11"
@@ -63,7 +64,11 @@ lazy val core = project
     name := "sjson new core",
     libraryDependencies ++= testDependencies,
     scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
-    mimaSettings
+    mimaSettings,
+    mimaBinaryIssueFilters ++= Seq(
+      // private[this] final val
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.JavaExtraFormats.sjsonnew$JavaExtraFormats$$fileScheme")
+    )
   )
 
 def support(n: String) =
