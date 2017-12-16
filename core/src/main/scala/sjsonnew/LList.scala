@@ -45,6 +45,8 @@ object LList extends LListFormats {
     override def find[A1: ClassTag](n: String): Option[A1] = None
     override def fieldNames: List[String] = Nil
   }
+
+  implicit def llistOps[L <: LList](l: L): LListOps[L] = new LListOps(l)
 }
 
 final case class LCons[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2) extends LList {
@@ -115,4 +117,66 @@ trait LListFormats {
             LCons("*", elem, tail)
         }
     }
+}
+
+final class LListOps[L <: LList](l: L) {
+  import Nat._
+  def _1(implicit at: At[L, _0]): at.Out = at(l)
+  def _2(implicit at: At[L, _1]): at.Out = at(l)
+  def _3(implicit at: At[L, _2]): at.Out = at(l)
+  def _4(implicit at: At[L, _3]): at.Out = at(l)
+  def _5(implicit at: At[L, _4]): at.Out = at(l)
+  def _6(implicit at: At[L, _5]): at.Out = at(l)
+  def _7(implicit at: At[L, _6]): at.Out = at(l)
+  def _8(implicit at: At[L, _7]): at.Out = at(l)
+  def _9(implicit at: At[L, _8]): at.Out = at(l)
+  def _10(implicit at: At[L, _9]): at.Out = at(l)
+  def _11(implicit at: At[L, _10]): at.Out = at(l)
+  def _12(implicit at: At[L, _11]): at.Out = at(l)
+  def _13(implicit at: At[L, _12]): at.Out = at(l)
+  def _14(implicit at: At[L, _13]): at.Out = at(l)
+  def _15(implicit at: At[L, _14]): at.Out = at(l)
+  def _16(implicit at: At[L, _15]): at.Out = at(l)
+  def _17(implicit at: At[L, _16]): at.Out = at(l)
+  def _18(implicit at: At[L, _17]): at.Out = at(l)
+  def _19(implicit at: At[L, _18]): at.Out = at(l)
+  def _20(implicit at: At[L, _19]): at.Out = at(l)
+  def _21(implicit at: At[L, _20]): at.Out = at(l)
+  def _22(implicit at: At[L, _21]): at.Out = at(l)
+}
+
+trait At[L <: LList, N <: Nat] {
+  type Out
+  def apply(t: L): Out
+}
+
+object At {
+  import Nat._
+  type Aux[L <: LList, N <: Nat, Out0] = At[L, N] { type Out = Out0 }
+
+  implicit def at0[H, T <: LList]: Aux[H :*: T, _0, H] =
+    new At[H :*: T, _0] {
+      type Out = H
+      def apply(l: H :*: T): Out = l.head
+    }
+
+  implicit def atN[H, T <: LList, N <: Nat, AtOut]
+      (implicit att: Aux[T, N, AtOut]): Aux[H :*: T, Succ[N], AtOut] =
+    new At[H :*: T, Succ[N]] {
+      type Out = AtOut
+      def apply(l: H :*: T): Out = att(l.tail)
+    }
+}
+
+trait Nat { type N <: Nat }
+object Nat {
+  final class _0 extends Nat { type N = _0 }
+  final case class Succ[P <: Nat]() extends Nat { type N = Succ[P] }
+
+  type _1 = Succ[_0]; type _2 = Succ[_1]; type _3 = Succ[_2]; type _4 = Succ[_3]
+  type _5 = Succ[_4]; type _6 = Succ[_5]; type _7 = Succ[_6]; type _8 = Succ[_7]
+  type _9 = Succ[_8]; type _10 = Succ[_9]; type _11 = Succ[_10]; type _12 = Succ[_11]
+  type _13 = Succ[_12]; type _14 = Succ[_13]; type _15 = Succ[_14]; type _16 = Succ[_15]
+  type _17 = Succ[_16]; type _18 = Succ[_17]; type _19 = Succ[_18]; type _20 = Succ[_19]
+  type _21 = Succ[_20]; type _22 = Succ[_21]
 }
