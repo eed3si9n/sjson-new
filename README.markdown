@@ -127,7 +127,7 @@ Because of this reason, each LList has its own type. Here's how it looks in the 
 ```scala
 scala> import sjsonnew._, LList.:*:
 import sjsonnew._
-import LList.$colon$plus$colon
+import LList.$colon$times$colon
 
 scala> import BasicJsonProtocol._
 import BasicJsonProtocol._
@@ -151,7 +151,7 @@ All you have to do is provide an isomorphism between your types and an LList usi
 ```scala
 scala> import sjsonnew._, LList.:*:
 import sjsonnew._
-import LList.$colon$plus$colon
+import LList.$colon$times$colon
 
 scala> import BasicJsonProtocol._
 import BasicJsonProtocol._
@@ -179,7 +179,7 @@ There's a function to compose the `JsonFormat` called `unionFormat2`, `unionForm
 ```scala
 scala> import sjsonnew._, LList.:*:
 import sjsonnew._
-import LList.$colon$plus$colon
+import LList.$colon$times$colon
 
 scala> import BasicJsonProtocol._
 import BasicJsonProtocol._
