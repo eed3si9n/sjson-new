@@ -22,7 +22,7 @@ object Converter extends SupportConverter[JValue] {
       new FContext[JValue] {
         var value: JValue = null
         def addField(s: String): Unit = { value = jstring(s) }
-        def add(v: JValue) { value = v }
+        def add(v: JValue): Unit = { value = v }
         def finish: JValue = value
         def isObj: Boolean = false
       }
@@ -31,7 +31,7 @@ object Converter extends SupportConverter[JValue] {
       new FContext[JValue] {
         val vs = mutable.ArrayBuffer.empty[JValue]
         def addField(s: String): Unit = { vs += jstring(s) }
-        def add(v: JValue) { vs += v }
+        def add(v: JValue): Unit = { vs += v }
         def finish: JValue = JArray(vs.toArray)
         def isObj: Boolean = false
       }

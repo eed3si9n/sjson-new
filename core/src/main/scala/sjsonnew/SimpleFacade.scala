@@ -37,7 +37,7 @@ trait SimpleBuilderFacade[J] extends BuilderFacade[J] {
   def singleContext() = new FContext[J] {
     var value: J = _
     def addField(s: String): Unit = { value = jstring(s) }
-    def add(v: J) { value = v }
+    def add(v: J): Unit = { value = v }
     def finish: J = value
     def isObj: Boolean = false
   }
@@ -45,7 +45,7 @@ trait SimpleBuilderFacade[J] extends BuilderFacade[J] {
   def arrayContext() = new FContext[J] {
     val vs = mutable.ListBuffer.empty[J]
     def addField(s: String): Unit = { vs += jstring(s) }
-    def add(v: J) { vs += v }
+    def add(v: J): Unit = { vs += v }
     def finish: J = jarray(vs.toList)
     def isObj: Boolean = false
   }

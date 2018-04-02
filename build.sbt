@@ -63,7 +63,7 @@ lazy val core = project
     commonSettings,
     name := "sjson new core",
     libraryDependencies ++= testDependencies,
-    scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+    scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
       // private[this] final val
@@ -78,7 +78,7 @@ def support(n: String) =
       commonSettings,
       name := s"sjson-new-$n",
       libraryDependencies ++= testDependencies,
-      scalacOptions ++= Seq("-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+      scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
       mimaSettings
     )
 
