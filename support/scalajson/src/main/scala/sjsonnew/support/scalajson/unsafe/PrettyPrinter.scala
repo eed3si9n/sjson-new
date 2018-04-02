@@ -28,11 +28,11 @@ import shaded.scalajson.ast.unsafe._
 trait PrettyPrinter extends JsonPrinter {
   val Indent = 2
 
-  def print(x: JValue, sb: StringBuilder) {
+  def print(x: JValue, sb: StringBuilder): Unit = {
     print(x, sb, 0)
   }
   
-  protected def print(x: JValue, sb: StringBuilder, indent: Int) {
+  protected def print(x: JValue, sb: StringBuilder, indent: Int): Unit = {
     x match {
       case JObject(x) => printJObject(x, sb, indent)
       case JArray(x)  => printJArray(x, sb, indent)
@@ -40,7 +40,7 @@ trait PrettyPrinter extends JsonPrinter {
     }
   }
 
-  protected def printJObject(members: Array[JField], sb: StringBuilder, indent: Int) {
+  protected def printJObject(members: Array[JField], sb: StringBuilder, indent: Int): Unit = {
     sb.append("{\n")    
     printArray(members, sb.append(",\n")) { m =>
       printIndent(sb, indent + Indent)
@@ -53,13 +53,13 @@ trait PrettyPrinter extends JsonPrinter {
     sb.append("}")
   }
   
-  protected def printJArray(elements: Array[JValue], sb: StringBuilder, indent: Int) {
+  protected def printJArray(elements: Array[JValue], sb: StringBuilder, indent: Int): Unit = {
     sb.append('[')
     printArray(elements, sb.append(", "))(print(_, sb, indent))
     sb.append(']')
   }
   
-  protected def printIndent(sb: StringBuilder, indent: Int) {
+  protected def printIndent(sb: StringBuilder, indent: Int): Unit = {
     @tailrec def rec(indent: Int): Unit =
       if (indent > 0) {
         sb.append(' ')
