@@ -1,9 +1,9 @@
 import Dependencies._
 import com.typesafe.tools.mima.core._
 
-val scala210 = "2.10.6"
-val scala211 = "2.11.11"
-val scala212 = "2.12.2"
+val scala210 = "2.10.7"
+val scala211 = "2.11.12"
+val scala212 = "2.12.6"
 
 lazy val root = (project in file("."))
   .aggregate(core, // shapeless, shapelessTest,
