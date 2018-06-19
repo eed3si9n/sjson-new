@@ -4,6 +4,7 @@ import com.typesafe.tools.mima.core._
 val scala210 = "2.10.7"
 val scala211 = "2.11.12"
 val scala212 = "2.12.6"
+val scala213 = "2.13.0-M4"
 
 lazy val root = (project in file("."))
   .aggregate(core, // shapeless, shapelessTest,
@@ -15,6 +16,7 @@ lazy val root = (project in file("."))
     commonSettings,
     name := "sjson new",
     noPublish,
+    crossScalaVersions += scala213,
     inThisBuild(Def settings (
       organization := "com.eed3si9n",
       organizationName := "eed3si9n",
@@ -54,15 +56,23 @@ val noPublish = List(
 )
 
 val mimaSettings = Def settings (
-  mimaPreviousArtifacts := Set(organization.value %% moduleName.value % "0.8.0")
+  mimaPreviousArtifacts := {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v >= 13 =>
+        Set.empty
+      case _ =>
+        Set(organization.value %% moduleName.value % "0.8.0")
+    }
+  }
 )
 
 lazy val core = project
   .enablePlugins(BoilerplatePlugin)
   .settings(
     commonSettings,
+    crossScalaVersions += scala213,
     name := "sjson new core",
-    libraryDependencies ++= testDependencies,
+    libraryDependencies ++= testDependencies.value,
     scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
@@ -77,7 +87,7 @@ def support(n: String) =
     .settings(
       commonSettings,
       name := s"sjson-new-$n",
-      libraryDependencies ++= testDependencies,
+      libraryDependencies ++= testDependencies.value,
       scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
       mimaSettings
     )
@@ -94,10 +104,14 @@ lazy val supportScalaJson = support("scalajson")
 
 lazy val supportMsgpack = support("msgpack")
   .settings(
+    crossScalaVersions += scala213,
     libraryDependencies += msgpackCore
   )
 
 lazy val supportMurmurhash = support("murmurhash")
+  .settings(
+    crossScalaVersions += scala213
+  )
 
 lazy val benchmark = (project in file("benchmark"))
   .dependsOn(supportSpray, supportScalaJson, supportMsgpack)

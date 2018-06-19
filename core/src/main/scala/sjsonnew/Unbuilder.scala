@@ -119,7 +119,7 @@ class Unbuilder[J](facade: Facade[J]) {
             case Some(pre) if pre.js == js =>
               precontext = None
               val excludeKeys = pre.names.toSet
-              UnbuilderContext.ObjectContext(fields filterKeys { k => !excludeKeys(k) }, names diff excludeKeys.toVector)
+              UnbuilderContext.ObjectContext(fields.filterKeys { k => !excludeKeys(k) }.toMap, names diff excludeKeys.toVector)
             case _ => UnbuilderContext.ObjectContext(fields, names)
           }
         val context =
