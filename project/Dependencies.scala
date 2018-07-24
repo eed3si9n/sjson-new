@@ -11,7 +11,7 @@ object Dependencies {
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.2"
   lazy val scalaJson = "com.eed3si9n" %% "shaded-scalajson" % "1.0.0-M4"
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.11"
-  lazy val jawnVersion = "0.10.4"
+  lazy val jawnVersion = "0.13.0"
   lazy val jawnParser = "org.spire-math" %% "jawn-parser" % jawnVersion
   lazy val jawnSpray = "org.spire-math" %% "jawn-spray" % jawnVersion
   lazy val lm = "org.scala-sbt" %% "librarymanagement" % "0.1.0-M12"
