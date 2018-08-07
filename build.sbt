@@ -94,6 +94,7 @@ def support(n: String) =
 
 lazy val supportSpray = support("spray").
   settings(
+    crossScalaVersions += scala213,
     libraryDependencies += sprayJson
   )
 
