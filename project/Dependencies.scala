@@ -5,7 +5,7 @@ object Dependencies {
   val specs2Version = Def.setting {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, v)) if v >= 13 =>
-        "4.3.0"
+        "4.3.5"
       case _ =>
         "3.8.6"
     }
@@ -14,7 +14,7 @@ object Dependencies {
     "org.specs2" %% "specs2-core" % specs2Version.value % "test",
     "org.specs2" %% "specs2-scalacheck" % specs2Version.value % "test",
     "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.6-SNAP1" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.6-SNAP3" % "test"
   ))
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.4"
   lazy val scalaJson = "com.eed3si9n" %% "shaded-scalajson" % "1.0.0-M4"
