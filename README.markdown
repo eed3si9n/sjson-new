@@ -171,7 +171,7 @@ scala> Converter.toJson[Person](Person("A", 1))
 res0: scala.util.Try[spray.json.JsValue] = Success({"name":"A","value":1})
 ```
 
-Using `personIso`, sjson-new derived the `JsonFomrat` for `Person`.
+Using `personIso`, sjson-new derived the `JsonFormat` for `Person`.
 
 Suppose now that we have an algebraic datatype (ADT) represented by a sealed trait.
 There's a function to compose the `JsonFormat` called `unionFormat2`, `unionFormat3`, ...
