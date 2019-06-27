@@ -5,6 +5,6 @@ matrix:
     script:
     - sbt "so test" "so benchmark/jmh:run -i 10 -wi 3 -f1 -t1" "so mimaReportBinaryIssues"
   - jdk: openjdk11
-    scala: 2.12.7
+    scala: 2.12.8
     script:
     - sbt "plz ${TRAVIS_SCALA_VERSION} test"
