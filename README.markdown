@@ -301,5 +301,5 @@ Along with any patches, please state that the patch is your original work and th
   [Databinder-Dispatch]: https://github.com/n8han/Databinder-Dispatch
   [APL 2.0]: http://www.apache.org/licenses/LICENSE-2.0
   [spray-user]: http://groups.google.com/group/spray-user
-  [Jawn]: https://github.com/non/jawn
+  [Jawn]: https://github.com/typelevel/jawn
   [Scala Pickling]: https://github.com/scala/pickling
