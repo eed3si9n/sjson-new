@@ -5,17 +5,19 @@ import sbt.librarymanagement._
 import java.net.URL
 
 trait LibraryManagementProtocol extends BasicJsonProtocol {
-  implicit val configurationStringIso: IsoString[Configuration] = IsoString.iso[Configuration](_.name, Configurations.config)
+  implicit val configrefStringIso: IsoString[ConfigRef] = IsoString.iso[ConfigRef](_.name, ConfigRef(_))
+  implicit val configurationStringIso: IsoString[Configuration] = IsoString.iso[Configuration](_.name,
+    x => Configuration.of(x, x))
   implicit val crossVersionStringIso: IsoString[CrossVersion] = IsoString.iso[CrossVersion](
     _ match {
       case CrossVersion.Disabled => "disabled"
       case x => x.toString
     },
     _ match {
-      case "disabled" => CrossVersion.Disabled
+      case "disabled" => CrossVersion.disabled
       case "full"     => CrossVersion.full
       case "binary"   => CrossVersion.binary
-      case ""         => CrossVersion.Disabled
+      case ""         => CrossVersion.disabled
     })
 
   // final case class Artifact(name: String, `type`: String, extension: String, classifier: Option[String],
@@ -42,11 +44,11 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
           val `type` = unbuilder.readField[String]("type")
           val extension = unbuilder.readField[String]("extension")
           val classifier = unbuilder.readField[Option[String]]("classifier")
-          val configurations = unbuilder.readField[List[Configuration]]("configurations")
+          val configurations = unbuilder.readField[List[ConfigRef]]("configurations").toVector
           val url = unbuilder.readField[Option[URL]]("url")
           val extraAttributes = unbuilder.readField[Map[String, String]]("extraAttributes")
           unbuilder.endObject()
-          Artifact(name, `type`, extension, classifier, configurations, url, extraAttributes)
+          Artifact(name, `type`, extension, classifier, configurations, url, extraAttributes, checksum = None)
         case None => deserializationError(s"Expected JsObject but got None")
       }
   }
@@ -70,9 +72,9 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
           val organization = unbuilder.readField[String]("organization")
           val name = unbuilder.readField[String]("name")
           val artifact = unbuilder.readField[String]("artifact")
-          val configurations = unbuilder.readField[Seq[String]]("configurations")
+          val configurations = unbuilder.readField[Seq[ConfigRef]]("configurations").toVector
           unbuilder.endObject()
-          InclExclRule(organization, name, artifact, configurations)
+          InclExclRule(organization, name, artifact, configurations, crossVersion = CrossVersion.binary)
         case None => emptyRule
       }
   }
@@ -142,14 +144,14 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
             case _       => false
           }
           val explicitArtifacts = unbuilder.readField[Seq[Artifact]]("explicitArtifacts")
-          val inclusions = unbuilder.readField[Seq[InclusionRule]]("inclusions")
-          val exclusions = unbuilder.readField[Seq[ExclusionRule]]("exclusions")
+          val inclusions = unbuilder.readField[Seq[InclExclRule]]("inclusions").toVector
+          val exclusions = unbuilder.readField[Seq[InclExclRule]]("exclusions").toVector
           val extraAttributes = unbuilder.readField[Map[String, String]]("extraAttributes")
           val crossVersion = unbuilder.readField[CrossVersion]("crossVersion")
           val branchName = unbuilder.readField[Option[String]]("branchName")
           unbuilder.endObject()
           ModuleID(organization, name, revision, configurations,
-            isChanging, isTransitive, isForce, explicitArtifacts,
+            isChanging, isTransitive, isForce, explicitArtifacts.toVector,
             inclusions, exclusions, extraAttributes, crossVersion, branchName)
         case None => deserializationError(s"Expected JsObject but got None")
       }
