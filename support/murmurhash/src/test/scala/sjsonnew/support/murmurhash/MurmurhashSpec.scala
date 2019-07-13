@@ -76,15 +76,27 @@ class MurmurhashSpec extends FlatSpec with BasicJsonProtocol {
 
   val map = Map("a" -> 1, "b" -> 2)
   "The mapFormat" should "convert a Map[String, Int] to an int hash" in {
-    assert(Hasher.hashUnsafe(map) === mapHash)
+    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+      assert(Hasher.hashUnsafe(map) === -875559656)
+    } else {
+      assert(Hasher.hashUnsafe(map) === mapHash)
+    }
   }
   lazy val mapHash = -929861022
 
   "The listFormat" should "convert a List[Int] to a length delimited list" in {
-    assert(Hasher.hashUnsafe(list) === listHash)
+    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+      assert(Hasher.hashUnsafe(list) === 836729159)
+    } else {
+      assert(Hasher.hashUnsafe(list) === listHash)
+    }
   }
   it should "convert a List[Map[String, Int]] to a length delimited list" in {
-    assert(Hasher.hashUnsafe(complexList) === complexListHash)
+    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+      assert(Hasher.hashUnsafe(complexList) === 527995371)
+    } else {
+      assert(Hasher.hashUnsafe(complexList) === complexListHash)
+    }
   }
   lazy val list = List(1, 2)
   lazy val complexList = List(map)
@@ -95,7 +107,11 @@ class MurmurhashSpec extends FlatSpec with BasicJsonProtocol {
     assert(Hasher.hashUnsafe(emptyList) === emptyHash)
   }
   it should "convert a list to an int hash" in {
-    assert(Hasher.hashUnsafe(a1) === a1Hash)
+    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+      assert(Hasher.hashUnsafe(a1) === -1240310382)
+    } else {
+      assert(Hasher.hashUnsafe(a1) === a1Hash)
+    }
   }
   lazy val emptyList = LNil
   lazy val emptyHash = -1609326920
