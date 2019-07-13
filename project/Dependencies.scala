@@ -37,7 +37,7 @@ object Dependencies {
       case _                       => "org.typelevel" %% "jawn-spray" % jawnVersion.value
     }
   }
-  lazy val lm = "org.scala-sbt" %% "librarymanagement" % "0.1.0-M12"
+  lazy val lmIvy = "org.scala-sbt" %% "librarymanagement-ivy" % "1.2.4"
   // lazy val shaplessVersion = "2.3.0"
   // lazy val shapelessDependencies = Def.setting {
   //   if (scalaVersion.value startsWith "2.10.") Seq(

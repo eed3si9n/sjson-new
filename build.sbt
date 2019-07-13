@@ -90,7 +90,7 @@ lazy val benchmark = (project in file("benchmark"))
   .dependsOn(supportSpray, supportScalaJson, supportMsgpack)
   .enablePlugins(JmhPlugin)
   .settings(
-    libraryDependencies ++= Seq(jawnSpray.value, lm),
+    libraryDependencies ++= Seq(jawnSpray.value, lmIvy),
     crossScalaVersions --= Seq(scala212, scala213),
     javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
     publish / skip := true,

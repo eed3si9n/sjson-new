@@ -5,7 +5,6 @@ import org.openjdk.jmh.annotations._
 import java.util.concurrent.TimeUnit
 
 import sbt.librarymanagement.ModuleID
-import sbt.internal.librarymanagement.impl.DependencyBuilders
 import java.io.{File, FileInputStream, FileOutputStream}
 
 import sbt.io.{IO, Using}
@@ -50,7 +49,8 @@ abstract class JsonBenchmark[J](converter: SupportConverter[J]) {
   def testFile: File
 }
 
-object BenchmarkData extends DependencyBuilders {
+object BenchmarkData {
+  import sbt.librarymanagement.syntax._
   lazy val moduleIds = listOfModuleIds(200000)
   def listOfModuleIds(n: Int): Vector[ModuleID] =
     (1 to n).toVector map { x =>
