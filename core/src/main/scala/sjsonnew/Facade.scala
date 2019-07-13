@@ -22,7 +22,7 @@
 
 package sjsonnew
 
-// https://github.com/non/jawn/blob/5f03ff5d9bccb483f6fd87d8e79cdb697f8794b6/parser/src/main/scala/jawn/Facade.scala
+// https://github.com/typelevel/jawn/blob/5f03ff5d9bccb483f6fd87d8e79cdb697f8794b6/parser/src/main/scala/jawn/Facade.scala
 
 /**
  * BuilderFacade is a type class that describes how JSON AST elements of
