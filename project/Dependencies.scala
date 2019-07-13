@@ -19,9 +19,24 @@ object Dependencies {
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.5"
   lazy val scalaJson = "com.eed3si9n" %% "shaded-scalajson" % "1.0.0-M4"
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.11"
-  lazy val jawnVersion = "0.10.4"
-  lazy val jawnParser = "org.spire-math" %% "jawn-parser" % jawnVersion
-  lazy val jawnSpray = "org.spire-math" %% "jawn-spray" % jawnVersion
+  lazy val jawnVersion = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, x)) if x <= 12 => "0.10.4"
+      case _                       => "0.14.2"
+    }
+  }
+  lazy val jawnParser = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, x)) if x <= 12 => "org.spire-math" %% "jawn-parser" % jawnVersion.value
+      case _                       => "org.typelevel" %% "jawn-parser" % jawnVersion.value
+    }
+  }
+  lazy val jawnSpray = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, x)) if x <= 12 => "org.spire-math" %% "jawn-spray" % jawnVersion.value
+      case _                       => "org.typelevel" %% "jawn-spray" % jawnVersion.value
+    }
+  }
   lazy val lm = "org.scala-sbt" %% "librarymanagement" % "0.1.0-M12"
   // lazy val shaplessVersion = "2.3.0"
   // lazy val shapelessDependencies = Def.setting {

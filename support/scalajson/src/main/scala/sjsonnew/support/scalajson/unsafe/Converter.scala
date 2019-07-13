@@ -107,7 +107,7 @@ object Converter extends SupportConverter[JValue] {
       value match {
         case JObject(fs) =>
           val names = (fs map { case JField(k, v) => k }).toVector
-          val fields = Map((fs map { case JField(k, v) => (k, v) }): _*)
+          val fields = Map((fs.toVector map { case JField(k, v) => (k, v) }): _*)
           (fields, names)
         case JNull => (Map.empty, Vector.empty)
         case x => deserializationError("Expected Map as JsObject, but got " + x)
