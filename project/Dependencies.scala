@@ -18,7 +18,7 @@ object Dependencies {
   ))
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.5"
   lazy val scalaJson = "com.eed3si9n" %% "shaded-scalajson" % "1.0.0-M4"
-  lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.11"
+  lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.17"
   lazy val jawnVersion = Def.setting {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, x)) if x <= 12 => "0.10.4"
