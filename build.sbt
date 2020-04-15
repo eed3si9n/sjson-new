@@ -3,8 +3,8 @@ import com.typesafe.tools.mima.core._
 
 val scala210 = "2.10.7"
 val scala211 = "2.11.12"
-val scala212 = "2.12.8"
-val scala213 = "2.13.0"
+val scala212 = "2.12.11"
+val scala213 = "2.13.1"
 
 ThisBuild / version := "0.8.3-SNAPSHOT"
 ThisBuild / crossScalaVersions := Seq(scala210, scala211, scala212, scala213)
