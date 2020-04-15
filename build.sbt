@@ -20,6 +20,7 @@ lazy val root = (project in file("."))
     name := "sjson new",
     publish / skip := true,
     crossScalaVersions := Nil,
+    mimaPreviousArtifacts := Set.empty,
   )
 
 // WORKAROUND https://github.com/sbt/sbt/issues/3353
