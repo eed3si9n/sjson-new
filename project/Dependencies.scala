@@ -22,7 +22,7 @@ object Dependencies {
   lazy val jawnVersion = Def.setting {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, x)) if x <= 12 => "0.10.4"
-      case _                       => "0.14.2"
+      case _                       => "1.0.0"
     }
   }
   lazy val jawnParser = Def.setting {
