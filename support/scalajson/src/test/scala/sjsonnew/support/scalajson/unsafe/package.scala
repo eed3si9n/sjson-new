@@ -1,6 +1,8 @@
 package sjsonnew
 package support.scalajson
 
+import java.io.{ByteArrayOutputStream, OutputStreamWriter}
+
 import shaded.scalajson.ast.unsafe._
 import org.scalactic._
 
@@ -12,11 +14,19 @@ package object unsafe {
   implicit class AnyOps2[A: JsonWriter : JsonReader](val _x: A) {
     def jsonRoundTrip: A = _x.toJson.toJsonStr.toJson.fromJson[A]
     def jsonPrettyRoundTrip: A = _x.toJson.toPrettyStr.toJson.fromJson[A]
+    def jsonBinaryRoundTrip: A = _x.toJson.toBinary.toJson.fromJson[A]
   }
 
   implicit class JValueOps(val _j: JValue) extends AnyVal {
     def toJsonStr: String          = CompactPrinter(_j)
     def toPrettyStr: String        = PrettyPrinter(_j)
+    def toBinary: Array[Byte]      = {
+      val baos = new ByteArrayOutputStream()
+      val xpto = new OutputStreamWriter(baos)
+      CompactPrinter.print(_j, xpto)
+      xpto.close()
+      baos.toByteArray
+    }
     def fromJson[A: JsonReader]: A = Converter.fromJsonUnsafe[A](_j)
 
     // scalajson.ast.unsafe doesn't have good toStrings
@@ -34,6 +44,10 @@ package object unsafe {
   implicit class StringOps(val _s: String) extends AnyVal {
     def toJson: JValue                = Parser parseUnsafe _s
     def fromJsonStr[A: JsonReader]: A = _s.toJson.fromJson[A]
+  }
+
+  implicit class ByteArrayOps(val a: Array[Byte]) extends AnyVal {
+    def toJson: JValue                = Parser.parseFromByteBuffer(java.nio.ByteBuffer.wrap(a)).get
   }
 
   // Can't trust unsafe's toString, eg. JObject doesn't nicely toString its fields array, so its toString sucks

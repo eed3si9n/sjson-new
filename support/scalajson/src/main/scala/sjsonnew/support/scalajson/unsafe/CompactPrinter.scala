@@ -26,7 +26,7 @@ import shaded.scalajson.ast.unsafe._
  */
 trait CompactPrinter extends JsonPrinter {
 
-  def print(x: JValue, sb: StringBuilder): Unit = {
+  def print(x: JValue, sb: Appendable): Unit = {
     x match {
       case JObject(x) => printJObject(x, sb)
       case JArray(x)  => printJArray(x, sb)
@@ -34,7 +34,7 @@ trait CompactPrinter extends JsonPrinter {
     }
   }
 
-  protected def printJObject(members: Array[JField], sb: StringBuilder): Unit = {
+  protected def printJObject(members: Array[JField], sb: Appendable): Unit = {
     sb.append('{')
     printArray(members, sb.append(',')) { m =>
       printString(m.field, sb)
@@ -44,7 +44,7 @@ trait CompactPrinter extends JsonPrinter {
     sb.append('}')
   }
 
-  protected def printJArray(elements: Array[JValue], sb: StringBuilder): Unit = {
+  protected def printJArray(elements: Array[JValue], sb: Appendable): Unit = {
     sb.append('[')
     printArray(elements, sb.append(','))(print(_, sb))
     sb.append(']')
