@@ -18,7 +18,6 @@
 package sjsonnew
 package support.scalajson.unsafe
 
-import java.lang.StringBuilder
 import annotation.tailrec
 import shaded.scalajson.ast.unsafe._
 
