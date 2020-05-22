@@ -50,7 +50,9 @@ class ScalaJsonSpec extends FlatSpec {
   it should "String.fromJsonStr[Peep] without fields correctly" in assert(bobJsonStrWithoutFields.fromJsonStr[Peep] === bob)
   it should "Peep.jsonRoundTrip correctly"                      in assertRoundTrip(bob)
   it should "Peep.jsonPrettyRoundTrip correctly"                in assertPrettyRoundTrip(bob)
+  it should "Peep.jsonBinaryRoundTrip correctly"                in assertBinaryRoundTrip(bob)
 
   private def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonRoundTrip)
   private def assertPrettyRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonPrettyRoundTrip)
+  private def assertBinaryRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonBinaryRoundTrip)
 }

@@ -77,7 +77,15 @@ lazy val supportScalaJson = support("scalajson")
         case Some((2, v)) if v < 13 => List(baseDirectory.value / "src" / "main" / "scala-pre2.13")
         case _ => List()
       }
-    }
+    },
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
+      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
+      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.PrettyPrinter.*"),
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.PrettyPrinter.*"),
+    )
   )
 
 lazy val supportMsgpack = support("msgpack")

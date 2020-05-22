@@ -19,7 +19,7 @@ package sjsonnew
 package support.scalajson.unsafe
 
 import annotation.tailrec
-import java.lang.{StringBuilder => JStringBuilder}
+import java.lang.{Appendable, StringBuilder => JStringBuilder}
 import shaded.scalajson.ast.unsafe._
 
 /**
@@ -42,9 +42,9 @@ trait JsonPrinter extends (JValue => String) {
     sb.toString
   }
 
-  def print(x: JValue, sb: JStringBuilder): Unit
+  def print(x: JValue, sb: Appendable): Unit
 
-  protected def printLeaf(x: JValue, sb: JStringBuilder): Unit = {
+  protected def printLeaf(x: JValue, sb: Appendable): Unit = {
     x match {
       case JNull      => sb.append("null")
       case JTrue      => sb.append("true")
@@ -55,7 +55,7 @@ trait JsonPrinter extends (JValue => String) {
     }
   }
 
-  protected def printString(s: String, sb: JStringBuilder): Unit = {
+  protected def printString(s: String, sb: Appendable): Unit = {
     import JsonPrinter._
     @tailrec def firstToBeEncoded(ix: Int = 0): Int =
       if (ix == s.length) -1 else if (requiresEncoding(s.charAt(ix))) ix else firstToBeEncoded(ix + 1)
