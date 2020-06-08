@@ -3,7 +3,7 @@ package support.scalajson.unsafe
 
 import shaded.scalajson.ast.unsafe._
 import scala.collection.mutable.ArrayBuffer
-import org.typelevel.jawn.{ Facade, FContext, SupportParser }
+import shaded.org.typelevel.jawn.{ Facade, FContext, SupportParser }
 
 object Parser extends SupportParser[JValue] {
   implicit val facade: Facade[JValue] =

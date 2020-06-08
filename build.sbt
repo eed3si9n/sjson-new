@@ -1,13 +1,11 @@
 import Dependencies._
 import com.typesafe.tools.mima.core._
 
-val scala210 = "2.10.7"
-val scala211 = "2.11.12"
 val scala212 = "2.12.11"
 val scala213 = "2.13.1"
 
 ThisBuild / version := "0.8.3-SNAPSHOT"
-ThisBuild / crossScalaVersions := Seq(scala210, scala211, scala212, scala213)
+ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 ThisBuild / scalaVersion := scala212
 
 lazy val root = (project in file("."))
@@ -22,12 +20,6 @@ lazy val root = (project in file("."))
     crossScalaVersions := Nil,
     mimaPreviousArtifacts := Set.empty,
   )
-
-// WORKAROUND https://github.com/sbt/sbt/issues/3353
-val scalaVersionSettings = Def settings (
-  crossScalaVersions := Seq(scala210, scala211, scala212),
-  scalaVersion := scala212
-)
 
 val mimaSettings = Def settings (
   mimaPreviousArtifacts := {
@@ -70,14 +62,9 @@ lazy val supportSpray = support("spray").
   )
 
 lazy val supportScalaJson = support("scalajson")
+  .dependsOn(shadedJawnParser)
   .settings(
-    libraryDependencies ++= Seq(scalaJson, jawnParser.value),
-    Compile / unmanagedSourceDirectories ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, v)) if v < 13 => List(baseDirectory.value / "src" / "main" / "scala-pre2.13")
-        case _ => List()
-      }
-    },
+    libraryDependencies += scalaJson,
     mimaBinaryIssueFilters ++= Seq(
       ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
       ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
@@ -85,6 +72,10 @@ lazy val supportScalaJson = support("scalajson")
       ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
       ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
       ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.PrettyPrinter.*"),
+      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.async"),
+      ProblemFilters.exclude[IncompatibleResultTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.facade"),
+      ProblemFilters.exclude[MissingTypesProblem]("sjsonnew.support.scalajson.unsafe.Parser$"),
+      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.async"),
     )
   )
 
@@ -95,12 +86,20 @@ lazy val supportMsgpack = support("msgpack")
 
 lazy val supportMurmurhash = support("murmurhash")
 
+lazy val shadedJawnParser = (project in file("shaded-jawn-parser"))
+  .enablePlugins(JarjarAbramsPlugin)
+  .settings(
+    name := "shaded-jawn-parser",
+    jarjarLibraryDependency := "org.typelevel" %% "jawn-parser" % "1.0.0",
+    jarjarShadeRules += ShadeRuleBuilder.moveUnder("org.typelevel", "sjsonnew.shaded"),
+  )
+
 lazy val benchmark = (project in file("benchmark"))
   .dependsOn(supportSpray, supportScalaJson, supportMsgpack)
   .enablePlugins(JmhPlugin)
   .settings(
-    libraryDependencies ++= Seq(jawnSpray.value, lmIvy),
-    crossScalaVersions --= Seq(scala212, scala213),
+    libraryDependencies ++= Seq(jawnSpray, lmIvy),
+    crossScalaVersions --= Seq(scala213),
     javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
     publish / skip := true,
   )

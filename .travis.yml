@@ -3,21 +3,16 @@ import: scala/scala-dev:travis/default.yml
 
 language: scala
 
-scala:
-  - 2.10.7
-  - 2.11.12
-  - 2.13.1
+scala: 2.12.11
 
 env: ADOPTOPENJDK=11
 
 matrix:
   include:
   - env: ADOPTOPENJDK=8
-    scala: 2.12.11
+    script: sbt "+test"
   - env: ADOPTOPENJDK=11
-    scala: 2.12.11
     script:
-      - sbt ++$TRAVIS_SCALA_VERSION! "test" "mimaReportBinaryIssues"
+      - sbt "+test"
+      - sbt ++$TRAVIS_SCALA_VERSION! "mimaReportBinaryIssues"
       - sbt ++$TRAVIS_SCALA_VERSION! "benchmark/jmh:run -i 10 -wi 3 -f1 -t1"
-
-script: sbt ++$TRAVIS_SCALA_VERSION! "test"
