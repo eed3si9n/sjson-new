@@ -70,7 +70,7 @@ class SprayBenchmark
   def saveToFile(js: JsValue, f: File): Unit =
     IO.write(f, CompactPrinter(js), IO.utf8)
   def loadFromFile(f: File): JsValue =
-    jawn.support.spray.Parser.parseFromFile(f).get
+    org.typelevel.jawn.support.spray.Parser.parseFromFile(f).get
 }
 
 class GzipSprayBenchmark
@@ -101,7 +101,7 @@ class GzipSprayBenchmark
             writer.write(buffer, 0, length)
             length = r.read(buffer)
           }
-          jawn.support.spray.Parser.parseFromString(writer.toString).get
+          org.typelevel.jawn.support.spray.Parser.parseFromString(writer.toString).get
         }
       }
     }
