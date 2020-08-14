@@ -3,11 +3,6 @@ sjson-new
 
 sjson-new is a typeclass based JSON codec, or wit for that [Jawn].
 
-### today's random Philadelphia word
-
-The term *wit* comes from the Philadelphia area.
-It's a quick way of ordering a cheesesteak "with" sautéed onions.
-
 ### overview
 
 sjson-new consists of two parts:
@@ -17,30 +12,30 @@ sjson-new consists of two parts:
 
 ### installation
 
-sjson-new 0.8.3 will be cross published for Scala 2.10, 2.11, 2.12 and 2.13.
+sjson-new 0.9.0 is cross published for Scala 2.12 and 2.13.
 
 Here's how to use sjson-new with Spray:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.8.3"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.9.0"
 ```
 
 Here's how to use sjson-new with Scala JSON:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.8.3"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.9.0"
 ```
 
 Here's how to use sjson-new with MessagePack:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.8.3"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.9.0"
 ```
 
 Here's how to use sjson-new with Murmur Hash:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-murmurhash" % "0.8.3"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-murmurhash" % "0.9.0"
 ```
 
 ### converting
