@@ -12,6 +12,9 @@ trait FlatUnionFormats {
     [#lazy val a1Format = implicitly[JF[A1]]#
     ]
 
+    [#lazy val a1Name = className(implicitly[Manifest[A1]].runtimeClass)#
+    ]
+
     def write[J](u: U, builder: Builder[J]): Unit = {
       builder.beginPreObject()
       builder.addFieldName(typeFieldName)
@@ -32,7 +35,7 @@ trait FlatUnionFormats {
           }
           unbuilder.endPreObject()
           val value = typeName match {
-          [#  case x if className(implicitly[Manifest[A1]].runtimeClass) == x => a1Format.read(Some(js), unbuilder)#
+          [#  case x if a1Name == x => a1Format.read(Some(js), unbuilder)#
           ]
           }
           value match { case u: U @unchecked => u }
