@@ -123,10 +123,10 @@ class Unbuilder[J](facade: Facade[J]) {
                 case 0 => UnbuilderContext.ObjectContext(fields, names)
                 case 1 =>
                   val excludeKey = pre.names.head
-                  UnbuilderContext.ObjectContext (fields.filterKeys { _ != excludeKey }, names.filter ( _ != excludeKey ) )
+                  UnbuilderContext.ObjectContext (fields.filterKeys { _ != excludeKey }.toMap, names.filter ( _ != excludeKey ) )
                 case _ =>
                   val excludeKeys = pre.names.toSet
-                  UnbuilderContext.ObjectContext (fields.filterKeys { k => ! excludeKeys (k)}, names.filter (n => ! excludeKeys (n) ) )
+                  UnbuilderContext.ObjectContext (fields.filterKeys { k => ! excludeKeys (k)}.toMap, names.filter (n => ! excludeKeys (n) ) )
               }
             case _ => UnbuilderContext.ObjectContext(fields, names)
           }
