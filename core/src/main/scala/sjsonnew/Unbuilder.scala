@@ -118,8 +118,16 @@ class Unbuilder[J](facade: Facade[J]) {
           precontext match {
             case Some(pre) if pre.js == js =>
               precontext = None
-              val excludeKeys = pre.names.toSet
-              UnbuilderContext.ObjectContext(fields.filterKeys { k => !excludeKeys(k) }.toMap, names diff excludeKeys.toVector)
+              // the case split here is for optimization. we do not want to be building and filtering on empty sets
+              pre.names.size match {
+                case 0 => UnbuilderContext.ObjectContext(fields, names)
+                case 1 =>
+                  val excludeKey = pre.names.head
+                  UnbuilderContext.ObjectContext (fields.filterKeys { _ != excludeKey }, names.filter ( _ != excludeKey ) )
+                case _ =>
+                  val excludeKeys = pre.names.toSet
+                  UnbuilderContext.ObjectContext (fields.filterKeys { k => ! excludeKeys (k)}, names.filter (n => ! excludeKeys (n) ) )
+              }
             case _ => UnbuilderContext.ObjectContext(fields, names)
           }
         val context =
@@ -233,14 +241,12 @@ object UnbuilderState {
 
 private[sjsonnew] trait UnbuilderContext[J]
 private[sjsonnew] object UnbuilderContext {
-  case class ObjectContext[J](fields: Map[String, J], names: Vector[String]) extends UnbuilderContext[J] {
-    private val size = names.size
-    private var idx: Int = 0
-    def hasNext: Boolean = idx < size
+  case class ObjectContext[J](fields: Map[String, J], names: Seq[String]) extends UnbuilderContext[J] {
+    private val namesIterator = names.iterator
+    def hasNext: Boolean = namesIterator.hasNext
     def next: (String, Option[J]) = {
-      val name = names(idx)
-      val x = fields.get(names(idx))
-      idx = idx + 1
+      val name = namesIterator.next()
+      val x = fields.get(name)
       (name, x)
     }
   }

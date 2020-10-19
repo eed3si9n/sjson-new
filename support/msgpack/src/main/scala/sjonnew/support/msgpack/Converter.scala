@@ -150,7 +150,7 @@ object Converter extends SupportConverter[Value] {
           Vector()
         case _ => deserializationError("Expected List as Array, but got " + value)
       }
-    def extractObject(value: Value): (Map[String, Value], Vector[String]) =
+    def extractObject(value: Value): (Map[String, Value], Seq[String]) =
       value.getValueType match {
         case ValueType.MAP =>
           val map = value.asMapValue.map
