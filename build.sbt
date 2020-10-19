@@ -4,7 +4,7 @@ import com.typesafe.tools.mima.core._
 val scala212 = "2.12.12"
 val scala213 = "2.13.3"
 
-ThisBuild / version := "0.9.1"
+ThisBuild / version := "0.9.2-SNAPSHOT"
 ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 ThisBuild / scalaVersion := scala212
 
