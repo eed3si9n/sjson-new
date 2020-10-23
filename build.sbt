@@ -1,15 +1,16 @@
 import Dependencies._
 import com.typesafe.tools.mima.core._
 
-val scala212 = "2.12.11"
-val scala213 = "2.13.1"
+val scala212 = "2.12.12"
+val scala213 = "2.13.3"
 
-ThisBuild / version := "0.9.1-SNAPSHOT"
+ThisBuild / version := "0.9.2-SNAPSHOT"
 ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 ThisBuild / scalaVersion := scala212
 
 lazy val root = (project in file("."))
   .aggregate(core, // shapeless, shapelessTest,
+    shadedJawnParser,
     supportSpray,
     supportScalaJson,
     supportMsgpack,
