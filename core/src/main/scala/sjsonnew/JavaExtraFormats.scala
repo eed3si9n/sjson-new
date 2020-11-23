@@ -44,7 +44,7 @@ trait JavaExtraFormats {
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     (f: File) => {
       if (f.isAbsolute) {
-        f.toPath.toUri.toASCIIString
+        f.toURI.toASCIIString
       } else {
         new URI(null, normalizeName(f.getPath), null).toASCIIString
       }
