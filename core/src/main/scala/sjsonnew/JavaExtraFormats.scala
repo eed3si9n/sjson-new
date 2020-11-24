@@ -44,13 +44,18 @@ trait JavaExtraFormats {
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     (f: File) => {
       if (f.isAbsolute) {
-        new URI(FileScheme, normalizeName(f.getAbsolutePath), null).toASCIIString
+        //not using f.toURI to avoid filesystem syscalls
+        new URI(FileScheme, normalizeName(slashify(f.getAbsolutePath)), null).toASCIIString
       } else {
         new URI(null, normalizeName(f.getPath), null).toASCIIString
       }
     },
     (s: String) => uriToFile(new URI(s)))
 
+  private[this] def slashify(name: String) = {
+    if(name.nonEmpty && name.head != File.separatorChar) File.separatorChar + name
+    else name
+  }
   private[this] def normalizeName(name: String) = {
     val sep = File.separatorChar
     if (sep == '/') name else name.replace(sep, '/')
