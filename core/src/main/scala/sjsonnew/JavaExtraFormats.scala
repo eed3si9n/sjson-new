@@ -45,7 +45,8 @@ trait JavaExtraFormats {
     (f: File) => {
       if (f.isAbsolute) {
         //not using f.toURI to avoid filesystem syscalls
-        new URI(FileScheme, normalizeName(slashify(f.getAbsolutePath)), null).toASCIIString
+        //we use empty string as host to force file:// instead of just file:
+        new URI(FileScheme, "", normalizeName(slashify(f.getAbsolutePath)), null).toASCIIString
       } else {
         new URI(null, normalizeName(f.getPath), null).toASCIIString
       }
