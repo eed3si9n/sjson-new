@@ -88,7 +88,7 @@ lazy val supportMsgpack = support("msgpack")
 lazy val supportMurmurhash = support("murmurhash")
 
 lazy val shadedJawnParser = (project in file("shaded-jawn-parser"))
-  .enablePlugins(JarjarAbramsPlugin)
+  .enablePlugins(JarjarAbramsPlugin).disablePlugins(MimaPlugin)
   .settings(
     name := "shaded-jawn-parser",
     jarjarLibraryDependency := "org.typelevel" %% "jawn-parser" % "1.0.0",
