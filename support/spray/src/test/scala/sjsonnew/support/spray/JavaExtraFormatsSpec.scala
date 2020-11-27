@@ -24,8 +24,7 @@ import java.io.File
 import java.util.{ Locale, Optional, UUID }
 
 class JavaExtraFormatsSpec extends Specification with BasicJsonProtocol {
-  lazy val isWindows: Boolean =
-    System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
+  import JavaExtraFormats._
 
   case class Person(name: Optional[String], value: Optional[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
