@@ -19,11 +19,14 @@ package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import org.specs2.mutable._
-import java.util.{ UUID, Optional }
 import java.net.{ URI, URL }
 import java.io.File
+import java.util.{ Locale, Optional, UUID }
 
 class JavaExtraFormatsSpec extends Specification with BasicJsonProtocol {
+  lazy val isWindows: Boolean =
+    System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
+
   case class Person(name: Optional[String], value: Optional[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
@@ -90,6 +93,18 @@ class JavaExtraFormatsSpec extends Specification with BasicJsonProtocol {
     }
     "convert the JsString back to the relative path" in {
       Converter.fromJsonUnsafe[File](JsString("src/main")) mustEqual f2
+    }
+    "convert an absolute path on Windows" in {
+      if (isWindows) Converter.toJsonUnsafe(new File("""C:\Documents and Settings\""")) mustEqual JsString("file:///C:/Documents%20and%20Settings")
+      else ok
+    }
+    "convert a relative path on Windows" in {
+      if (isWindows) Converter.toJsonUnsafe(new File("""..\My Documents\test""")) mustEqual JsString("../My%20Documents/test")
+      else ok
+    }
+    "convert a UNC path on Windows" in {
+      if (isWindows) Converter.toJsonUnsafe(new File("""\\laptop\My Documents\Some.doc""")) mustEqual JsString("file://laptop/My%20Documents/Some.doc")
+      else ok
     }
   }
 
