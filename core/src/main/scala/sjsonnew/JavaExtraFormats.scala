@@ -43,10 +43,14 @@ trait JavaExtraFormats {
 
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     (f: File) => {
+      val p = f.getPath
       if (f.isAbsolute) {
         //not using f.toURI to avoid filesystem syscalls
         //we use empty string as host to force file:// instead of just file:
         new URI(FileScheme, "", normalizeName(slashify(f.getAbsolutePath)), null).toASCIIString
+      } else if (p.startsWith(File.separatorChar.toString)) {
+        // supports /tmp on Windows
+        new URI(FileScheme, "", normalizeName(slashify(p)), null).toASCIIString
       } else {
         new URI(null, normalizeName(f.getPath), null).toASCIIString
       }
