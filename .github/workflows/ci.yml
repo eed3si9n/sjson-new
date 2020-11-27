@@ -6,8 +6,8 @@ on:
 
 jobs:
   test:
-    fail-fast: false
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
