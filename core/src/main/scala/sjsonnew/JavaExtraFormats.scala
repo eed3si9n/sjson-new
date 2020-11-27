@@ -16,13 +16,14 @@
 
 package sjsonnew
 
-import java.util.{ UUID, Optional }
 import java.net.{ URI, URL }
 import java.io.File
 import java.math.{ BigInteger, BigDecimal => JBigDecimal }
+import java.util.{ Locale, Optional, UUID }
 
 trait JavaExtraFormats {
   this: PrimitiveFormats with AdditionalFormats with IsoFormats =>
+  import JavaExtraFormats._
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
@@ -43,17 +44,27 @@ trait JavaExtraFormats {
 
   implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
     (f: File) => {
-      if (f.isAbsolute) {
+      val p = f.getPath
+      if (p.startsWith(File.separatorChar.toString) && isWindows) {
+        if (p.startsWith("""\\""")) {
+          // supports \\laptop\My Documents\Some.doc on Windows
+          new URI(FileScheme, normalizeName(p), null).toASCIIString
+        }
+        else {
+          // supports /tmp on Windows
+          new URI(FileScheme, "", normalizeName(p), null).toASCIIString
+        }
+      } else if (f.isAbsolute) {
         //not using f.toURI to avoid filesystem syscalls
         //we use empty string as host to force file:// instead of just file:
-        new URI(FileScheme, "", normalizeName(slashify(f.getAbsolutePath)), null).toASCIIString
+        new URI(FileScheme, "", normalizeName(ensureHeadSlash(f.getAbsolutePath)), null).toASCIIString
       } else {
         new URI(null, normalizeName(f.getPath), null).toASCIIString
       }
     },
     (s: String) => uriToFile(new URI(s)))
 
-  private[this] def slashify(name: String) = {
+  private[this] def ensureHeadSlash(name: String) = {
     if(name.nonEmpty && name.head != File.separatorChar) File.separatorChar + name
     else name
   }
@@ -99,4 +110,9 @@ trait JavaExtraFormats {
         case None => Optional.empty[A]
       }
   }
+}
+
+object JavaExtraFormats {
+  private[sjsonnew] lazy val isWindows: Boolean =
+    System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
 }
