@@ -17,10 +17,10 @@
 package sjsonnew
 package support.msgpack
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 import BUtil._
 
-class MsgpackSpec extends FlatSpec with BasicJsonProtocol {
+class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   "The IntJsonFormat" should "convert an Int to an int message" in {
     assert(Converter.toBinaryUnsafe[Int](150) === intMessage)
   }
