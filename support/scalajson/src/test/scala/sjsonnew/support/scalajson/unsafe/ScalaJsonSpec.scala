@@ -3,11 +3,11 @@ package support.scalajson.unsafe
 
 import shaded.scalajson.ast.unsafe._
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
 import BasicJsonProtocol._
 
-class ScalaJsonSpec extends FlatSpec {
+class ScalaJsonSpec extends AnyFlatSpec {
 
   "The Parser" should "parse JSON objects" in {
     val json = """{ "x": 5 }"""

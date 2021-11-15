@@ -4,9 +4,9 @@ package unsafe
 
 import shaded.scalajson.ast.unsafe._
 import BasicJsonProtocol._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
-class HListFormatSpec extends FlatSpec {
+class HListFormatSpec extends AnyFlatSpec {
   case class Peep(name: String, age: Int)
 
   import HList.:+:
