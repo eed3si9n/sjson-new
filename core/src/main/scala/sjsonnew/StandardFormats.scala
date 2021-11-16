@@ -53,7 +53,7 @@ trait StandardFormats {
       }
   }
 
-  implicit def eitherFormat[A :JF, B :JF] = new JF[Either[A, B]] {
+  implicit def eitherFormat[A :JF, B :JF]: JF[Either[A, B]] = new JF[Either[A, B]] {
     lazy val leftFormat = implicitly[JF[A]]
     lazy val rightFormat = implicitly[JF[B]]
     def write[J](either: Either[A, B], builder: Builder[J]): Unit =
