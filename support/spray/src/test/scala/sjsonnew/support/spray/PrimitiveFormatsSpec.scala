@@ -155,10 +155,10 @@ class PritimiveFormatsSpec extends Specification with BasicJsonProtocol {
 
   "The SymbolJsonFormat" should {
     "convert a Symbol to a JsString" in {
-      Converter.toJsonUnsafe('Hello) mustEqual JsString("Hello")
+      Converter.toJsonUnsafe(Symbol("Hello")) mustEqual JsString("Hello")
     }
     "convert a JsString to a Symbol" in {
-      Converter.fromJsonUnsafe[Symbol](JsString("Hello")) mustEqual 'Hello
+      Converter.fromJsonUnsafe[Symbol](JsString("Hello")) mustEqual Symbol("Hello")
     }
   }
 

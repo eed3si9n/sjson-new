@@ -45,7 +45,7 @@ trait ThrowableFormats {
           val message = unbuilder.readField[Option[String]]("message")
           val cause = unbuilder.readField[Option[Throwable]]("cause")
           val stackTraces = unbuilder.readField[Vector[StackTraceElement]]("stackTrace")
-          unbuilder.endObject
+          unbuilder.endObject()
           val t = new PersistedException(message.orNull, cause.orNull, className)
           t.setStackTrace(stackTraces.toArray)
           t
@@ -71,7 +71,7 @@ trait ThrowableFormats {
           val methodName = unbuilder.readField[Option[String]]("methodName")
           val fileName = unbuilder.readField[Option[String]]("fileName")
           val lineNumber = unbuilder.readField[Int]("lineNumber")
-          unbuilder.endObject
+          unbuilder.endObject()
           new StackTraceElement(className.orNull, methodName.orNull,
             fileName.orNull, lineNumber)
         case None => deserializationError("Expected JsObject, but got None")
