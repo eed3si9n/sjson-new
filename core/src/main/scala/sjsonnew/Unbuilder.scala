@@ -172,7 +172,7 @@ class Unbuilder[J](facade: Facade[J]) {
 
   @deprecated("Use nextFieldOpt that returns (J, Option[J]). nextFieldOptWithJString uses JNull to encode elided fields.", "0.8.0")
   def nextFieldWithJString(): (J, J) =
-    nextField match {
+    nextField() match {
       case (k, v) => (facade.jstring(k), v)
     }
 

@@ -17,7 +17,7 @@ class ScalaJsonSpec extends AnyFlatSpec {
         assert(fields(0) === JField("x", JNumber(5)))
 
       case _ =>
-        fail
+        fail()
     }
   }
 

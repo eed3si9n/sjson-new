@@ -47,10 +47,10 @@ trait CollectionFormats { self: AdditionalFormats =>
         case Some(js) =>
           val size = unbuilder.beginObject(js)
           val xs = (1 to size).toList map { _ =>
-            val (k, v) = unbuilder.nextFieldOpt
+            val (k, v) = unbuilder.nextFieldOpt()
             keyFormat.read(k) -> valueFormat.read(v, unbuilder)
           }
-          unbuilder.endObject
+          unbuilder.endObject()
           Map(xs: _*)
         case None => Map()
       }
@@ -93,7 +93,7 @@ trait CollectionFormats { self: AdditionalFormats =>
             val elem = unbuilder.nextElement
             elemFormat.read(Some(elem), unbuilder)
           }
-          unbuilder.endArray
+          unbuilder.endArray()
           f(xs)
         case None => f(Nil)
       }

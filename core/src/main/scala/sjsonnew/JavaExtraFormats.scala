@@ -65,7 +65,7 @@ trait JavaExtraFormats {
     (s: String) => uriToFile(new URI(s)))
 
   private[this] def ensureHeadSlash(name: String) = {
-    if(name.nonEmpty && name.head != File.separatorChar) File.separatorChar + name
+    if(name.nonEmpty && name.head != File.separatorChar) s"${File.separatorChar}$name"
     else name
   }
   private[this] def normalizeName(name: String) = {
@@ -96,7 +96,7 @@ trait JavaExtraFormats {
     lazy val elemFormat = implicitly[JF[A]]
     def write[J](o: Optional[A], builder: Builder[J]): Unit =
       if (o.isPresent) elemFormat.write(o.get, builder)
-      else builder.writeNull
+      else builder.writeNull()
     override def addField[J](name: String, o: Optional[A], builder: Builder[J]): Unit =
       if (o.isPresent) {
         builder.addFieldName(name)

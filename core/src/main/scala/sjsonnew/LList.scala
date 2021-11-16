@@ -102,7 +102,7 @@ trait LListFormats {
             }
             if (!unbuilder.isInObject) objectPreamble(js)
             if (unbuilder.hasNextField) {
-              val (name, optX) = unbuilder.nextFieldOpt
+              val (name, optX) = unbuilder.nextFieldOpt()
               optX foreach { x =>
                 if (unbuilder.isObject(x)) objectPreamble(x)
               }

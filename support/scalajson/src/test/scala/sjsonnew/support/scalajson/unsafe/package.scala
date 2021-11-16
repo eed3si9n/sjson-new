@@ -36,8 +36,8 @@ package object unsafe {
       case JNumber(value) => s"JNumber($value)"
       case JTrue          => "JTrue"
       case JFalse         => "JFalse"
-      case JObject(value) => value.iterator map (f => s"${f.field}: ${f.value.to_s}") mkString ("JObject(", ", ", ")")
-      case JArray(value)  => value.iterator map (_.to_s) mkString ("JArray(", ", ", ")")
+      case JObject(value) => value.iterator.map(f => s"${f.field}: ${f.value.to_s}").mkString("JObject(", ", ", ")")
+      case JArray(value)  => value.iterator.map(_.to_s).mkString("JArray(", ", ", ")")
     }
   }
 
