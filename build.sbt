@@ -9,7 +9,7 @@ ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 ThisBuild / scalaVersion := scala212
 
 lazy val root = (project in file("."))
-  .aggregate(core, // shapeless, shapelessTest,
+  .aggregate(core,
     shadedJawnParser,
     supportSpray,
     supportScalaJson,
