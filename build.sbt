@@ -28,7 +28,7 @@ val mimaSettings = Def settings (
       case Some((2, v)) if v >= 13 =>
         Set.empty
       case _ =>
-        Set(organization.value %% moduleName.value % "0.8.0")
+        Set(organization.value %% moduleName.value % "0.9.1")
     }
   }
 )
@@ -101,7 +101,7 @@ lazy val benchmark = (project in file("benchmark"))
   .settings(
     libraryDependencies ++= Seq(jawnSpray, lmIvy),
     crossScalaVersions --= Seq(scala213),
-    javaOptions in (Jmh, run) ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
+    Jmh / run / javaOptions ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
     publish / skip := true,
   )
 
