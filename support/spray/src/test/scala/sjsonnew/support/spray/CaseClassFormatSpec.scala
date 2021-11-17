@@ -28,7 +28,7 @@ class CaseClassFormatsSpec extends Specification with BasicJsonProtocol {
 
   "case class Json Object Format" should {
     implicit val instance: JsonFormat[Foo] =
-      BasicJsonProtocol.caseClass(Foo.apply _, Foo.unapply _)("a", "b")
+      BasicJsonProtocol.caseClass(Foo.apply _, (x: Foo) => Option((x.a, x.b)))("a", "b")
 
     val json = JsObject("a" -> JsNumber(42), "b" -> JsString("bar"))
 
@@ -42,7 +42,7 @@ class CaseClassFormatsSpec extends Specification with BasicJsonProtocol {
 
   "case class Json Array Format" should {
     implicit val instance: JsonFormat[Foo] =
-      BasicJsonProtocol.caseClassArray(Foo.apply _, Foo.unapply _)
+      BasicJsonProtocol.caseClassArray(Foo.apply _, (x: Foo) => Option((x.a, x.b)))
 
     val json = JsArray(JsNumber(42), JsString("bar"))
 
@@ -58,7 +58,7 @@ class CaseClassFormatsSpec extends Specification with BasicJsonProtocol {
   private val x = Uno(42)
 
   "case class with 1 field" should {
-    implicit val jf = BasicJsonProtocol.caseClass(Uno.apply _, Uno.unapply _)("a")
+    implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClass(Uno.apply _, (x: Uno) => Option(x.a))("a")
 
     val json = JsObject("a" -> JsNumber(42))
 
@@ -71,7 +71,7 @@ class CaseClassFormatsSpec extends Specification with BasicJsonProtocol {
   }
 
   "case class with 1 field" should {
-    implicit val jf = BasicJsonProtocol.caseClassArray(Uno.apply _, Uno.unapply _)
+    implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClassArray(Uno.apply _, (x: Uno) => Option(x.a))
 
     val json = JsArray(JsNumber(42))
 
