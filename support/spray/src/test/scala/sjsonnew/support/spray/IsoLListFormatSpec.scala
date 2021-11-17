@@ -26,13 +26,13 @@ class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
   case class Organization(name: String, value: Option[Int]) extends Contact
 
   implicit val personIso: IsoLList.Aux[Person, String :*: Option[Int] :*: LNil] = LList.isoCurried(
-    { p: Person => ("name", p.name) :*: ("value", p.value) :*: LNil })
+    { (p: Person) => ("name", p.name) :*: ("value", p.value) :*: LNil })
     { in => Person(
       in.find[String]("name").get,
       in.find[Option[Int]]("value").flatten) }
 
   implicit val organizationIso: IsoLList.Aux[Organization, String :*: Option[Int] :*: LNil] = LList.isoCurried(
-    { o: Organization => ("name", o.name) :*: ("value", o.value) :*: LNil })
+    { (o: Organization) => ("name", o.name) :*: ("value", o.value) :*: LNil })
     { in => Organization(
       in.find[String]("name").get,
       in.find[Option[Int]]("value").flatten) }
