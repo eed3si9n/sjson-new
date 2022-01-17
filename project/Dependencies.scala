@@ -4,10 +4,15 @@ import Keys._
 object Dependencies {
   lazy val testDependencies = Def.setting(Seq(
     verify % Test,
-    "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
-    "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+    scalacheck % Test,
+    scalatest % Test,
   ))
-  lazy val verify = "com.eed3si9n.verify" %% "verify" % "1.0.0"
+  def scalaCheckVersion = "1.15.4"
+  lazy val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion
+  def scalaTestVersion = "3.2.10"
+  lazy val scalatest = "org.scalatest" %% "scalatest" % scalaTestVersion
+  def verifyVersion = "1.0.0"
+  lazy val verify = "com.eed3si9n.verify" %% "verify" % verifyVersion
   lazy val sprayJson = "io.spray" %% "spray-json" % "1.3.6"
   lazy val scalaJson = "com.eed3si9n" %% "shaded-scalajson" % "1.0.0-M4"
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.17"

@@ -43,15 +43,14 @@ jobs:
       if: ${{ matrix.jobtype == 1 }}
       shell: bash
       run: |
-        sbt -v +test
+        sbt -v test
     - name: Build and test (2)
       if: ${{ matrix.jobtype == 2 }}
       shell: bash
       run: |
-        sbt -v --client +test
-        SCALA_VERSION=2.12.12
-        sbt -v --client "++$SCALA_VERSION!" mimaReportBinaryIssues
-        sbt -v --client "++$SCALA_VERSION!" "benchmark/jmh:run -i 10 -wi 3 -f1 -t1"
+        sbt -v --client test
+        sbt -v --client mimaReportBinaryIssues
+        # sbt -v --client "benchmark2_12/jmh:run -i 10 -wi 3 -f1 -t1"
     - name: Cleanup
       shell: bash
       run: |

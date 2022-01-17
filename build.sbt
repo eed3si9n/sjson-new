@@ -1,20 +1,21 @@
 import Dependencies._
 import com.typesafe.tools.mima.core._
+import sbt.internal.ProjectMatrix
 
 val scala212 = "2.12.15"
 val scala213 = "2.13.8"
 val scala3 = "3.1.0"
 
 ThisBuild / version := "0.9.2-SNAPSHOT"
-ThisBuild / crossScalaVersions := Seq(scala212, scala213, scala3)
 ThisBuild / scalaVersion := scala212
+lazy val allScalaVersions = Seq(scala212, scala213, scala3)
 
 lazy val root = (project in file("."))
-  .aggregate(core,
-    supportSpray,
-    supportScalaJson,
-    supportMsgpack,
-    supportMurmurhash)
+  .aggregate(core.projectRefs ++
+    supportSpray.projectRefs ++
+    supportScalaJson.projectRefs ++
+    supportMsgpack.projectRefs ++
+    supportMurmurhash.projectRefs: _*)
   .settings(
     name := "sjson new",
     publish / skip := true,
@@ -27,19 +28,16 @@ val mimaSettings = Def settings (
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((3, _)) =>
         Set.empty
-      case Some((2, v)) if v >= 13 =>
-        Set.empty
       case _ =>
         Set(organization.value %% moduleName.value % "0.9.1")
     }
   }
 )
 
-lazy val core = project
+lazy val core = (projectMatrix in file("core"))
   .enablePlugins(BoilerplatePlugin)
   .settings(
     name := "sjson new core",
-    libraryDependencies ++= testDependencies.value,
     scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
@@ -47,25 +45,26 @@ lazy val core = project
       ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.JavaExtraFormats.sjsonnew$JavaExtraFormats$$FileScheme")
     )
   )
+  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
+    libraryDependencies ++= testDependencies.value,
+  ))
 
 def support(n: String) =
-  Project(id = n, base = file(s"support/$n"))
+  ProjectMatrix(id = n, base = file(s"support/$n"))
     .dependsOn(core)
     .settings(
       name := s"sjson-new-$n",
-      libraryDependencies ++= testDependencies.value,
       scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
-      mimaSettings
+      mimaSettings,
     )
 
-lazy val supportSpray = support("spray").
-  settings(
-    libraryDependencies += sprayJson
-  )
+lazy val supportSpray = support("spray")
+  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
+    libraryDependencies ++= testDependencies.value ++ Seq(sprayJson),
+  ))
 
 lazy val supportScalaJson = support("scalajson")
   .settings(
-    libraryDependencies ++= Seq(scalaJson, shadedJawnParser),
     mimaBinaryIssueFilters ++= Seq(
       ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
       ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
@@ -79,23 +78,29 @@ lazy val supportScalaJson = support("scalajson")
       ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.async"),
     )
   )
+  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
+    libraryDependencies ++= testDependencies.value ++ Seq(scalaJson, shadedJawnParser),
+  ))
 
 lazy val supportMsgpack = support("msgpack")
-  .settings(
-    libraryDependencies += msgpackCore
-  )
+  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
+    libraryDependencies ++= testDependencies.value ++ Seq(msgpackCore),
+  ))
 
 lazy val supportMurmurhash = support("murmurhash")
+  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
+    libraryDependencies ++= testDependencies.value,
+  ))
 
-lazy val benchmark = (project in file("benchmark"))
+lazy val benchmark = (projectMatrix in file("benchmark"))
   .dependsOn(supportSpray, supportScalaJson, supportMsgpack)
   .enablePlugins(JmhPlugin)
   .settings(
     libraryDependencies ++= Seq(jawnSpray, lmIvy),
-    crossScalaVersions --= Seq(scala213),
     Jmh / run / javaOptions ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
     publish / skip := true,
   )
+  .jvmPlatform(scalaVersions = Seq(scala212))
 
 ThisBuild / organization := "com.eed3si9n"
 ThisBuild / organizationName := "eed3si9n"
