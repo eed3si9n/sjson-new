@@ -19,38 +19,33 @@ package sjsonnew
 package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsArray }
-import org.specs2.mutable._
 import scala.Right
 
-class TupleFormatsSpec extends Specification with BasicJsonProtocol {
+object TupleFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
 
-  "The tuple1Format" should {
-    "convert (42) to a JsNumber" in {
-      Converter.toJsonUnsafe(Tuple1(42)) mustEqual JsArray(JsNumber(42))
-    }
-    "be able to convert a JsNumber to a Tuple1[Int]" in {
-      Converter.fromJsonUnsafe[Tuple1[Int]](JsArray(JsNumber(42))) mustEqual Tuple1(42)
-    }
+  test("The tuple1Format") {
+    // "convert (42) to a JsNumber"
+    Predef.assert(Converter.toJsonUnsafe(Tuple1(42)) == JsArray(JsNumber(42)))
+
+    // "be able to convert a JsNumber to a Tuple1[Int]"
+    Predef.assert(Converter.fromJsonUnsafe[Tuple1[Int]](JsArray(JsNumber(42))) == Tuple1(42))
   }
 
-  "The tuple2Format" should {
+  test("The tuple2Format") {
     val json = JsArray(JsNumber(42), JsNumber(4.2))
-    "convert (42, 4.2) to a JsArray" in {
-      Converter.toJsonUnsafe((42, 4.2)) mustEqual json
-    }
-    "be able to convert a JsArray to a (Int, Double)]" in {
-      Converter.fromJsonUnsafe[(Int, Double)](json) mustEqual (42, 4.2)
-    }
+    // "convert (42, 4.2) to a JsArray"
+    Predef.assert(Converter.toJsonUnsafe((42, 4.2)) == json)
+
+    // "be able to convert a JsArray to a (Int, Double)]"
+    Predef.assert(Converter.fromJsonUnsafe[(Int, Double)](json) == (42, 4.2))
   }
 
-  "The tuple3Format" should {
+  test("The tuple3Format") {
     val json = JsArray(JsNumber(42), JsNumber(4.2), JsString("hello"))
-    "convert (42, 4.2, \"hello\") to a JsArray" in {
-      Converter.toJsonUnsafe((42, 4.2, "hello")) mustEqual json
-    }
-    "be able to convert a JsArray to a (Int, Double, Int)]" in {
-      Converter.fromJsonUnsafe[(Int, Double, String)](json) mustEqual (42, 4.2, "hello")
-    }
-  }
+    // "convert (42, 4.2, \"hello\") to a JsArray"
+    Predef.assert(Converter.toJsonUnsafe((42, 4.2, "hello")) == json)
 
+    // "be able to convert a JsArray to a (Int, Double, Int)]"
+    Predef.assert(Converter.fromJsonUnsafe[(Int, Double, String)](json) == (42, 4.2, "hello"))
+  }
 }

@@ -19,68 +19,56 @@ package sjsonnew
 package support.spray
 
 import spray.json.{JsonFormat => _, _}
-import org.specs2.mutable._
 
-class CaseClassFormatsSpec extends Specification with BasicJsonProtocol {
+object CaseClassFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
 
   private case class Foo(a: Int, b: String)
   private val foo = Foo(42, "bar")
 
-  "case class Json Object Format" should {
+  test("case class Json Object Format") {
     implicit val instance: JsonFormat[Foo] =
       BasicJsonProtocol.caseClass(Foo.apply _, (x: Foo) => Option((x.a, x.b)))("a", "b")
-
     val json = JsObject("a" -> JsNumber(42), "b" -> JsString("bar"))
 
-    "convert to a JsObject" in {
-      Converter.toJsonUnsafe(foo) mustEqual json
-    }
-    "be able to convert a JsObject to a case class" in {
-      Converter.fromJsonUnsafe[Foo](json) mustEqual foo
-    }
+    // "convert to a JsObject"
+    Predef.assert(Converter.toJsonUnsafe(foo) == json)
+    // "be able to convert a JsObject to a case class"
+    Predef.assert(Converter.fromJsonUnsafe[Foo](json) == foo)
   }
 
-  "case class Json Array Format" should {
+  test("case class Json Array Format") {
     implicit val instance: JsonFormat[Foo] =
       BasicJsonProtocol.caseClassArray(Foo.apply _, (x: Foo) => Option((x.a, x.b)))
 
     val json = JsArray(JsNumber(42), JsString("bar"))
 
-    "convert to a JsArray" in {
-      Converter.toJsonUnsafe(foo) mustEqual json
-    }
-    "be able to convert a JsArray to a case class" in {
-      Converter.fromJsonUnsafe[Foo](json) mustEqual foo
-    }
+    // "convert to a JsArray"
+    Predef.assert(Converter.toJsonUnsafe(foo) == json)
+    // "be able to convert a JsArray to a case class" in {
+    Predef.assert(Converter.fromJsonUnsafe[Foo](json) == foo)
   }
 
   private case class Uno(a: Int)
   private val x = Uno(42)
 
-  "case class with 1 field" should {
+  test("case class with 1 field") {
     implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClass(Uno.apply _, (x: Uno) => Option(x.a))("a")
 
     val json = JsObject("a" -> JsNumber(42))
-
-    "convert case cass -> JsObject" in {
-      Converter.toJsonUnsafe(x) mustEqual json
-    }
-    "convert JsObject -> case class" in {
-      Converter.fromJsonUnsafe[Uno](json) mustEqual x
-    }
+    // "convert case cass -> JsObject"
+    Predef.assert(Converter.toJsonUnsafe(x) == json)
+    // "convert JsObject -> case class"
+    Predef.assert(Converter.fromJsonUnsafe[Uno](json) == x)
   }
 
-  "case class with 1 field" should {
+  test("case class with 1 field") {
     implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClassArray(Uno.apply _, (x: Uno) => Option(x.a))
 
     val json = JsArray(JsNumber(42))
 
-    "convert case class -> JsArray" in {
-      Converter.toJsonUnsafe(x) mustEqual json
-    }
-    "convert JsArray -> case class" in {
-      Converter.fromJsonUnsafe[Uno](json) mustEqual x
-    }
+    // "convert case class -> JsArray" in
+    Predef.assert(Converter.toJsonUnsafe(x) == json)
+    // "convert JsArray -> case class" in
+    Predef.assert(Converter.fromJsonUnsafe[Uno](json) == x)
   }
-
 }

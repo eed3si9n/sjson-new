@@ -18,11 +18,10 @@
 package sjsonnew
 package support.spray
 
-import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsObject, JsString, JsValue }
 
-class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
+object CollectionFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
   case class Person(name: String, value: List[Int], ary: Array[Int],
     m: Map[String, Int], vs: Vector[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
@@ -78,77 +77,78 @@ class CollectionFormatsSpec extends Specification with BasicJsonProtocol {
   implicit val PeepKeyFormat: JsonKeyFormat[Peep] = JsonKeyFormat(_.name, Peep)
   val peep = Peep("x")
 
-  "The listFormat" should {
+  test("The listFormat") {
     val list = List(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
-    "convert a List[Int] to a JsArray of JsNumbers" in {
-      Converter.toJsonUnsafe(list) mustEqual json
-    }
-    "convert a JsArray of JsNumbers to a List[Int]" in {
-      Converter.fromJsonUnsafe[List[Int]](json) mustEqual list
-    }
-    "not omit Nil fields" in {
-      Converter.toJsonUnsafe(person) mustEqual personJson
-    }
+    // "convert a List[Int] to a JsArray of JsNumbers"
+    Predef.assert(Converter.toJsonUnsafe(list) == json)
+    // "convert a JsArray of JsNumbers to a List[Int]"
+    Predef.assert(Converter.fromJsonUnsafe[List[Int]](json) == list)
+    // "not omit Nil fields"
+    Predef.assert(Converter.toJsonUnsafe(person) == personJson)
   }
 
-  "The arrayFormat" should {
+  test("The arrayFormat") {
     val array = Array(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
-    "convert an Array[Int] to a JsArray of JsNumbers" in {
-      Converter.toJsonUnsafe(array) mustEqual json
-    }
-    "convert a JsArray of JsNumbers to an Array[Int]" in {
-      Arrays.equals(Converter.fromJsonUnsafe[Array[Int]](json), array) must beTrue
-    }
+    // "convert an Array[Int] to a JsArray of JsNumbers" in {
+    Predef.assert(Converter.toJsonUnsafe(array) == json)
+    // "convert a JsArray of JsNumbers to an Array[Int]" in {
+    Predef.assert(Arrays.equals(Converter.fromJsonUnsafe[Array[Int]](json), array))
   }
 
-  "The mapFormat" should {
+  test("The mapFormat") {
     val map = Map("a" -> 1, "b" -> 2, "c" -> 3)
     val json = JsObject("a" -> JsNumber(1), "b" -> JsNumber(2), "c" -> JsNumber(3))
-    "convert a Map[String, Long] to a JsObject" in {
-      Converter.toJsonUnsafe(map) mustEqual json
-    }
-    "be able to convert a JsObject to a Map[String, Long]" in {
-      Converter.fromJsonUnsafe[Map[String, Long]](json) mustEqual map
-    }
-    "round trip a Map[Peep, Int]" in assertRoundTrip(Map(peep -> 1))
-    "round trip a Map[Unit, Int]" in assertRoundTrip(Map(() -> 1))
-    "round trip a Map[Boolean, Int]" in assertRoundTrip(Map(true -> 1))
-    "round trip a Map[Byte, Int]" in assertRoundTrip(Map(1.toByte -> 1))
-    "round trip a Map[Short, Int]" in assertRoundTrip(Map(1.toShort -> 1))
-    "round trip a Map[Char, Int]" in assertRoundTrip(Map('c' -> 1))
-    "round trip a Map[Int, Int]" in assertRoundTrip(Map(1 -> 1))
-    "round trip a Map[Long, Int]" in assertRoundTrip(Map(7563661897011259335L -> 1))
-    "round trip a Map[Float, Int]" in assertRoundTrip(Map(4.2f -> 1))
-    "round trip a Map[Double, Int]" in assertRoundTrip(Map(4.2 -> 1))
+    // "convert a Map[String, Long] to a JsObject"
+    Predef.assert(Converter.toJsonUnsafe(map) == json)
+
+    // "be able to convert a JsObject to a Map[String, Long]"
+    Predef.assert(Converter.fromJsonUnsafe[Map[String, Long]](json) == map)
+
+    // "round trip a Map[Peep, Int]"
+    assertRoundTrip(Map(peep -> 1))
+    // "round trip a Map[Unit, Int]"
+    assertRoundTrip(Map(() -> 1))
+    // "round trip a Map[Boolean, Int]"
+    assertRoundTrip(Map(true -> 1))
+    // "round trip a Map[Byte, Int]"
+    assertRoundTrip(Map(1.toByte -> 1))
+    // "round trip a Map[Short, Int]"
+    assertRoundTrip(Map(1.toShort -> 1))
+    // "round trip a Map[Char, Int]"
+    assertRoundTrip(Map('c' -> 1))
+    // "round trip a Map[Int, Int]"
+    assertRoundTrip(Map(1 -> 1))
+    // "round trip a Map[Long, Int]"
+    assertRoundTrip(Map(7563661897011259335L -> 1))
+    // "round trip a Map[Float, Int]"
+    assertRoundTrip(Map(4.2f -> 1))
+    // "round trip a Map[Double, Int]"
+    assertRoundTrip(Map(4.2 -> 1))
   }
 
-  "The immutableSetFormat" should {
+  test("The immutableSetFormat") {
     val set = Set(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
-    "convert a Set[Int] to a JsArray of JsNumbers" in {
-      Converter.toJsonUnsafe(set) mustEqual json
-    }
-    "convert a JsArray of JsNumbers to a Set[Int]" in {
-      Converter.fromJsonUnsafe[Set[Int]](json) mustEqual set
-    }
+    // "convert a Set[Int] to a JsArray of JsNumbers"
+    Predef.assert(Converter.toJsonUnsafe(set) == json)
+    // "convert a JsArray of JsNumbers to a Set[Int]"
+    Predef.assert(Converter.fromJsonUnsafe[Set[Int]](json) == set)
   }
 
-  "The indexedSeqFormat" should {
+  test("The indexedSeqFormat") {
     val seq = collection.IndexedSeq(1, 2, 3)
     val json = JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
-    "convert a Set[Int] to a JsArray of JsNumbers" in {
-      Converter.toJsonUnsafe(seq) mustEqual json
-    }
-    "convert a JsArray of JsNumbers to a IndexedSeq[Int]" in {
-      Converter.fromJsonUnsafe[collection.IndexedSeq[Int]](json) mustEqual seq
-    }
+    // "convert a Set[Int] to a JsArray of JsNumbers"
+    Predef.assert(Converter.toJsonUnsafe(seq) == json)
+    // "convert a JsArray of JsNumbers to a IndexedSeq[Int]"
+    Predef.assert(Converter.fromJsonUnsafe[collection.IndexedSeq[Int]](json) == seq)
   }
 
   def assertRoundTrip[A: JsonWriter: JsonReader](x: A) = {
     val jValue: JsValue = Converter.toJsonUnsafe(x)
     val y: A = Converter.fromJsonUnsafe[A](jValue)
-    x mustEqual y
+    assert(x == y)
   }
 }

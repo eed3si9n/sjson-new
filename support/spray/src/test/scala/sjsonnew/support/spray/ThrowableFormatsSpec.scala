@@ -17,18 +17,15 @@
 package sjsonnew
 package support.spray
 
-import org.specs2.mutable._
-
-class ThrowableFormatsSpec extends Specification with BasicJsonProtocol {
-  "The throwableFormat" should {
+object ThrowableFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+  test("The throwableFormat round trip") {
     val t: Throwable = new Exception("foo", new Exception("bar"))
-    "round trip" in {
-      val r = Converter.fromJsonUnsafe[Throwable](Converter.toJsonUnsafe(t))
-      val stackTraces = r.getStackTrace
-      val x = stackTraces.head
-      (r.getMessage mustEqual "foo") and
-      (r.getCause.getMessage mustEqual "bar") and
-      (x.getFileName mustEqual "ThrowableFormatsSpec.scala")
-    }
+
+    val r = Converter.fromJsonUnsafe[Throwable](Converter.toJsonUnsafe(t))
+    val stackTraces = r.getStackTrace
+    val x = stackTraces.head
+    Predef.assert(r.getMessage == "foo")
+    Predef.assert(r.getCause.getMessage == "bar")
+    Predef.assert(x.getFileName == "ThrowableFormatsSpec.scala")
   }
 }

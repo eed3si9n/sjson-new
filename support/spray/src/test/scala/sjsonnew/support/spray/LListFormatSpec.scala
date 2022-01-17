@@ -17,43 +17,45 @@
 package sjsonnew
 package support.spray
 
-import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
-class LListFormatsSpec extends Specification with BasicJsonProtocol {
+object LListFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+  val empty = LNil
+  val emptyObject = JsObject()
+  val list = ("Z", 2) :*: ("a", 1) :*: LNil
+  val obj = JsObject("$fields" -> JsArray(JsString("Z"), JsString("a")), "Z" -> JsNumber(2), "a" -> JsNumber(1))
+  val nested = ("b", list) :*: LNil
+  val nestedObj = JsObject("$fields" -> JsArray(JsString("b")), "b" -> obj)
 
-  "The llistFormat" should {
-    val empty = LNil
-    val emptyObject = JsObject()
-    val list = ("Z", 2) :*: ("a", 1) :*: LNil
-    val obj = JsObject("$fields" -> JsArray(JsString("Z"), JsString("a")), "Z" -> JsNumber(2), "a" -> JsNumber(1))
-    val nested = ("b", list) :*: LNil
-    val nestedObj = JsObject("$fields" -> JsArray(JsString("b")), "b" -> obj)
-    "convert an empty list to JObject" in {
-      Converter.toJsonUnsafe(empty) mustEqual emptyObject
-    }
-    "convert a list to JObject" in {
-      Converter.toJsonUnsafe(list) mustEqual obj
-    }
-    "convert a nested list to JObject" in {
-      Converter.toJsonUnsafe(nested) mustEqual nestedObj
-    }
-    "convert a JObject to list" in {
-      Converter.fromJsonUnsafe[Int :*: Int :*: LNil](obj) mustEqual list
-    }
-    "convert a nested JObject to list" in {
-      Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: LNil](nestedObj) mustEqual nested
-    }
+  test("convert an empty list to JObject") {
+    Predef.assert(Converter.toJsonUnsafe(empty) == emptyObject)
+  }
 
-    val obj2 = JsObject("$fields" -> JsArray(JsString("f")), "f" -> JsString("foo"))
-    val nested2Obj = JsObject("$fields" -> JsArray(JsString("b"), JsString("c")), "b" -> obj, "c" -> obj2)
+  test("convert a list to JObject") {
+    Predef.assert(Converter.toJsonUnsafe(list) == obj)
+  }
 
-    val list2 = ("f", "foo") :*: LNil
-    val nested2 = ("b", list) :*: ("c", list2) :*: LNil
+  test("convert a nested list to JObject") {
+    Predef.assert(Converter.toJsonUnsafe(nested) == nestedObj)
+  }
 
-    "convert a 2 nested JObjects to list" in {
-      Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: (String :*: LNil) :*: LNil](nested2Obj) mustEqual nested2
-    }
+  test("convert a JObject to list") {
+    Predef.assert(Converter.fromJsonUnsafe[Int :*: Int :*: LNil](obj) == list)
+  }
+
+  test("convert a nested JObject to list") {
+    Predef.assert(Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: LNil](nestedObj) == nested)
+  }
+
+  val obj2 = JsObject("$fields" -> JsArray(JsString("f")), "f" -> JsString("foo"))
+  val nested2Obj = JsObject("$fields" -> JsArray(JsString("b"), JsString("c")), "b" -> obj, "c" -> obj2)
+
+  val list2 = ("f", "foo") :*: LNil
+  val nested2 = ("b", list) :*: ("c", list2) :*: LNil
+
+  test("convert a 2 nested JObjects to list") {
+    Predef.assert(Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: (String :*: LNil) :*: LNil](nested2Obj) == nested2)
   }
 }
+

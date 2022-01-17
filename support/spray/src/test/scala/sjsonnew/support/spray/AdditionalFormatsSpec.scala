@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package sjsonnew
-package support.spray
+// package sjsonnew
+// package support.spray
 
-import org.specs2.mutable._
+// import spray.json._
 
-// class AdditionalFormatsSpec extends Specification {
-
+// object AdditionalFormatsSpec extends verify.BasicTestSuite {
 //   case class Container[A](inner: Option[A])
 
-//   object ReaderProtocol extends DefaultJsonProtocol {
-//     implicit def containerReader[T :JsonFormat] = lift {
+//   object ReaderProtocol extends BasicJsonProtocol {
+//     implicit def containerReader[T :JsonFormat]: JsonFormat[Container[T]] = liftFormat {
 //       new JsonReader[Container[T]] {
 //         def read(value: JsValue) = value match {
 //           case JsObject(fields) if fields.contains("content") => Container(Some(jsonReader[T].read(fields("content"))))
@@ -34,26 +33,23 @@ import org.specs2.mutable._
 //     }
 //   }
 
-//   object WriterProtocol extends DefaultJsonProtocol {
-//     implicit def containerWriter[T :JsonFormat] = lift {
+//   object WriterProtocol extends BasicJsonProtocol {
+//     implicit def containerWriter[T :JsonFormat]: JsonFormat[Container[T]] = liftFormat {
 //       new JsonWriter[Container[T]] {
 //         def write(obj: Container[T]) = JsObject("content" -> obj.inner.toJson)
 //       }
 //     }
 //   }
 
-//   "The liftJsonWriter" should {
-//     val obj = Container(Some(Container(Some(List(1, 2, 3)))))
+//   val obj = Container(Some(Container(Some(List(1, 2, 3)))))
+//   test("The liftJsonWriter should properly write a Container[Container[List[Int]]] to JSON") {
+//     import WriterProtocol._
+//     Predef.assert(obj.toJson.toString == """{"content":{"content":[1,2,3]}}""")
+//   }
 
-//     "properly write a Container[Container[List[Int]]] to JSON" in {
-//       import WriterProtocol._
-//       obj.toJson.toString mustEqual """{"content":{"content":[1,2,3]}}"""
-//     }
-
-//     "properly read a Container[Container[List[Int]]] from JSON" in {
-//       import ReaderProtocol._
-//       """{"content":{"content":[1,2,3]}}""".parseJson.convertTo[Container[Container[List[Int]]]] mustEqual obj
-//     }
+//   test("The liftJsonWriter should properly read a Container[Container[List[Int]]] from JSON") {
+//     import ReaderProtocol._
+//     Predef.assert("""{"content":{"content":[1,2,3]}}""".parseJson.convertTo[Container[Container[List[Int]]]] == obj)
 //   }
 
 //   // case class Foo(id: Long, name: String, foos: Option[List[Foo]] = None)

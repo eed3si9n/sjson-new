@@ -18,103 +18,103 @@ package sjsonnew
 package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
-import org.specs2.mutable._
 import java.util.{ Calendar, TimeZone }
 import java.time._
 
-class CalendarFormatsSpec extends Specification with BasicJsonProtocol {
-  "The dateStringIso" should {
-    // JDK 8 / Joda dates
-    val odt = OffsetDateTime.of(1999, 1, 1, 0, 0, 0, 0, ZoneOffset.of("Z"))
-    val omillis = odt.plusNanos(1000 * 1000)
-    val zdt = ZonedDateTime.of(1999, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
-    val zmillis = zdt.plusNanos(1000 * 1000)
-    // zoneless instant in time
-    val inst = omillis.toInstant
-    val ld = LocalDate.of(1999, 1, 1)
-    val ldt = LocalDateTime.of(1999, 1, 1, 0, 0, 0, 1000 * 1000)
+object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+  // JDK 8 / Joda dates
+  val odt = OffsetDateTime.of(1999, 1, 1, 0, 0, 0, 0, ZoneOffset.of("Z"))
+  val omillis = odt.plusNanos(1000 * 1000)
+  val zdt = ZonedDateTime.of(1999, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+  val zmillis = zdt.plusNanos(1000 * 1000)
+  // zoneless instant in time
+  val inst = omillis.toInstant
+  val ld = LocalDate.of(1999, 1, 1)
+  val ldt = LocalDateTime.of(1999, 1, 1, 0, 0, 0, 1000 * 1000)
 
-    // legacy dates
-    val seconds = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    seconds.clear
-    seconds.set(1999, 1, 1, 0, 0, 0)
-    
-    val milliseconds = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    milliseconds.clear
-    milliseconds.set(1999, 1, 1, 0, 0, 0)
-    milliseconds.set(Calendar.MILLISECOND, 1)
+  // legacy dates
+  val seconds = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+  seconds.clear
+  seconds.set(1999, 1, 1, 0, 0, 0)
 
-    "convert a OffsetDateTime to JsString" in {
-      Converter.toJsonUnsafe(odt) mustEqual JsString("1999-01-01T00:00:00Z")
-    }
+  val milliseconds = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+  milliseconds.clear
+  milliseconds.set(1999, 1, 1, 0, 0, 0)
+  milliseconds.set(Calendar.MILLISECOND, 1)
 
-    "convert the JsString back to the OffsetDateTime" in {
-      Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00Z")) mustEqual odt
-    }
+  test("convert a OffsetDateTime to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(odt) == JsString("1999-01-01T00:00:00Z"))
+  }
 
-    "convert a OffsetDateTime with milliseconds to JsString" in {
-      Converter.toJsonUnsafe(omillis) mustEqual JsString("1999-01-01T00:00:00.001Z")
-    }
+  test("convert the JsString back to the OffsetDateTime") {
+    Predef.assert(Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00Z")) == odt)
+  }
 
-    "convert the JsString back to the OffsetDateTime with milliseconds" in {
-      Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00.001Z")) mustEqual omillis
-    }
+  test("convert a OffsetDateTime with milliseconds to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(omillis) == JsString("1999-01-01T00:00:00.001Z"))
+  }
 
-    "convert a ZonedDateTime to JsString" in {
-      Converter.toJsonUnsafe(zdt) mustEqual JsString("1999-01-01T00:00:00Z[UTC]")
-    }
+  test("convert the JsString back to the OffsetDateTime with milliseconds") {
+    Predef.assert(Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00.001Z")) == omillis)
+  }
 
-    "convert the JsString back to the ZonedDateTime" in {
-      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00Z[UTC]")) mustEqual zdt
-    }
+  test("convert a ZonedDateTime to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(zdt) == JsString("1999-01-01T00:00:00Z[UTC]"))
+  }
 
-    "convert a ZonedDateTime with milliseconds to JsString" in {
-      Converter.toJsonUnsafe(zmillis) mustEqual JsString("1999-01-01T00:00:00.001Z[UTC]")
-    }
+  test("convert the JsString back to the ZonedDateTime") {
+    Predef.assert(Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00Z[UTC]")) == zdt)
+  }
 
-    "convert the JsString back to the ZonedDateTime with milliseconds" in {
-      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) mustEqual zmillis
-    }
+  test("convert a ZonedDateTime with milliseconds to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(zmillis) == JsString("1999-01-01T00:00:00.001Z[UTC]"))
+  }
 
-    "convert an Instant to JsString" in {
-      Converter.toJsonUnsafe(inst) mustEqual JsString("1999-01-01T00:00:00.001Z")
-    }
+  test("convert the JsString back to the ZonedDateTime with milliseconds") {
+    Predef.assert(Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) == zmillis)
+  }
 
-    "convert the JsString back to the Instant with milliseconds" in {
-      Converter.fromJsonUnsafe[Instant](JsString("1999-01-01T00:00:00.001Z")) mustEqual inst
-    }
+  test("convert an Instant to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(inst) == JsString("1999-01-01T00:00:00.001Z"))
+  }
 
-    "convert a LocalDate to JsString" in {
-      Converter.toJsonUnsafe(ld) mustEqual JsString("1999-01-01")
-    }
-    
-    "convert the JsString with no time back to the LocalDate" in {
-      Converter.fromJsonUnsafe[LocalDate](JsString("1999-01-01")) mustEqual ld
-    }
+  test("convert the JsString back to the Instant with milliseconds") {
+    Predef.assert(Converter.fromJsonUnsafe[Instant](JsString("1999-01-01T00:00:00.001Z")) == inst)
+  }
 
-    "convert a LocalDateTime to JsString" in {
-      Converter.toJsonUnsafe(ldt) mustEqual JsString("1999-01-01T00:00:00.001")
-    }
-    
-    "convert the JsString with no time back to the LocalDateTime" in {
-      Converter.fromJsonUnsafe[LocalDateTime](JsString("1999-01-01T00:00:00.001")) mustEqual ldt
-    }
+  test("convert a LocalDate to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(ld) == JsString("1999-01-01"))
+  }
 
-    "convert a Date to JsString" in {
-      Converter.toJsonUnsafe(seconds) mustEqual JsString("1999-02-01T00:00:00Z")
-    }
-    "convert a Date with milliseconds to JsString" in {
-      Converter.toJsonUnsafe(milliseconds) mustEqual JsString("1999-02-01T00:00:00.001Z")
-    }
-    "convert the JsString back to the Date" in {
-      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00Z")).getTimeInMillis mustEqual seconds.getTimeInMillis
-    }
-    "convert the JsString with milliseconds back to the Date" in {
-      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00.001Z")).getTimeInMillis mustEqual milliseconds.getTimeInMillis
-    }
-    "convert the JsString with no time back to the Date" in {
-      Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01Z")).getTimeInMillis mustEqual seconds.getTimeInMillis
-    }
+  test("convert the JsString with no time back to the LocalDate") {
+    Predef.assert(Converter.fromJsonUnsafe[LocalDate](JsString("1999-01-01")) == ld)
+  }
 
+  test("convert a LocalDateTime to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(ldt) == JsString("1999-01-01T00:00:00.001"))
+  }
+
+  test("convert the JsString with no time back to the LocalDateTime") {
+    Predef.assert(Converter.fromJsonUnsafe[LocalDateTime](JsString("1999-01-01T00:00:00.001")) == ldt)
+  }
+
+  test("convert a Date to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(seconds) == JsString("1999-02-01T00:00:00Z"))
+  }
+
+  test("convert a Date with milliseconds to JsString") {
+    Predef.assert(Converter.toJsonUnsafe(milliseconds) == JsString("1999-02-01T00:00:00.001Z"))
+  }
+
+  test("convert the JsString back to the Date") {
+    Predef.assert(Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00Z")).getTimeInMillis == seconds.getTimeInMillis)
+  }
+
+  test("convert the JsString with milliseconds back to the Date") {
+    Predef.assert(Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00.001Z")).getTimeInMillis == milliseconds.getTimeInMillis)
+  }
+
+  test("convert the JsString with no time back to the Date") {
+    Predef.assert(Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01Z")).getTimeInMillis == seconds.getTimeInMillis)
   }
 }
