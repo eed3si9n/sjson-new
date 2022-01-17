@@ -19,10 +19,9 @@ package sjsonnew
 package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
-import org.specs2.mutable._
 import scala.Right
 
-class StandardFormatsSpec extends Specification with BasicJsonProtocol {
+object StandardFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
   case class Person(name: Option[String], value: Option[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
@@ -44,39 +43,37 @@ class StandardFormatsSpec extends Specification with BasicJsonProtocol {
       }
   }
 
-  "The optionFormat" should {
-    "convert None to JsNull" in {
-      Converter.toJsonUnsafe(None.asInstanceOf[Option[Int]]) mustEqual JsNull
-    }
-    "convert JsNull to None" in {
-      Converter.fromJsonUnsafe[Option[Int]](JsNull) mustEqual None
-    }
-    "convert Some(Hello) to JsString(Hello)" in {
-      Converter.toJsonUnsafe(Some("Hello").asInstanceOf[Option[String]]) mustEqual JsString("Hello")
-    }
-    "convert JsString(Hello) to Some(Hello)" in {
-      Converter.fromJsonUnsafe[Option[String]](JsString("Hello")) mustEqual Some("Hello")
-    }
-    "omit None fields" in {
-      Converter.toJsonUnsafe(Person(None, None)) mustEqual JsObject()
-    }
+  test("The optionFormat") {
+    // "convert None to JsNull"
+    Predef.assert(Converter.toJsonUnsafe(None.asInstanceOf[Option[Int]]) == JsNull)
+
+    // "convert JsNull to None"
+    Predef.assert(Converter.fromJsonUnsafe[Option[Int]](JsNull) == None)
+
+    // "convert Some(Hello) to JsString(Hello)"
+    Predef.assert(Converter.toJsonUnsafe(Some("Hello").asInstanceOf[Option[String]]) == JsString("Hello"))
+
+    // "convert JsString(Hello) to Some(Hello)"
+    Predef.assert(Converter.fromJsonUnsafe[Option[String]](JsString("Hello")) == Some("Hello"))
+
+    // "omit None fields"
+    Predef.assert(Converter.toJsonUnsafe(Person(None, None)) == JsObject())
   }
 
-  "The eitherFormat" should {
+  test("The eitherFormat") {
     val a: Either[Int, String] = Left(42)
     val b: Either[Int, String] = Right("Hello")
 
-    "convert the left side of an Either value to Json" in {
-      Converter.toJsonUnsafe(a) mustEqual JsNumber(42)
-    }
-    "convert the right side of an Either value to Json" in {
-      Converter.toJsonUnsafe(b) mustEqual JsString("Hello")
-    }
-    "convert the left side of an Either value from Json" in {
-      Converter.fromJsonUnsafe[Either[Int, String]](JsNumber(42)) mustEqual Left(42)
-    }
-    "convert the right side of an Either value from Json" in {
-      Converter.fromJsonUnsafe[Either[Int, String]](JsString("Hello")) mustEqual Right("Hello")
-    }
+    // "convert the left side of an Either value to Json"
+    Predef.assert(Converter.toJsonUnsafe(a) == JsNumber(42))
+
+    // "convert the right side of an Either value to Json"
+    Predef.assert(Converter.toJsonUnsafe(b) == JsString("Hello"))
+
+    // "convert the left side of an Either value from Json"
+    Predef.assert(Converter.fromJsonUnsafe[Either[Int, String]](JsNumber(42)) == Left(42))
+
+    // "convert the right side of an Either value from Json"
+    Predef.assert(Converter.fromJsonUnsafe[Either[Int, String]](JsString("Hello")) == Right("Hello"))
   }
 }

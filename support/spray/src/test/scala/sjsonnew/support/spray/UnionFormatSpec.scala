@@ -17,12 +17,11 @@
 package sjsonnew
 package support.spray
 
-import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 import LList._
 
-class UnionFormatsSpec extends Specification with BasicJsonProtocol {
+object UnionFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
   sealed trait Fruit
   case class Apple() extends Fruit
   sealed trait Citrus extends Fruit
@@ -71,27 +70,27 @@ class UnionFormatsSpec extends Specification with BasicJsonProtocol {
         case None => deserializationError("Expected JsNumber but found None")
       }
   }
+
   val fruit: Fruit = Apple()
-  "The unionFormat" should {
+
+  test("The unionFormat") {
     implicit val FruitFormat: JsonFormat[Fruit] = unionFormat2[Fruit, Apple, Orange]
     val fruitJson = JsObject("value" ->  JsObject("x" -> JsNumber(0)), "type" -> JsString("Apple"))
-    "convert a value of ADT to JObject" in {
-      Converter.toJsonUnsafe(fruit) mustEqual fruitJson
-    }
-    "convert JObject back to ADT" in {
-      Converter.fromJsonUnsafe[Fruit](fruitJson) mustEqual fruit
-    }
+    // "convert a value of ADT to JObject"
+    Predef.assert(Converter.toJsonUnsafe(fruit) == fruitJson)
+
+    // "convert JObject back to ADT"
+    Predef.assert(Converter.fromJsonUnsafe[Fruit](fruitJson) == fruit)
   }
 
-  "The flatUnionFormat" should {
+  test("The flatUnionFormat") {
     implicit val FruitFormat: JsonFormat[Fruit] = flatUnionFormat2[Fruit, Apple, Orange]("type")
     val fruitJson2 = JsObject("type" -> JsString("Apple"), "x" -> JsNumber(0))
-    "convert a value of ADT to JObject" in {
-      Converter.toJsonUnsafe(fruit) mustEqual fruitJson2
-    }
-    "convert JObject back to ADT" in {
-      // println(Converter.fromJsonUnsafe[Fruit](fruitJson2))
-      Converter.fromJsonUnsafe[Fruit](fruitJson2) mustEqual fruit
-    }
+    // "convert a value of ADT to JObject"
+    Predef.assert(Converter.toJsonUnsafe(fruit) == fruitJson2)
+
+    // "convert JObject back to ADT"
+    // println(Predef.assert(Converter.fromJsonUnsafe[Fruit](fruitJson2)))
+    Predef.assert(Converter.fromJsonUnsafe[Fruit](fruitJson2) == fruit)
   }
 }

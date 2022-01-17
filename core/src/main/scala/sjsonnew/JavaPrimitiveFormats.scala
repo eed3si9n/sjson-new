@@ -21,7 +21,7 @@ import java.lang.{ Integer => JInteger, Long => JLong, Boolean => JBoolean,
   Character => JCharacter }
 
 trait JavaPrimitiveFormats {
-  this: PrimitiveFormats with AdditionalFormats with StandardFormats =>
+  this: PrimitiveFormats with AdditionalFormats with IsoFormats with StandardFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 

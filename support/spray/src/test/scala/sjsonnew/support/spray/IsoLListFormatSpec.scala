@@ -18,9 +18,8 @@ package sjsonnew
 package support.spray
 
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
-import org.specs2.mutable.Specification
 
-class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
+object IsoLListFormatSpec extends verify.BasicTestSuite with BasicJsonProtocol {
   sealed trait Contact
   case class Person(name: String, value: Option[Int]) extends Contact
   case class Organization(name: String, value: Option[Int]) extends Contact
@@ -49,15 +48,12 @@ class IsoLListFormatSpec extends Specification with BasicJsonProtocol {
       "$fields" -> JsArray(JsString("name"), JsString("value")),
       "name" -> JsString("Company")
     )
-  "The isomorphism from a custom type to LList" should {
-    "convert from value to JObject" in {
-      Converter.toJsonUnsafe(p1) mustEqual personJs
-    }
-    "convert from JObject to the same value" in {
-      Converter.fromJsonUnsafe[Person](personJs) mustEqual p1
-    }
-    "convert from a union value to JObject" in {
-      Converter.toJsonUnsafe(c1) mustEqual contactJs
-    }
+  test("The isomorphism from a custom type to LList") {
+    // "convert from value to JObject"
+    Predef.assert(Converter.toJsonUnsafe(p1) == personJs)
+    // "convert from JObject to the same value"
+    Predef.assert(Converter.fromJsonUnsafe[Person](personJs) == p1)
+    // "convert from a union value to JObject"
+    Predef.assert(Converter.toJsonUnsafe(c1) == contactJs)
   }
 }

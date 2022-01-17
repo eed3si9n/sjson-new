@@ -17,12 +17,11 @@
 package sjsonnew
 package support.spray
 
-import org.specs2.mutable._
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 import LList._
 
-class BuilderSpec extends Specification with BasicJsonProtocol {
+object BuilderSpec extends BasicJsonProtocol with verify.BasicTestSuite {
   case class Person(name: String, value: Int)
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
@@ -44,14 +43,14 @@ class BuilderSpec extends Specification with BasicJsonProtocol {
       }
   }
 
-  "Custom format using builder" should {
-    val p1 = Person("Alice", 1)
-    val personJs = JsObject("name" -> JsString("Alice"), "value" -> JsNumber(1))
-    "convert from value to JObject" in {
-      Converter.toJsonUnsafe(p1) mustEqual personJs
-    }
-    "convert from JObject to the same value" in {
-      Converter.fromJsonUnsafe[Person](personJs) mustEqual p1
-    }
+  val p1 = Person("Alice", 1)
+  val personJs = JsObject("name" -> JsString("Alice"), "value" -> JsNumber(1))
+
+  test("Custom format using builder should convert from value to JObject") {
+    Predef.assert(Converter.toJsonUnsafe(p1) == personJs)
+  }
+
+  test("Custom format using builder should convert from JObject to the same value") {
+    Predef.assert(Converter.fromJsonUnsafe[Person](personJs) == p1)
   }
 }

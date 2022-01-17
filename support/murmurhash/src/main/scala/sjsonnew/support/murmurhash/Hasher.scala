@@ -29,17 +29,17 @@ object Hasher extends SupportHasher[Int] {
 
   implicit val facade: BuilderFacade[Int] = FacadeImpl
   private object FacadeImpl extends SimpleBuilderFacade[Int] {
-    val jnull                 = nullHash
-    val jfalse                = falseHash
-    val jtrue                 = trueHash
-    def jnumstring(s: String) = jstring(s)
-    def jintstring(s: String) = jstring(s)
-    def jint(i: Int)          = hashLong(i.toLong)
-    def jlong(l: Long)        = hashLong(l)
-    def jdouble(d: Double)    = hashLong(JDouble.doubleToRawLongBits(d))
-    def jbigdecimal(d: BigDecimal) = jstring(d.toString)
-    def jstring(s: String)    = MurmurHash3.stringHash(s)
-    def jarray(vs: List[Int]): Int = MurmurHash3.seqHash(vs)
-    def jobject(vs: Map[String, Int]): Int = MurmurHash3.mapHash(vs)
+    override def jnull() = nullHash
+    override def jfalse() = falseHash
+    override def jtrue() = trueHash
+    override def jnumstring(s: String) = jstring(s)
+    override def jintstring(s: String) = jstring(s)
+    override def jint(i: Int)          = hashLong(i.toLong)
+    override def jlong(l: Long)        = hashLong(l)
+    override def jdouble(d: Double)    = hashLong(JDouble.doubleToRawLongBits(d))
+    override def jbigdecimal(d: BigDecimal) = jstring(d.toString)
+    override def jstring(s: String)    = MurmurHash3.stringHash(s)
+    override def jarray(vs: List[Int]): Int = MurmurHash3.seqHash(vs)
+    override def jobject(vs: Map[String, Int]): Int = MurmurHash3.mapHash(vs)
   }
 }

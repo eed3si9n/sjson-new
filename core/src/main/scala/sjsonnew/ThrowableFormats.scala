@@ -17,7 +17,7 @@
 package sjsonnew
 
 trait ThrowableFormats {
-  this: PrimitiveFormats with StandardFormats with CollectionFormats =>
+  this: PrimitiveFormats with StandardFormats with IsoFormats with CollectionFormats with AdditionalFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
@@ -41,7 +41,7 @@ trait ThrowableFormats {
       jsOpt match {
         case Some(js) =>
           val size = unbuilder.beginObject(js)
-          val className = unbuilder.readField[String]("className")          
+          val className = unbuilder.readField[String]("className")
           val message = unbuilder.readField[Option[String]]("message")
           val cause = unbuilder.readField[Option[Throwable]]("cause")
           val stackTraces = unbuilder.readField[Vector[StackTraceElement]]("stackTrace")
