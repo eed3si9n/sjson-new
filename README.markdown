@@ -12,30 +12,30 @@ sjson-new consists of two parts:
 
 ### installation
 
-sjson-new 0.9.0 is cross published for Scala 2.12 and 2.13.
+sjson-new 0.10.0 is cross published for Scala 2.12, 2.13, and 3.
 
 Here's how to use sjson-new with Spray:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.9.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-spray" % "0.10.0"
 ```
 
 Here's how to use sjson-new with Scala JSON:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.9.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-scalajson" % "0.10.0"
 ```
 
 Here's how to use sjson-new with MessagePack:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.9.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-msgpack" % "0.10.0"
 ```
 
 Here's how to use sjson-new with Murmur Hash:
 
 ```scala
-libraryDependencies += "com.eed3si9n" %%  "sjson-new-murmurhash" % "0.9.0"
+libraryDependencies += "com.eed3si9n" %%  "sjson-new-murmurhash" % "0.10.0"
 ```
 
 ### converting
