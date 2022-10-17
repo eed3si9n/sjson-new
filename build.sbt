@@ -6,7 +6,7 @@ val scala212 = "2.12.15"
 val scala213 = "2.13.8"
 val scala3 = "3.1.0"
 
-ThisBuild / version := "0.10.1-SNAPSHOT"
+ThisBuild / version := "0.11.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
 lazy val allScalaVersions = Seq(scala212, scala213, scala3)
 
@@ -24,14 +24,7 @@ lazy val root = (project in file("."))
   )
 
 val mimaSettings = Def settings (
-  mimaPreviousArtifacts := {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _)) =>
-        Set.empty
-      case _ =>
-        Set(organization.value %% moduleName.value % "0.9.1")
-    }
-  }
+  mimaPreviousArtifacts := Set.empty,
 )
 
 lazy val core = (projectMatrix in file("core"))
