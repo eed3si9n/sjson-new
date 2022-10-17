@@ -1,5 +1,7 @@
 package sjsonnew
 
+import scala.reflect.ClassTag
+
 trait FlatUnionFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 

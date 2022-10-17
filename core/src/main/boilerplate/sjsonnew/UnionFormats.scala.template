@@ -1,10 +1,12 @@
 package sjsonnew
 
+import scala.reflect.ClassTag
+
 trait UnionFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
   [#/** *BEWARE*: [# A1#] must be a concrete leaf type, and not an interface. */
-  def unionFormat1[U, [#A1 :JF: Manifest#]]: JF[U] = new JF[U] {
+  def unionFormat1[U, [#A1 :JF: ClassTag#]]: JF[U] = new JF[U] {
     [#lazy val a1Format = implicitly[JF[A1]]#
     ]
 
@@ -12,7 +14,7 @@ trait UnionFormats {
       builder.beginObject()
       builder.addFieldName("value")
       u match {
-      [#  case x if implicitly[Manifest[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
+      [#  case x if implicitly[ClassTag[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
       ]
       }
       builder.addFieldName("type")
@@ -32,7 +34,7 @@ trait UnionFormats {
             case None    => deserializationError("Field not found: value")
           }
           val value = typeName match {
-          [#  case x if className(implicitly[Manifest[A1]].runtimeClass) == x => a1Format.read(Some(valueJs), unbuilder)#
+          [#  case x if className(implicitly[ClassTag[A1]].runtimeClass) == x => a1Format.read(Some(valueJs), unbuilder)#
           ]
           }
           unbuilder.endObject()
