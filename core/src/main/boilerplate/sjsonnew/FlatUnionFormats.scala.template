@@ -6,15 +6,15 @@ trait FlatUnionFormats {
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
   [#/** *BEWARE*: [# A1#] must be a concrete leaf type, and not an interface. */
-  def flatUnionFormat1[U, [#A1 :JF: Manifest#]]: JF[U] =
+  def flatUnionFormat1[U, [#A1 :JF: ClassTag#]]: JF[U] =
     flatUnionFormat1[U, [#A1#]]("type")#
   ]
   [#/** *BEWARE*: [# A1#] must be a concrete leaf type, and not an interface. */
-  def flatUnionFormat1[U, [#A1 :JF: Manifest#]](typeFieldName: String): JF[U] = new JF[U] {
+  def flatUnionFormat1[U, [#A1 :JF: ClassTag#]](typeFieldName: String): JF[U] = new JF[U] {
     [#lazy val a1Format = implicitly[JF[A1]]#
     ]
 
-    [#lazy val a1Name = className(implicitly[Manifest[A1]].runtimeClass)#
+    [#lazy val a1Name = className(implicitly[ClassTag[A1]].runtimeClass)#
     ]
 
     def write[J](u: U, builder: Builder[J]): Unit = {
@@ -23,7 +23,7 @@ trait FlatUnionFormats {
       builder.writeString(className(u.getClass))
       builder.endPreObject()
       u match {
-      [#  case x if implicitly[Manifest[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
+      [#  case x if implicitly[ClassTag[A1]].runtimeClass == x.getClass => a1Format.write(x.asInstanceOf[A1], builder)#
       ]
       }
     }
