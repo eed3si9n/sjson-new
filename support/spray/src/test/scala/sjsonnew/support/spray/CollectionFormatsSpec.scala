@@ -21,7 +21,7 @@ package support.spray
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsObject, JsString, JsValue }
 
-object CollectionFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+object CollectionFormatsSpec extends verify.BasicTestSuite {
   case class Person(name: String, value: List[Int], ary: Array[Int],
     m: Map[String, Int], vs: Vector[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
