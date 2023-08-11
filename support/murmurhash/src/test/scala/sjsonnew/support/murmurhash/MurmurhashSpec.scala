@@ -21,7 +21,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import BUtil._
 import LList._
 
-class MurmurhashSpec extends AnyFlatSpec with BasicJsonProtocol {
+class MurmurhashSpec extends AnyFlatSpec {
   "The IntJsonFormat" should "convert an Int to an int hash" in {
     assert(Hasher.hashUnsafe[Int](1) === 1527037976)
   }

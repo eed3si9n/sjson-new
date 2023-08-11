@@ -3,7 +3,6 @@ package support.scalajson
 package unsafe
 
 import shaded.scalajson.ast.unsafe._
-import BasicJsonProtocol._
 import org.scalatest.flatspec.AnyFlatSpec
 
 class HListFormatSpec extends AnyFlatSpec {

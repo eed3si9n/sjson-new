@@ -17,7 +17,7 @@
 package sjsonnew
 package support.spray
 
-object ThrowableFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+object ThrowableFormatsSpec extends verify.BasicTestSuite {
   test("The throwableFormat round trip") {
     val t: Throwable = new Exception("foo", new Exception("bar"))
 

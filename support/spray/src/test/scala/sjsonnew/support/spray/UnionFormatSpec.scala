@@ -21,7 +21,7 @@ import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 import LList._
 
-object UnionFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+object UnionFormatsSpec extends verify.BasicTestSuite {
   sealed trait Fruit
   case class Apple() extends Fruit
   sealed trait Citrus extends Fruit

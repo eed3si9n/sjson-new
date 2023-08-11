@@ -19,7 +19,7 @@ package support.spray
 
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
-object IsoLListFormatSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+object IsoLListFormatSpec extends verify.BasicTestSuite {
   sealed trait Contact
   case class Person(name: String, value: Option[Int]) extends Contact
   case class Organization(name: String, value: Option[Int]) extends Contact

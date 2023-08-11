@@ -21,7 +21,7 @@ package support.spray
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsArray }
 import scala.Right
 
-object TupleFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+object TupleFormatsSpec extends verify.BasicTestSuite {
 
   test("The tuple1Format") {
     // "convert (42) to a JsNumber"

@@ -20,7 +20,7 @@ package support.spray
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
-object LListFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
+object LListFormatsSpec extends verify.BasicTestSuite {
   val empty = LNil
   val emptyObject = JsObject()
   val list = ("Z", 2) :*: ("a", 1) :*: LNil
