@@ -19,11 +19,10 @@ package sjsonnew
 import java.net.{ URI, URL }
 import java.io.File
 import java.math.{ BigInteger, BigDecimal => JBigDecimal }
-import java.util.{ Locale, Optional, UUID }
+import java.util.{ Optional, UUID }
 
 trait JavaExtraFormats {
   this: PrimitiveFormats with AdditionalFormats with IsoFormats =>
-  import JavaExtraFormats._
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
@@ -39,57 +38,6 @@ trait JavaExtraFormats {
     _.toASCIIString, new URI(_))
   implicit val urlStringIso: IsoString[URL] = IsoString.iso[URL](
     _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
-
-  private[this] final val FileScheme = "file"
-
-  implicit val fileStringIso: IsoString[File] = IsoString.iso[File](
-    (f: File) => {
-      val p = f.getPath
-      if (p.startsWith(File.separatorChar.toString) && isWindows) {
-        if (p.startsWith("""\\""")) {
-          // supports \\laptop\My Documents\Some.doc on Windows
-          new URI(FileScheme, normalizeName(p), null).toASCIIString
-        }
-        else {
-          // supports /tmp on Windows
-          new URI(FileScheme, "", normalizeName(p), null).toASCIIString
-        }
-      } else if (f.isAbsolute) {
-        //not using f.toURI to avoid filesystem syscalls
-        //we use empty string as host to force file:// instead of just file:
-        new URI(FileScheme, "", normalizeName(ensureHeadSlash(f.getAbsolutePath)), null).toASCIIString
-      } else {
-        new URI(null, normalizeName(f.getPath), null).toASCIIString
-      }
-    },
-    (s: String) => uriToFile(new URI(s)))
-
-  private[this] def ensureHeadSlash(name: String) = {
-    if(name.nonEmpty && name.head != File.separatorChar) s"${File.separatorChar}$name"
-    else name
-  }
-  private[this] def normalizeName(name: String) = {
-    val sep = File.separatorChar
-    if (sep == '/') name else name.replace(sep, '/')
-  }
-
-  private[this] def uriToFile(uri: URI): File = {
-    val part = uri.getSchemeSpecificPart
-    // scheme might be omitted for relative URI reference.
-    assert(
-      Option(uri.getScheme) match {
-        case None | Some(FileScheme) => true
-        case _                       => false
-      },
-      s"Expected protocol to be '$FileScheme' or empty in URI $uri"
-    )
-    Option(uri.getAuthority) match {
-      case None if part startsWith "/" => new File(uri)
-      case _                           =>
-        if (!(part startsWith "/") && (part contains ":")) new File("//" + part)
-        else new File(part)
-    }
-  }
 
   implicit def optionalFormat[A :JF]: JF[Optional[A]] = new OptionalFormat[A]
   final class OptionalFormat[A :JF] extends JF[Optional[A]] {
@@ -112,7 +60,4 @@ trait JavaExtraFormats {
   }
 }
 
-object JavaExtraFormats {
-  private[sjsonnew] lazy val isWindows: Boolean =
-    System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows")
-}
+object JavaExtraFormats

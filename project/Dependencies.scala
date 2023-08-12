@@ -20,4 +20,5 @@ object Dependencies {
   lazy val jawnSpray = "org.typelevel" %% "jawn-spray" % jawnVersion
   lazy val shadedJawnParser = "com.eed3si9n" %% "shaded-jawn-parser" % "1.3.2"
   lazy val lmIvy = "org.scala-sbt" %% "librarymanagement-ivy" % "1.2.4"
+  lazy val zeroAllocationHashing = "net.openhft" % "zero-allocation-hashing" % "0.10.1"
 }
