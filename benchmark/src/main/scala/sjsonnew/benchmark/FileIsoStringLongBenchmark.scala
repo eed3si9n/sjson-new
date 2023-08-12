@@ -3,14 +3,13 @@ package sjsonnew.benchmark
 import java.io.File
 
 import org.openjdk.jmh.annotations.Benchmark
-import sjsonnew.IsoString
+import sjsonnew.IsoStringLong
 
-class FileIsoStringBenchmark {
+class FileIsoStringLongBenchmark {
 
   @Benchmark
   def fileB: String = {
-    import sjsonnew.BasicJsonProtocol._
-    val isoFile = implicitly[IsoString[File]]
+    val isoFile = implicitly[IsoStringLong[File]]
     val f = new File("/tmp")
     isoFile.to(f)
   }

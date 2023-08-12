@@ -17,11 +17,15 @@
 package sjsonnew
 package support.murmurhash
 
+import java.io.File
+import java.nio.file.Paths
 import org.scalatest.flatspec.AnyFlatSpec
 import BUtil._
 import LList._
 
 class MurmurhashSpec extends AnyFlatSpec {
+  import IsoStringLong.isWindows
+
   "The IntJsonFormat" should "convert an Int to an int hash" in {
     assert(Hasher.hashUnsafe[Int](1) === 1527037976)
   }
@@ -118,4 +122,44 @@ class MurmurhashSpec extends AnyFlatSpec {
   lazy val a1 = ("a", 1) :*: LNil
   lazy val ba1 = ("b", a1) :*: LNil
   lazy val a1Hash = 1371594665
+
+  "The FileIsoStringLongs" should "convert a File to an int hash" in {
+    if (isWindows) {
+      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+        assert(Hasher.hashUnsafe(new File("LICENSE")) == 1342556559)
+        assert(Hasher.hashUnsafe(new File("non-existent")) == -857314535)
+      } else {
+        assert(Hasher.hashUnsafe(new File("LICENSE")) == 39842659)
+        assert(Hasher.hashUnsafe(new File("non-existent")) == -863778723)
+      }
+    } else {
+      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+        assert(Hasher.hashUnsafe(new File("LICENSE")) == 1209992821)
+        assert(Hasher.hashUnsafe(new File("non-existent")) == -857314535)
+      } else {
+        assert(Hasher.hashUnsafe(new File("LICENSE")) == 1642989355)
+        assert(Hasher.hashUnsafe(new File("non-existent")) == -863778723)
+      }
+    }
+  }
+
+  it should "convert a Path to an int hash" in {
+    if (isWindows) {
+      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 1342556559)
+        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -857314535)
+      } else {
+        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 39842659)
+        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -863778723)
+      }
+    } else {
+      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 1209992821)
+        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -857314535)
+      } else {
+        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 1642989355)
+        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -863778723)
+      }
+    }
+  }
 }

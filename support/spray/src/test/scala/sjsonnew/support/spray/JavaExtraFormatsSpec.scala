@@ -23,8 +23,6 @@ import java.io.File
 import java.util.{ Locale, Optional, UUID }
 
 object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
-  import JavaExtraFormats._
-
   case class Person(name: Optional[String], value: Optional[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
@@ -70,35 +68,6 @@ object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
     Predef.assert(Converter.toJsonUnsafe(url) == JsString("http://localhost"))
     // "convert the JsString back to the URI" in {
     Predef.assert(Converter.fromJsonUnsafe[URL](JsString("http://localhost")) == url)
-  }
-
-  test("The fileStringIso") {
-    val f = new File("/tmp")
-    val f2 = new File(new File("src"), "main")
-    // "convert a File to JsString" in {
-    Predef.assert(Converter.toJsonUnsafe(f) == JsString("file:///tmp"))
-
-    // "convert a relative path to JsString" in {
-    // https://tools.ietf.org/html/rfc3986#section-4.2
-    Predef.assert(Converter.toJsonUnsafe(f2) == JsString("src/main"))
-
-    // "convert the JsString back to the File" in {
-    Predef.assert(Converter.fromJsonUnsafe[File](JsString("file:///tmp")) == f)
-
-    // "convert the JsString back to the relative path" in {
-    Predef.assert(Converter.fromJsonUnsafe[File](JsString("src/main")) == f2)
-
-    // "convert an absolute path on Windows" in {
-    if (isWindows) Predef.assert(Converter.toJsonUnsafe(new File("""C:\Documents and Settings\""")) == JsString("file:///C:/Documents%20and%20Settings"))
-    else ()
-
-    // "convert a relative path on Windows" in {
-    if (isWindows) Predef.assert(Converter.toJsonUnsafe(new File("""..\My Documents\test""")) == JsString("../My%20Documents/test"))
-    else ()
-
-    // "convert a UNC path on Windows" in {
-    if (isWindows) Predef.assert(Converter.toJsonUnsafe(new File("""\\laptop\My Documents\Some.doc""")) == JsString("file://laptop/My%20Documents/Some.doc"))
-    else ()
   }
 
   test("The optionalFormat") {

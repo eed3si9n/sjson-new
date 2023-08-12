@@ -29,12 +29,14 @@ trait BasicJsonProtocol
         with AdditionalFormats
         with UnionFormats
         with FlatUnionFormats
+        with IsoStringLongFormats
         with IsoFormats
         with JavaPrimitiveFormats
         with JavaExtraFormats
         with CalendarFormats
         with ImplicitHashWriters
         with CaseClassFormats
+        with FileIsoStringLongs
         with ThrowableFormats
 
 object BasicJsonProtocol extends BasicJsonProtocol

@@ -39,7 +39,7 @@ lazy val core = (projectMatrix in file("core"))
     )
   )
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value,
+    libraryDependencies ++= testDependencies.value ++ Seq(zeroAllocationHashing),
   ))
 
 def support(n: String) =

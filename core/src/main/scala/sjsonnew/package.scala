@@ -24,9 +24,11 @@ package object sjsonnew
   with AdditionalFormats
   with UnionFormats
   with FlatUnionFormats
+  with IsoStringLongFormats
   with IsoFormats
   with JavaPrimitiveFormats
   with ThrowableFormats
+  with FileIsoStringLongs
   with ImplicitHashWriters
  {
   def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
