@@ -28,4 +28,10 @@ trait FileIsoStringLongs {
   implicit lazy val pathStringLongIso: IsoStringLong[Path] = IsoStringLong.iso[Path](
     (file: Path) => (file.toString, HashUtil.farmHash(file)),
     (p: (String, Long)) => Paths.get(p._1))
+
+  implicit lazy val fileJsonKeyFormat: JsonKeyFormat[File] = 
+    JsonKeyFormat(IsoStringLong.fileToString, key => IsoStringLong.uriToFile(new URI(key)))
+
+  implicit lazy val pathJsonKeyFormat: JsonKeyFormat[Path] = 
+    JsonKeyFormat(_.toString, Paths.get(_))
 }
