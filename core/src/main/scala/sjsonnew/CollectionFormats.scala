@@ -18,6 +18,7 @@
 
 package sjsonnew
 
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
 
 trait CollectionFormats { self: AdditionalFormats =>
@@ -42,18 +43,19 @@ trait CollectionFormats { self: AdditionalFormats =>
         }
         builder.endObject()
       }
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Map[K, V] =
-      jsOpt match {
-        case Some(js) =>
-          val size = unbuilder.beginObject(js)
-          val xs = (1 to size).toList map { _ =>
-            val (k, v) = unbuilder.nextFieldOpt()
-            keyFormat.read(k) -> valueFormat.read(v, unbuilder)
-          }
-          unbuilder.endObject()
-          Map(xs: _*)
-        case None => Map()
+    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Map[K, V] = {
+      require(unbuilder.state == UnbuilderState.InObject)
+      @tailrec
+      def loop(acc: Map[K, V]): Map[K, V] = {
+        if (unbuilder.hasNextField) {
+          val (k, v) = unbuilder.nextFieldOpt()
+          loop(acc.updated(keyFormat.read(k), valueFormat.read(v, unbuilder)))
+        } else acc
       }
+      val result = loop(Map.empty)
+      unbuilder.endObject()
+      result
+    }
   }
 
   import collection.{immutable => imm}
