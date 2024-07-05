@@ -129,18 +129,21 @@ trait LListFormats {
       def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LCons[A1, A2] =
         jsOpt match {
           case Some(js) =>
-            def objectPreamble(x: J) = {
+            def objectPreamble(x: J, inner: Boolean) = {
               unbuilder.beginPreObject(x)
               val jf = implicitly[JsonFormat[Vector[String]]]
               val fieldNames = unbuilder.lookupField(fieldNamesField).map(x => jf.read(Some(x), unbuilder))
               unbuilder.endPreObject()
-              unbuilder.beginObject(x, fieldNames)
+              if (fieldNames.nonEmpty || !inner) {
+                // call beginObject the second time, only for the nested LList cases
+                unbuilder.beginObject(x, fieldNames)
+              }
             }
-            if (!unbuilder.isInObject) objectPreamble(js)
+            if (!unbuilder.isInObject) objectPreamble(js, false)
             if (unbuilder.hasNextField) {
               val (name, optX) = unbuilder.nextFieldOpt()
               optX foreach { x =>
-                if (unbuilder.isObject(x)) objectPreamble(x)
+                if (unbuilder.isObject(x)) objectPreamble(x, true)
               }
               val elem = a1Format.read(optX, unbuilder)
               val tail = a2Format.read(Option(js), unbuilder)
