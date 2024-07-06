@@ -6,7 +6,7 @@ val scala212 = "2.12.19"
 val scala213 = "2.13.14"
 val scala3 = "3.3.3"
 
-ThisBuild / version := "0.9.2-SNAPSHOT"
+ThisBuild / version := "0.10.1-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
 lazy val allScalaVersions = Seq(scala212, scala213, scala3)
 
