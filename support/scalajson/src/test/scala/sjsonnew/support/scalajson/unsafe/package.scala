@@ -7,17 +7,17 @@ import shaded.scalajson.ast.unsafe._
 import org.scalactic._
 
 package object unsafe {
-  implicit class AnyOps[A: JsonWriter](val _x: A) {
+  implicit class AnyOps[A: JsonWriter](_x: A) {
     def toJson: JValue    = Converter toJsonUnsafe _x
     def toJsonStr: String = _x.toJson.toJsonStr
   }
-  implicit class AnyOps2[A: JsonWriter : JsonReader](val _x: A) {
+  implicit class AnyOps2[A: JsonWriter : JsonReader](_x: A) {
     def jsonRoundTrip: A = _x.toJson.toJsonStr.toJson.fromJson[A]
     def jsonPrettyRoundTrip: A = _x.toJson.toPrettyStr.toJson.fromJson[A]
     def jsonBinaryRoundTrip: A = _x.toJson.toBinary.toJson.fromJson[A]
   }
 
-  implicit class JValueOps(val _j: JValue) extends AnyVal {
+  implicit class JValueOps(private val _j: JValue) extends AnyVal {
     def toJsonStr: String          = CompactPrinter(_j)
     def toPrettyStr: String        = PrettyPrinter(_j)
     def toBinary: Array[Byte]      = {
@@ -41,12 +41,12 @@ package object unsafe {
     }
   }
 
-  implicit class StringOps(val _s: String) extends AnyVal {
+  implicit class StringOps(private val _s: String) extends AnyVal {
     def toJson: JValue                = Parser parseUnsafe _s
     def fromJsonStr[A: JsonReader]: A = _s.toJson.fromJson[A]
   }
 
-  implicit class ByteArrayOps(val a: Array[Byte]) extends AnyVal {
+  implicit class ByteArrayOps(private val a: Array[Byte]) extends AnyVal {
     def toJson: JValue                = Parser.parseFromByteBuffer(java.nio.ByteBuffer.wrap(a)).get
   }
 
