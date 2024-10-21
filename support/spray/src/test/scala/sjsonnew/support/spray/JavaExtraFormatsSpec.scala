@@ -63,7 +63,7 @@ object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
   }
 
   test("The urlStringIso") {
-    val url = new URL("http://localhost")
+    val url = new URI("http://localhost").toURL
     // "convert a URL to JsString" in {
     Predef.assert(Converter.toJsonUnsafe(url) == JsString("http://localhost"))
     // "convert the JsString back to the URI" in {
