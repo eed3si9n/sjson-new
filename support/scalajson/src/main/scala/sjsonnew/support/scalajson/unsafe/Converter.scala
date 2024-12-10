@@ -39,7 +39,7 @@ object Converter extends SupportConverter[JValue] {
     def objectContext() =
       new FContext[JValue] {
         var key: String = null
-       val vs = mutable.ArrayBuffer.empty[JField]
+        val vs = mutable.ArrayBuffer.empty[JField]
         def addField(s: String): Unit =
           if (key == null) key = s
           else { vs += JField(key, jstring(s)); key = null }
