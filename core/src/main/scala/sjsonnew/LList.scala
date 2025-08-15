@@ -158,7 +158,7 @@ trait LListFormats {
     }
 }
 
-final class LListOps[L <: LList](private val l: L) extends AnyVal {
+final class LListOps[L <: LList](l: L) {
   import Nat._
   def _1(implicit at: At[L, _0]): at.Out = at(l)
   def _2(implicit at: At[L, _1]): at.Out = at(l)
