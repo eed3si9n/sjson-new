@@ -17,20 +17,7 @@
 import scala.reflect.ClassTag
 
 package object sjsonnew
-  extends PrimitiveFormats
-  with StandardFormats
-  with TupleFormats
-  with CollectionFormats
-  with AdditionalFormats
-  with UnionFormats
-  with FlatUnionFormats
-  with IsoStringLongFormats
-  with IsoFormats
-  with JavaPrimitiveFormats
-  with ThrowableFormats
-  with FileIsoStringLongs
-  with ImplicitHashWriters
- {
+  extends AdditionalFormats {
   def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
   def serializationError(msg: String) = throw new SerializationException(msg)
 

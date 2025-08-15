@@ -18,6 +18,8 @@ package sjsonnew
 package support.spray
 
 object ThrowableFormatsSpec extends verify.BasicTestSuite {
+  import sjsonnew.BasicJsonProtocol.{ *, given }
+
   test("The throwableFormat round trip") {
     val t: Throwable = new Exception("foo", new Exception("bar"))
 

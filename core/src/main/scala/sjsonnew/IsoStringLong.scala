@@ -25,7 +25,7 @@ trait IsoStringLong[A] {
   def from(p: (String, Long)): A
 }
 
-object IsoStringLong {
+object IsoStringLong extends FileIsoStringLongs {
   def iso[A](to0: A => (String, Long), from0: ((String, Long)) => A): IsoStringLong[A] = new IsoStringLong[A] {
     def to(a: A): (String, Long) = to0(a)
     def from(p: (String, Long)): A = from0(p)

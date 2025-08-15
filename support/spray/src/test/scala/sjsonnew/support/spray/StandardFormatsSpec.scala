@@ -22,6 +22,8 @@ import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObje
 import scala.Right
 
 object StandardFormatsSpec extends verify.BasicTestSuite {
+  import sjsonnew.BasicJsonProtocol.{ *, given }
+
   case class Person(name: Option[String], value: Option[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {

@@ -30,3 +30,5 @@ trait HashWriter[A] {
       write(obj, builder)
     }
 }
+
+object HashWriter extends ImplicitHashWriters

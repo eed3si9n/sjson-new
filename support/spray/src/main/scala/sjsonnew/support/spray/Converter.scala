@@ -6,18 +6,18 @@ import spray.json.{ deserializationError => _, _ }
 object Converter extends SupportConverter[JsValue] {
   val facade: Facade[JsValue] = FacadeImpl
   private object FacadeImpl extends SimpleFacade[JsValue] {
-    def jnull() = JsNull
-    def jfalse() = JsFalse
-    def jtrue() = JsTrue
-    def jdouble(d: Double) = JsNumber(d)
-    def jnumstring(s: String) = JsNumber(s)
-    def jbigdecimal(d: BigDecimal) = JsNumber(d)
-    def jintstring(s: String) = JsNumber(s)
-    def jint(i: Int) = JsNumber(i)
-    def jlong(l: Long) = JsNumber(l)
-    def jstring(s: String) = JsString(s)
-    def jarray(vs: List[JsValue]) = JsArray(vs: _*)
-    def jobject(vs: Map[String, JsValue]) = JsObject(vs)
+    def jnull(): JsNull.type = JsNull
+    def jfalse(): JsFalse.type = JsFalse
+    def jtrue(): JsTrue.type = JsTrue
+    def jdouble(d: Double): JsValue = JsNumber(d)
+    def jnumstring(s: String): JsNumber = JsNumber(s)
+    def jbigdecimal(d: BigDecimal): JsNumber = JsNumber(d)
+    def jintstring(s: String): JsNumber = JsNumber(s)
+    def jint(i: Int): JsNumber = JsNumber(i)
+    def jlong(l: Long): JsNumber = JsNumber(l)
+    def jstring(s: String): JsString = JsString(s)
+    def jarray(vs: List[JsValue]): JsArray = JsArray(vs: _*)
+    def jobject(vs: Map[String, JsValue]): JsObject = JsObject(vs)
     def isJnull(value: JsValue): Boolean =
       value match {
         case JsNull => true
