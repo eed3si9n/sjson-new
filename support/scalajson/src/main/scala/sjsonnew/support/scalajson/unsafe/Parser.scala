@@ -8,12 +8,13 @@ import shaded.org.typelevel.jawn.{ Facade, FContext, SupportParser }
 object Parser extends SupportParser[JValue] {
   implicit val facade: Facade[JValue] =
     new Facade[JValue] {
-      def jnull(index: Int) = JNull
-      def jfalse(index: Int) = JFalse
-      def jtrue(index: Int) = JTrue
-      def jnum(s: CharSequence, decIndex: Int, expIndex: Int, index: Int) = JNumber(s.toString)
-      def jint(s: String) = JNumber(s)
-      def jstring(s: CharSequence, index: Int) = JString(s.toString)
+      def jnull(index: Int): JNull.type = JNull
+      def jfalse(index: Int): JFalse.type = JFalse
+      def jtrue(index: Int): JTrue.type = JTrue
+      def jnum(s: CharSequence, decIndex: Int, expIndex: Int, index: Int): JNumber =
+        JNumber(s.toString)
+      def jint(s: String): JNumber = JNumber(s)
+      def jstring(s: CharSequence, index: Int): JString = JString(s.toString)
       def singleContext(index: Int) = new FContext[JValue] {
         var value: JValue = _
         def add(s: CharSequence, index: Int) = value = jstring(s, index)

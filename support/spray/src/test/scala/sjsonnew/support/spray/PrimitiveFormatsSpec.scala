@@ -21,6 +21,7 @@ package support.spray
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse }
 
 object PritimiveFormatsSpec extends verify.BasicTestSuite {
+  import sjsonnew.BasicJsonProtocol.{ *, given }
 
   test("The IntJsonFormat") {
     // "convert an Int to a JsNumber"

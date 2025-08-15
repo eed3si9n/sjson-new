@@ -22,6 +22,8 @@ import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 import LList._
 
 object UnionFormatsSpec extends verify.BasicTestSuite {
+  import sjsonnew.BasicJsonProtocol.{ *, given }
+
   sealed trait Fruit
   case class Apple() extends Fruit
   sealed trait Citrus extends Fruit

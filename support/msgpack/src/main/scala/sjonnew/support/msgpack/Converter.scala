@@ -58,16 +58,16 @@ object Converter extends SupportConverter[Value] {
 
   implicit val facade: Facade[Value] = FacadeImpl
   private object FacadeImpl extends SimpleFacade[Value] {
-    def jnull()               = ValueFactory.newNil
-    def jfalse()              = ValueFactory.newBoolean(false)
-    def jtrue()               = ValueFactory.newBoolean(true)
-    def jnumstring(s: String) = ValueFactory.newString(s)
-    def jintstring(s: String) = ValueFactory.newInteger(new java.math.BigInteger(s))
-    def jint(i: Int)          = ValueFactory.newInteger(i)
-    def jlong(l: Long)        = ValueFactory.newInteger(l)
-    def jdouble(d: Double)    = ValueFactory.newFloat(d)
-    def jbigdecimal(d: BigDecimal) = ValueFactory.newString(d.toString)
-    def jstring(s: String)    = ValueFactory.newString(s)
+    def jnull(): ImmutableNilValue = ValueFactory.newNil
+    def jfalse(): ImmutableBooleanValue = ValueFactory.newBoolean(false)
+    def jtrue(): ImmutableBooleanValue = ValueFactory.newBoolean(true)
+    def jnumstring(s: String): ImmutableStringValue = ValueFactory.newString(s)
+    def jintstring(s: String): ImmutableIntegerValue = ValueFactory.newInteger(new java.math.BigInteger(s))
+    def jint(i: Int): ImmutableIntegerValue = ValueFactory.newInteger(i)
+    def jlong(l: Long): ImmutableIntegerValue = ValueFactory.newInteger(l)
+    def jdouble(d: Double): ImmutableFloatValue = ValueFactory.newFloat(d)
+    def jbigdecimal(d: BigDecimal): ImmutableStringValue = ValueFactory.newString(d.toString)
+    def jstring(s: String): ImmutableStringValue = ValueFactory.newString(s)
 
     def jarray(vs: List[Value]): Value =
       ValueFactory.newArray(vs.toArray[Value], true)

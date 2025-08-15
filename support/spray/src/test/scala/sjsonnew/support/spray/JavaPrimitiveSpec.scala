@@ -23,6 +23,8 @@ import java.lang.{ Integer => JInteger, Long => JLong, Boolean => JBoolean,
   Character => JCharacter }
 
 object JavaPrimitiveFormatsSpec extends verify.BasicTestSuite {
+  import sjsonnew.BasicJsonProtocol.{ *, given }
+
   test("The JIntegerJsonFormat") {
     // "convert an JInteger to a JsNumber" in {
     Predef.assert(Converter.toJsonUnsafe[JInteger](42: JInteger) == JsNumber(42))

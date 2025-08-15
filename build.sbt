@@ -6,7 +6,7 @@ val scala212 = "2.12.19"
 val scala213 = "2.13.14"
 val scala3 = "3.3.3"
 
-ThisBuild / version := "0.13.0-SNAPSHOT"
+ThisBuild / version := "0.14.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
 lazy val allScalaVersions = Seq(scala212, scala213, scala3)
 
@@ -25,7 +25,8 @@ lazy val root = (project in file("."))
 
 val mimaSettings = Def settings (
   mimaPreviousArtifacts := {
-    Set(organization.value %% moduleName.value % "0.14.0-M2")
+    Set.empty
+    // Set(organization.value %% moduleName.value % "0.14.0-M2")
   }
 )
 
@@ -33,7 +34,15 @@ lazy val core = (projectMatrix in file("core"))
   .enablePlugins(BoilerplatePlugin)
   .settings(
     name := "sjson new core",
-    scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+    scalacOptions ++= Seq(
+      "-Xsource:3",
+      "-feature",
+      "-language:_",
+      "-unchecked",
+      "-deprecation",
+      "-encoding",
+      "utf8"
+    ),
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
       // private[this] final val
@@ -49,7 +58,14 @@ def support(n: String) =
     .dependsOn(core)
     .settings(
       name := s"sjson-new-$n",
-      scalacOptions ++= Seq("-Xfuture", "-feature", "-language:_", "-unchecked", "-deprecation", "-encoding", "utf8"),
+      scalacOptions ++= Seq(
+        "-Xsource:3",
+        "-feature",
+        "-language:_",
+        "-unchecked",
+        "-deprecation",
+        "-encoding",
+        "utf8"),
       mimaSettings,
     )
 

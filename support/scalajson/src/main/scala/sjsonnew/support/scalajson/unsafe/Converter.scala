@@ -7,16 +7,16 @@ import shaded.scalajson.ast.unsafe._
 object Converter extends SupportConverter[JValue] {
   implicit val facade: Facade[JValue] = FacadeImpl
   private object FacadeImpl extends Facade[JValue] {
-    def jnull() = JNull
-    def jfalse() = JFalse
-    def jtrue() = JTrue
-    def jnumstring(s: String) = JNumber(s)
-    def jintstring(s: String) = JNumber(s)
-    def jint(i: Int) = JNumber(i)
-    def jlong(l: Long) = JNumber(l)
-    def jdouble(d: Double) = JNumber(d)
-    def jbigdecimal(d: BigDecimal) = JNumber(d)
-    def jstring(s: String) = JString(s)
+    def jnull(): JNull.type = JNull
+    def jfalse(): JFalse.type = JFalse
+    def jtrue(): JTrue.type = JTrue
+    def jnumstring(s: String): JNumber = JNumber(s)
+    def jintstring(s: String): JNumber = JNumber(s)
+    def jint(i: Int): JNumber = JNumber(i)
+    def jlong(l: Long): JNumber = JNumber(l)
+    def jdouble(d: Double): JNumber = JNumber(d)
+    def jbigdecimal(d: BigDecimal): JNumber = JNumber(d)
+    def jstring(s: String): JString = JString(s)
 
     def singleContext() =
       new FContext[JValue] {

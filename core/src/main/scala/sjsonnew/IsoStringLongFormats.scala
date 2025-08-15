@@ -31,6 +31,7 @@ trait IsoStringLongFormats {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       jsOpt match {
         case Some(js) =>
+          import JsonFormat.{ *, given }
           unbuilder.beginObject(js)
           val first = unbuilder.readField[String]("first")
           val second = unbuilder.readField[Long]("second")

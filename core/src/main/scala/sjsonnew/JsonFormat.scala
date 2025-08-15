@@ -28,6 +28,8 @@ trait JsonReader[A] {
   def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A
 }
 
+object JsonReader
+
 /**
   * Provides the JSON serialization for type A.
  */
@@ -45,6 +47,19 @@ trait JsonWriter[A] {
   * Provides the JSON deserialization and serialization for type A.
  */
 trait JsonFormat[A] extends JsonReader[A] with JsonWriter[A]
+
+object JsonFormat extends PrimitiveFormats
+  with StandardFormats
+  with TupleFormats
+  with CollectionFormats
+  with AdditionalFormats
+  with UnionFormats
+  with FlatUnionFormats
+  with IsoStringLongFormats
+  with IsoFormats
+  with JavaPrimitiveFormats
+  with ThrowableFormats {
+}
 
 /**
  * A special JsonReader capable of reading a legal JSON root object, i.e. either a JSON array or a JSON object.

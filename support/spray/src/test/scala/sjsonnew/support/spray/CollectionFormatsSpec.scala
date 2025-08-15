@@ -19,9 +19,12 @@ package sjsonnew
 package support.spray
 
 import java.util.Arrays
+import scala.annotation.nowarn
 import spray.json.{ JsArray, JsNumber, JsObject, JsString, JsValue }
 
 object CollectionFormatsSpec extends verify.BasicTestSuite {
+  import sjsonnew.BasicJsonProtocol.{ *, given }
+
   case class Person(name: String, value: List[Int], ary: Array[Int],
     m: Map[String, Int], vs: Vector[Int])
   implicit object PersonFormat extends JsonFormat[Person] {
@@ -74,6 +77,7 @@ object CollectionFormatsSpec extends verify.BasicTestSuite {
       case None => deserializationError("Expected JsObject but found None")
     }
   }
+  @nowarn
   implicit val PeepKeyFormat: JsonKeyFormat[Peep] = JsonKeyFormat(_.name, Peep)
   val peep = Peep("x")
 
