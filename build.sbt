@@ -3,8 +3,8 @@ import com.typesafe.tools.mima.core._
 import sbt.internal.ProjectMatrix
 
 val scala212 = "2.12.19"
-val scala213 = "2.13.14"
-val scala3 = "3.3.3"
+val scala213 = "2.13.16"
+val scala3 = "3.7.2"
 
 ThisBuild / version := "0.14.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
@@ -37,7 +37,6 @@ lazy val core = (projectMatrix in file("core"))
     scalacOptions ++= Seq(
       "-Xsource:3",
       "-feature",
-      "-language:_",
       "-unchecked",
       "-deprecation",
       "-encoding",
@@ -61,7 +60,6 @@ def support(n: String) =
       scalacOptions ++= Seq(
         "-Xsource:3",
         "-feature",
-        "-language:_",
         "-unchecked",
         "-deprecation",
         "-encoding",
@@ -124,8 +122,8 @@ ThisBuild / developers := List(
 ThisBuild / description := "A Scala library for JSON (de)serialization"
 ThisBuild / licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 ThisBuild / publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+  if (version.value.endsWith("-SNAPSHOT")) Some("central-snapshots" at centralSnapshots)
+  else localStaging.value
 }
 ThisBuild / testFrameworks += new TestFramework("verify.runner.Framework")
