@@ -7,9 +7,9 @@ object Dependencies {
     scalacheck % Test,
     scalatest % Test,
   ))
-  def scalaCheckVersion = "1.15.4"
+  def scalaCheckVersion = "1.18.1"
   lazy val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion
-  def scalaTestVersion = "3.2.10"
+  def scalaTestVersion = "3.2.19"
   lazy val scalatest = "org.scalatest" %% "scalatest" % scalaTestVersion
   def verifyVersion = "1.0.0"
   lazy val verify = "com.eed3si9n.verify" %% "verify" % verifyVersion
