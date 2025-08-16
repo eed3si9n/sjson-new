@@ -28,7 +28,10 @@ trait JsonReader[A] {
   def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A
 }
 
-object JsonReader
+object JsonReader {
+  implicit def jsonFormatToJsonReader[A1](implicit jf: JsonFormat[A1]): JsonReader[A1] =
+    jf
+}
 
 /**
   * Provides the JSON serialization for type A.
@@ -41,6 +44,11 @@ trait JsonWriter[A] {
       builder.addFieldName(name)
       write(obj, builder)
     }
+}
+
+object JsonWriter {
+  implicit def jsonFormatToJsonWriter[A1](implicit jf: JsonFormat[A1]): JsonWriter[A1] =
+    jf
 }
 
 /**
