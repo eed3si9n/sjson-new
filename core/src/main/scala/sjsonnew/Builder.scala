@@ -40,7 +40,13 @@ class Builder[J](facade: BuilderFacade[J]) {
       case _ => writeJ(facade.jstring(x))
     }
 
-  def addField[A](field: String, a: A)(implicit writer: JsonWriter[A]): Unit = writer.addField(field, a, this)
+  def addField[A](field: String, a: A)(implicit writer: JsonWriter[A]): Unit =
+    try {
+      writer.addField(field, a, this)
+    } catch {
+      case e: Throwable =>
+        serializationError(s"error while writing the field $field", e, List(field))
+    }
 
   /** Write field name to the current context. */
   def addFieldName(field: String): Unit =

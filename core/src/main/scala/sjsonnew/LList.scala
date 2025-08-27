@@ -115,16 +115,20 @@ trait LListFormats {
       val a1Format: JsonFormat[A1] = implicitly
       val a2Format: JsonFormat[A2] = implicitly
 
-      def write[J](x: LCons[A1, A2], builder: Builder[J]): Unit = {
-        if (!builder.isInObject) {
-          builder.beginPreObject()
-          builder.addField(fieldNamesField, x.fieldNames)
-          builder.endPreObject()
-          builder.beginObject()
+      def write[J](x: LCons[A1, A2], builder: Builder[J]): Unit =
+        try {
+          if (!builder.isInObject) {
+            builder.beginPreObject()
+            builder.addField(fieldNamesField, x.fieldNames)
+            builder.endPreObject()
+            builder.beginObject()
+          }
+          builder.addField(x.name, x.head)(a1Format)
+          a2Format.write(x.tail, builder)
+        } catch {
+          case e: Throwable =>
+            serializationError(s"error while writing LList $x", e)
         }
-        builder.addField(x.name, x.head)(a1Format)
-        a2Format.write(x.tail, builder)
-      }
 
       def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LCons[A1, A2] =
         jsOpt match {
