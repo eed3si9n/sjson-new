@@ -11,11 +11,11 @@ ThisBuild / scalaVersion := scala212
 lazy val allScalaVersions = Seq(scala212, scala213, scala3)
 
 lazy val root = (project in file("."))
-  .aggregate(core.projectRefs ++
+  .aggregate((core.projectRefs ++
     supportSpray.projectRefs ++
     supportScalaJson.projectRefs ++
     supportMsgpack.projectRefs ++
-    supportMurmurhash.projectRefs: _*)
+    supportMurmurhash.projectRefs)*)
   .settings(
     name := "sjson new",
     publish / skip := true,

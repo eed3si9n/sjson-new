@@ -16,7 +16,7 @@ object Converter extends SupportConverter[JsValue] {
     def jint(i: Int): JsNumber = JsNumber(i)
     def jlong(l: Long): JsNumber = JsNumber(l)
     def jstring(s: String): JsString = JsString(s)
-    def jarray(vs: List[JsValue]): JsArray = JsArray(vs: _*)
+    def jarray(vs: List[JsValue]): JsArray = JsArray(vs*)
     def jobject(vs: Map[String, JsValue]): JsObject = JsObject(vs)
     def isJnull(value: JsValue): Boolean =
       value match {
