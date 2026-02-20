@@ -33,8 +33,15 @@ lazy val core = (projectMatrix in file("core"))
   .enablePlugins(BoilerplatePlugin)
   .settings(
     name := "sjson new core",
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Nil
+        case _ =>
+          Seq("-Xsource:3")
+      }
+    },
     scalacOptions ++= Seq(
-      "-Xsource:3",
       "-feature",
       "-unchecked",
       "-deprecation",
@@ -52,8 +59,15 @@ def support(n: String) =
     .dependsOn(core)
     .settings(
       name := s"sjson-new-$n",
+      scalacOptions ++= {
+        scalaBinaryVersion.value match {
+          case "3" =>
+            Nil
+          case _ =>
+            Seq("-Xsource:3")
+        }
+      },
       scalacOptions ++= Seq(
-        "-Xsource:3",
         "-feature",
         "-unchecked",
         "-deprecation",
