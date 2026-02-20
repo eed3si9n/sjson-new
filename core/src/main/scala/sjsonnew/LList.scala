@@ -123,7 +123,7 @@ trait LListFormats {
             builder.endPreObject()
             builder.beginObject()
           }
-          builder.addField(x.name, x.head)(a1Format)
+          builder.addField(x.name, x.head)(using a1Format)
           a2Format.write(x.tail, builder)
         } catch {
           case e: Throwable =>
