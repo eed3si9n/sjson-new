@@ -10,7 +10,7 @@ trait SupportHasher[J] {
     * Convert an object of type `A` to a JSON AST of type `J`.
     */
   def hash[A](obj: A)(implicit writer: HashWriter[A]): Try[J] =
-    Try(hashUnsafe(obj)(writer))
+    Try(hashUnsafe(obj)(using writer))
 
   /**
     * Convert an object of type `A` to a JSON AST of type `J`.

@@ -26,7 +26,7 @@ trait CollectionFormats { self: AdditionalFormats =>
 
   /** Supplies the JsonFormat for Arrays. */
   implicit def arrayFormat[A: JsonFormat: ClassTag]: RootJsonFormat[Array[A]] =
-    rootFormat(projectFormat[Array[A], List[A]](_.toList, _.toArray)(listFormat[A]))
+    rootFormat(projectFormat[Array[A], List[A]](_.toList, _.toArray)(using listFormat[A]))
 
   /** Supplies the JsonFormat for Maps. */
   implicit def mapFormat[K: JsonKeyFormat, V: JsonFormat]: RootJsonFormat[Map[K, V]] = new RootJsonFormat[Map[K, V]] {
