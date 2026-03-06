@@ -22,7 +22,7 @@ import java.math.{ BigInteger, BigDecimal => JBigDecimal }
 import java.util.{ Optional, UUID }
 
 trait JavaExtraFormats {
-  this: PrimitiveFormats with AdditionalFormats with IsoFormats =>
+  this: PrimitiveFormats & AdditionalFormats & IsoFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
