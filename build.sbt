@@ -25,8 +25,7 @@ lazy val root = (project in file("."))
 
 val mimaSettings = Def settings (
   mimaPreviousArtifacts := {
-    Set.empty
-    // Set(organization.value %% moduleName.value % "0.14.0-M2")
+    Set(organization.value %% moduleName.value % "0.14.0-M5"),
   }
 )
 
@@ -43,10 +42,6 @@ lazy val core = (projectMatrix in file("core"))
       "utf8"
     ),
     mimaSettings,
-    mimaBinaryIssueFilters ++= Seq(
-      // private[this] final val
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.JavaExtraFormats.sjsonnew$JavaExtraFormats$$FileScheme")
-    )
   )
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
     libraryDependencies ++= testDependencies.value ++ Seq(zeroAllocationHashing),
@@ -73,20 +68,6 @@ lazy val supportSpray = support("spray")
   ))
 
 lazy val supportScalaJson = support("scalajson")
-  .settings(
-    mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
-      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
-      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.PrettyPrinter.*"),
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.CompactPrinter.*"),
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.JsonPrinter.*"),
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("sjsonnew.support.scalajson.unsafe.PrettyPrinter.*"),
-      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.async"),
-      ProblemFilters.exclude[IncompatibleResultTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.facade"),
-      ProblemFilters.exclude[MissingTypesProblem]("sjsonnew.support.scalajson.unsafe.Parser$"),
-      ProblemFilters.exclude[IncompatibleMethTypeProblem]("sjsonnew.support.scalajson.unsafe.Parser.async"),
-    )
-  )
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
     libraryDependencies ++= testDependencies.value ++ Seq(scalaJson, shadedJawnParser),
   ))
