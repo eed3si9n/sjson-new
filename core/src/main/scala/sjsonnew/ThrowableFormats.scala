@@ -17,7 +17,7 @@
 package sjsonnew
 
 trait ThrowableFormats {
-  this: PrimitiveFormats with StandardFormats with IsoFormats with CollectionFormats with AdditionalFormats =>
+  this: PrimitiveFormats & StandardFormats & IsoFormats & CollectionFormats & AdditionalFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 

@@ -24,7 +24,7 @@ import scala.{Left, Right}
   * Provides the JsonFormats for the non-collection standard types.
  */
 trait StandardFormats {
-  this: AdditionalFormats with IsoFormats =>
+  this: AdditionalFormats & IsoFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
