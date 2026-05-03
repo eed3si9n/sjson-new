@@ -2,9 +2,9 @@ import Dependencies._
 import com.typesafe.tools.mima.core._
 import sbt.internal.ProjectMatrix
 
-val scala212 = "2.12.19"
-val scala213 = "2.13.16"
-val scala3 = "3.7.2"
+val scala212 = "2.12.21"
+val scala213 = "2.13.18"
+val scala3 = "3.8.3"
 
 ThisBuild / version := "0.14.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
@@ -38,7 +38,7 @@ lazy val core = (projectMatrix in file("core"))
         case "3" =>
           Nil
         case _ =>
-          Seq("-Xsource:3")
+          Seq("-Xsource:3", "-release:8")
       }
     },
     scalacOptions ++= Seq(
@@ -49,6 +49,11 @@ lazy val core = (projectMatrix in file("core"))
       "utf8"
     ),
     mimaSettings,
+    mimaBinaryIssueFilters ++= Seq(
+      ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.BasicJsonProtocol.<clinit>"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.IsoStringLong.<clinit>"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.JsonFormat.<clinit>")
+    ),
   )
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
     libraryDependencies ++= testDependencies.value ++ Seq(zeroAllocationHashing),
@@ -64,7 +69,7 @@ def support(n: String) =
           case "3" =>
             Nil
           case _ =>
-            Seq("-Xsource:3")
+            Seq("-Xsource:3", "-release:8")
         }
       },
       scalacOptions ++= Seq(
@@ -94,6 +99,8 @@ lazy val supportMsgpack = support("msgpack")
 lazy val supportMurmurhash = support("murmurhash")
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
     libraryDependencies ++= testDependencies.value,
+    Test / fork := true,
+    Test / javaOptions += s"-Dscala.version=${scalaVersion.value}",
   ))
 
 lazy val benchmark = (projectMatrix in file("benchmark"))

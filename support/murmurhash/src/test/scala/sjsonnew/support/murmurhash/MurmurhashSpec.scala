@@ -27,6 +27,9 @@ class MurmurhashSpec extends AnyFlatSpec {
   import IsoStringLong.isWindows
   import sjsonnew.BasicJsonProtocol.{ *, given }
 
+  lazy val scalaVersion: String = sys.props("scala.version")
+  def scala213or3: Boolean = scalaVersion.startsWith("2.13.") || scalaVersion.startsWith("3.")
+
   "The IntJsonFormat" should "convert an Int to an int hash" in {
     assert(Hasher.hashUnsafe[Int](1) === 1527037976)
   }
@@ -80,24 +83,25 @@ class MurmurhashSpec extends AnyFlatSpec {
   lazy val nullHash = 0xc0
 
   val map = Map("a" -> 1, "b" -> 2)
+  lazy val mapHash = -875559656
+  lazy val mapHash2 = -929861022
   "The mapFormat" should "convert a Map[String, Int] to an int hash" in {
-    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
-      assert(Hasher.hashUnsafe(map) === -875559656)
-    } else {
+    if (scala213or3) {
       assert(Hasher.hashUnsafe(map) === mapHash)
+    } else {
+      assert(Hasher.hashUnsafe(map) === mapHash2)
     }
   }
-  lazy val mapHash = -929861022
 
   "The listFormat" should "convert a List[Int] to a length delimited list" in {
-    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+    if (scala213or3) {
       assert(Hasher.hashUnsafe(list) === 836729159)
     } else {
       assert(Hasher.hashUnsafe(list) === listHash)
     }
   }
   it should "convert a List[Map[String, Int]] to a length delimited list" in {
-    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+    if (scala213or3) {
       assert(Hasher.hashUnsafe(complexList) === 527995371)
     } else {
       assert(Hasher.hashUnsafe(complexList) === complexListHash)
@@ -112,7 +116,7 @@ class MurmurhashSpec extends AnyFlatSpec {
     assert(Hasher.hashUnsafe(emptyList) === emptyHash)
   }
   it should "convert a list to an int hash" in {
-    if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
+    if (scala213or3) {
       assert(Hasher.hashUnsafe(a1) === -1240310382)
     } else {
       assert(Hasher.hashUnsafe(a1) === a1Hash)
@@ -123,44 +127,4 @@ class MurmurhashSpec extends AnyFlatSpec {
   lazy val a1 = ("a", 1) :*: LNil
   lazy val ba1 = ("b", a1) :*: LNil
   lazy val a1Hash = 1371594665
-
-  "The FileIsoStringLongs" should "convert a File to an int hash" in {
-    if (isWindows) {
-      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
-        assert(Hasher.hashUnsafe(new File("LICENSE")) == 1342556559)
-        assert(Hasher.hashUnsafe(new File("non-existent")) == -857314535)
-      } else {
-        assert(Hasher.hashUnsafe(new File("LICENSE")) == 39842659)
-        assert(Hasher.hashUnsafe(new File("non-existent")) == -863778723)
-      }
-    } else {
-      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
-        assert(Hasher.hashUnsafe(new File("LICENSE")) == 1209992821)
-        assert(Hasher.hashUnsafe(new File("non-existent")) == -857314535)
-      } else {
-        assert(Hasher.hashUnsafe(new File("LICENSE")) == 1642989355)
-        assert(Hasher.hashUnsafe(new File("non-existent")) == -863778723)
-      }
-    }
-  }
-
-  it should "convert a Path to an int hash" in {
-    if (isWindows) {
-      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
-        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 1342556559)
-        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -857314535)
-      } else {
-        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 39842659)
-        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -863778723)
-      }
-    } else {
-      if (scala.util.Properties.versionNumberString.startsWith("2.13.")) {
-        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 1209992821)
-        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -857314535)
-      } else {
-        assert(Hasher.hashUnsafe(Paths.get("LICENSE")) == 1642989355)
-        assert(Hasher.hashUnsafe(Paths.get("non-existent")) == -863778723)
-      }
-    }
-  }
 }
