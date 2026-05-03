@@ -94,6 +94,8 @@ lazy val supportMsgpack = support("msgpack")
 lazy val supportMurmurhash = support("murmurhash")
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
     libraryDependencies ++= testDependencies.value,
+    Test / fork := true,
+    Test / javaOptions += s"-Dscala.version=${scalaVersion.value}",
   ))
 
 lazy val benchmark = (projectMatrix in file("benchmark"))
