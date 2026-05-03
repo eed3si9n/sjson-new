@@ -25,7 +25,7 @@ trait AdditionalFormats {
   /**
    * Constructs a JsonFormat from its two parts, JsonReader and JsonWriter.
    */
-  def jsonFormat[A](reader: JsonReader[A], writer: JsonWriter[A]) = new JsonFormat[A] {
+  def jsonFormat[A](reader: JsonReader[A], writer: JsonWriter[A]): JsonFormat[A] = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = reader.read(jsOpt, unbuilder)
   }
@@ -33,13 +33,13 @@ trait AdditionalFormats {
   /**
    * Constructs a RootJsonFormat from its two parts, RootJsonReader and RootJsonWriter.
    */
-  def rootJsonFormat[T](reader: RootJsonReader[T], writer: RootJsonWriter[T]) =
+  def rootJsonFormat[A](reader: RootJsonReader[A], writer: RootJsonWriter[A]): RootJsonFormat[A] =
     rootFormat(jsonFormat(reader, writer))
 
   /**
    * Turns a JsonWriter into a JsonFormat that throws an UnsupportedOperationException for reads.
    */
-  def liftFormat[A](writer: JsonWriter[A]) = new JsonFormat[A] {
+  def liftFormat[A](writer: JsonWriter[A]): JsonFormat[A] = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = writer.write(obj, builder)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       throw new UnsupportedOperationException("JsonReader implementation missing")
@@ -54,7 +54,7 @@ trait AdditionalFormats {
   /**
    * Turns a JsonReader into a JsonFormat that throws an UnsupportedOperationException for writes.
    */
-  def liftFormat[A <: AnyRef](reader: JsonReader[A]) = new JsonFormat[A] {
+  def liftFormat[A <: AnyRef](reader: JsonReader[A]): JsonFormat[A] = new JsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit =
       throw new UnsupportedOperationException("No JsonWriter[" + obj.getClass + "] available")
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = reader.read(jsOpt, unbuilder)
@@ -69,7 +69,7 @@ trait AdditionalFormats {
   /**
    * Lazy wrapper around serialization. Useful when you want to serialize (mutually) recursive structures.
    */
-  def lazyFormat[A](format: => JsonFormat[A]) = new JsonFormat[A] {
+  def lazyFormat[A](format: => JsonFormat[A]): JsonFormat[A] = new JsonFormat[A] {
     lazy val delegate = format
     def write[J](obj: A, builder: Builder[J]): Unit = delegate.write(obj, builder)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = delegate.read(jsOpt, unbuilder)
@@ -78,7 +78,7 @@ trait AdditionalFormats {
   /**
    * Explicitly turns a JsonFormat into a RootJsonFormat.
    */
-  def rootFormat[A](format: JsonFormat[A]) = new RootJsonFormat[A] {
+  def rootFormat[A](format: JsonFormat[A]): RootJsonFormat[A] = new RootJsonFormat[A] {
     def write[J](obj: A, builder: Builder[J]): Unit = format.write(obj, builder)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A = format.read(jsOpt, unbuilder)
 
@@ -89,7 +89,7 @@ trait AdditionalFormats {
   /**
    * Wraps an existing JsonReader with Exception protection.
    */
-  def safeReader[A: JsonReader] = new JsonReader[Either[Exception, A]] {
+  def safeReader[A: JsonReader]: JsonReader[Either[Exception, A]] = new JsonReader[Either[Exception, A]] {
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Either[Exception, A] = {
       val reader = implicitly[JsonReader[A]]
       try {

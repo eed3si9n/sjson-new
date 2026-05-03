@@ -64,7 +64,7 @@ def support(n: String) =
           case "3" =>
             Nil
           case _ =>
-            Seq("-Xsource:3")
+            Seq("-Xsource:3", "-release:8")
         }
       },
       scalacOptions ++= Seq(
