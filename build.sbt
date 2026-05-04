@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
 
 val mimaSettings = Def settings (
   mimaPreviousArtifacts := {
-    Set(organization.value %% moduleName.value % "0.14.0-M5"),
+    Set(organization.value %% moduleName.value % "0.14.0"),
   }
 )
 
