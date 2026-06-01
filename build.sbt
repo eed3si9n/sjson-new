@@ -52,11 +52,12 @@ lazy val core = (projectMatrix in file("core"))
     mimaBinaryIssueFilters ++= Seq(
       ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.BasicJsonProtocol.<clinit>"),
       ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.IsoStringLong.<clinit>"),
-      ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.JsonFormat.<clinit>")
+      ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.JsonFormat.<clinit>"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.HashUtil.farmHash"),
     ),
   )
   .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value ++ Seq(zeroAllocationHashing),
+    libraryDependencies ++= testDependencies.value,
   ))
 
 def support(n: String) =

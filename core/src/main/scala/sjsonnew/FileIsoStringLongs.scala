@@ -22,10 +22,10 @@ import java.nio.file.{ Path, Paths }
 
 trait FileIsoStringLongs {
   implicit lazy val fileStringLongIso: IsoStringLong[File] = IsoStringLong.iso[File](
-    (file: File) => (IsoStringLong.fileToString(file), HashUtil.farmHash(file.toPath())),
+    (file: File) => (IsoStringLong.fileToString(file), HashUtil.sha256ToLong(file.toPath())),
     (p: (String, Long)) => IsoStringLong.uriToFile(new URI(p._1)))
 
   implicit lazy val pathStringLongIso: IsoStringLong[Path] = IsoStringLong.iso[Path](
-    (file: Path) => (file.toString, HashUtil.farmHash(file)),
+    (file: Path) => (file.toString, HashUtil.sha256ToLong(file)),
     (p: (String, Long)) => Paths.get(p._1))
 }

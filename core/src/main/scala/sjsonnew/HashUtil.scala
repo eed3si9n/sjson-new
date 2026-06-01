@@ -1,8 +1,8 @@
 package sjsonnew
 
 import java.io.{ BufferedInputStream, File, FileInputStream, FileNotFoundException, InputStream }
+import java.nio.ByteBuffer
 import java.nio.file.{ Files, Path }
-import net.openhft.hashing.LongHashFunction
 
 object HashUtil {
   // https://github.com/addthis/stream-lib/blob/master/src/main/java/com/clearspring/analytics/hash/MurmurHash.java
@@ -24,17 +24,12 @@ object HashUtil {
       h
     }
 
-  private[sjsonnew] def farmHash(bytes: Array[Byte]): Long =
-    LongHashFunction.farmNa().hashBytes(bytes)
-
-  private[sjsonnew] def farmHash(path: Path): Long = {
-    // allocating many byte arrays for large files may lead to OOME
-    // but it is more efficient for small files
-    val largeFileLimit = 10 * 1024 * 1024
+  private[sjsonnew] def sha256ToLong(path: Path): Long =
     if (!Files.exists(path) || Files.isDirectory(path)) 0L
-    else if (Files.size(path) < largeFileLimit) farmHash(Files.readAllBytes(path))
-    else farmHash(sha256(path.toFile))
-  }
+    else toLong(sha256(path.toFile()))
+
+  private def toLong(buf: Array[Byte]): Long =
+    ByteBuffer.wrap(buf).getLong()
 
   /** Calculates the SHA-1 hash of the given file. */
   def sha256(file: File): Array[Byte] =
