@@ -2,9 +2,9 @@ import Dependencies._
 import com.typesafe.tools.mima.core._
 import sbt.internal.ProjectMatrix
 
-val scala212 = "2.12.19"
-val scala213 = "2.13.14"
-val scala3 = "3.3.3"
+val scala212 = "2.12.21"
+val scala213 = "2.13.18"
+val scala3 = "3.3.8"
 
 ThisBuild / version := "0.10.1-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
