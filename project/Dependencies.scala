@@ -18,6 +18,6 @@ object Dependencies {
   lazy val msgpackCore = "org.msgpack" % "msgpack-core" % "0.8.17"
   lazy val jawnVersion = "1.0.0"
   lazy val jawnSpray = "org.typelevel" %% "jawn-spray" % jawnVersion
-  lazy val shadedJawnParser = "com.eed3si9n" %% "shaded-jawn-parser" % "1.3.2"
+  lazy val shadedJawnParser = "com.eed3si9n" %% "shaded-jawn-parser" % "1.7.0"
   lazy val lmIvy = "org.scala-sbt" %% "librarymanagement-ivy" % "1.2.4"
 }
