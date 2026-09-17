@@ -4,7 +4,7 @@ import sbt.internal.ProjectMatrix
 
 val scala212 = "2.12.21"
 val scala213 = "2.13.18"
-val scala3 = "3.8.3"
+val scala3 = "3.9.0"
 
 ThisBuild / version := "0.14.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
