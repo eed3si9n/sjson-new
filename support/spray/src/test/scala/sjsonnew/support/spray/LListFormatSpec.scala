@@ -20,11 +20,18 @@ package support.spray
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
+
 object LListFormatsSpec extends verify.BasicTestSuite {
   val empty = LNil
   val emptyObject = JsObject()
   val list = ("Z", 2) :*: ("a", 1) :*: LNil
-  val obj = JsObject("$fields" -> JsArray(JsString("Z"), JsString("a")), "Z" -> JsNumber(2), "a" -> JsNumber(1))
+
+  val obj = JsObject(
+    "$fields" -> JsArray(JsString("Z"), JsString("a")),
+    "Z" -> JsNumber(2),
+    "a" -> JsNumber(1),
+  )
+
   val nested = ("b", list) :*: LNil
   val nestedObj = JsObject("$fields" -> JsArray(JsString("b")), "b" -> obj)
 
@@ -32,9 +39,7 @@ object LListFormatsSpec extends verify.BasicTestSuite {
     Predef.assert(Converter.toJsonUnsafe(empty) == emptyObject)
   }
 
-  test("convert a list to JObject") {
-    Predef.assert(Converter.toJsonUnsafe(list) == obj)
-  }
+  test("convert a list to JObject") { Predef.assert(Converter.toJsonUnsafe(list) == obj) }
 
   test("convert a nested list to JObject") {
     Predef.assert(Converter.toJsonUnsafe(nested) == nestedObj)
@@ -49,13 +54,18 @@ object LListFormatsSpec extends verify.BasicTestSuite {
   }
 
   val obj2 = JsObject("$fields" -> JsArray(JsString("f")), "f" -> JsString("foo"))
-  val nested2Obj = JsObject("$fields" -> JsArray(JsString("b"), JsString("c")), "b" -> obj, "c" -> obj2)
+
+  val nested2Obj =
+    JsObject("$fields" -> JsArray(JsString("b"), JsString("c")), "b" -> obj, "c" -> obj2)
 
   val list2 = ("f", "foo") :*: LNil
   val nested2 = ("b", list) :*: ("c", list2) :*: LNil
 
   test("convert a 2 nested JObjects to list") {
-    Predef.assert(Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: (String :*: LNil) :*: LNil](nested2Obj) == nested2)
+    Predef.assert(
+      Converter.fromJsonUnsafe[(Int :*: Int :*: LNil) :*: (String :*: LNil) :*: LNil](
+        nested2Obj
+      ) == nested2
+    )
   }
 }
-

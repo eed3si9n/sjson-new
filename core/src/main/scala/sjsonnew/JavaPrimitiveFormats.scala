@@ -16,9 +16,10 @@
 
 package sjsonnew
 
-import java.lang.{ Integer => JInteger, Long => JLong, Boolean => JBoolean,
-  Float => JFloat, Double => JDouble, Byte => JByte, Short => JShort,
-  Character => JCharacter }
+import java.lang.{ Integer as JInteger, Long as JLong, Boolean as JBoolean,
+  Float as JFloat, Double as JDouble, Byte as JByte, Short as JShort,
+  Character as JCharacter }
+
 
 trait JavaPrimitiveFormats {
   this: PrimitiveFormats & AdditionalFormats & IsoFormats & StandardFormats =>
@@ -108,17 +109,24 @@ trait JavaPrimitiveFormats {
       (x: Option[Char]) => {
         x match {
           case Some(x) => x
-          case None    => deserializationError("Expected Char as single-character JsString, but got None")
+          case None    => deserializationError(
+            "Expected Char as single-character JsString, but got None"
+          )
         }
       }
     )
 
-  implicit val JBooleanJsonKeyFormat: JsonKeyFormat[JBoolean]     = JsonKeyFormat(_.toString, _.toBoolean)
-  implicit val JByteJsonKeyFormat: JsonKeyFormat[JByte]           = JsonKeyFormat(_.toString, _.toByte)
-  implicit val JShortJsonKeyFormat: JsonKeyFormat[JShort]         = JsonKeyFormat(_.toString, _.toShort)
-  implicit val JCharacterJsonKeyFormat: JsonKeyFormat[JCharacter] = JsonKeyFormat(_.toString, _.head)
-  implicit val JIntegerJsonKeyFormat: JsonKeyFormat[JInteger]     = JsonKeyFormat(_.toString, _.toInt)
-  implicit val JLongJsonKeyFormat: JsonKeyFormat[JLong]           = JsonKeyFormat(_.toString, _.toLong)
-  implicit val JFloatJsonKeyFormat: JsonKeyFormat[JFloat]         = JsonKeyFormat(_.toString, _.toFloat)
-  implicit val JDoubleJsonKeyFormat: JsonKeyFormat[JDouble]       = JsonKeyFormat(_.toString, _.toDouble)
+  implicit val JBooleanJsonKeyFormat: JsonKeyFormat[JBoolean] =
+    JsonKeyFormat(_.toString, _.toBoolean)
+
+  implicit val JByteJsonKeyFormat: JsonKeyFormat[JByte] = JsonKeyFormat(_.toString, _.toByte)
+  implicit val JShortJsonKeyFormat: JsonKeyFormat[JShort] = JsonKeyFormat(_.toString, _.toShort)
+
+  implicit val JCharacterJsonKeyFormat: JsonKeyFormat[JCharacter] =
+    JsonKeyFormat(_.toString, _.head)
+
+  implicit val JIntegerJsonKeyFormat: JsonKeyFormat[JInteger] = JsonKeyFormat(_.toString, _.toInt)
+  implicit val JLongJsonKeyFormat: JsonKeyFormat[JLong] = JsonKeyFormat(_.toString, _.toLong)
+  implicit val JFloatJsonKeyFormat: JsonKeyFormat[JFloat] = JsonKeyFormat(_.toString, _.toFloat)
+  implicit val JDoubleJsonKeyFormat: JsonKeyFormat[JDouble] = JsonKeyFormat(_.toString, _.toDouble)
 }

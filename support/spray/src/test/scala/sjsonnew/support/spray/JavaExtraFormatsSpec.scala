@@ -22,8 +22,10 @@ import java.net.{ URI, URL }
 import java.io.File
 import java.util.{ Locale, Optional, UUID }
 
+
 object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
   case class Person(name: Optional[String], value: Optional[Int])
+
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
       builder.beginObject()
@@ -31,6 +33,7 @@ object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
       builder.addField("value", x.value)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
       jsOpt match {
         case Some(js) =>
@@ -50,7 +53,9 @@ object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
     Predef.assert(Converter.toJsonUnsafe(uuid) == JsString("abc220ea-2a01-11e6-b67b-9e71128cae77"))
 
     // "convert the JsString back to the UUID" in {
-    Predef.assert(Converter.fromJsonUnsafe[UUID](JsString("abc220ea-2a01-11e6-b67b-9e71128cae77")) == uuid)
+    Predef.assert(
+      Converter.fromJsonUnsafe[UUID](JsString("abc220ea-2a01-11e6-b67b-9e71128cae77")) == uuid
+    )
   }
 
   test("The uriStringIso") {
@@ -81,10 +86,14 @@ object JavaExtraFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
     Predef.assert(Converter.toJsonUnsafe(Optional.of("Hello")) == JsString("Hello"))
 
     // "convert JsString(Hello) to Some(Hello)" in {
-    Predef.assert(Converter.fromJsonUnsafe[Optional[String]](JsString("Hello")) == Optional.of("Hello"))
+    Predef.assert(
+      Converter.fromJsonUnsafe[Optional[String]](JsString("Hello")) == Optional.of("Hello")
+    )
 
     // "omit None fields" in {
-    Predef.assert(Converter.toJsonUnsafe(Person(Optional.empty[String], Optional.empty[Int])) == JsObject())
+    Predef.assert(
+      Converter.toJsonUnsafe(Person(Optional.empty[String], Optional.empty[Int])) == JsObject()
+    )
 
   }
 }

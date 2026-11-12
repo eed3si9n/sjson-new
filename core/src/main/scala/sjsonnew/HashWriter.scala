@@ -18,12 +18,14 @@ package sjsonnew
 
 import annotation.implicitNotFound
 
-/**
-  * Provides hashing for type A.
- */
-@implicitNotFound(msg = "Cannot find HashWriter type class for ${A}")
+
+/** Provides hashing for type A. */
+@implicitNotFound(
+  msg = "Cannot find HashWriter type class for ${A}"
+)
 trait HashWriter[A] {
   def write[J](obj: A, builder: Builder[J]): Unit
+
   def addField[J](name: String, obj: A, builder: Builder[J]): Unit =
     {
       builder.addFieldName(name)

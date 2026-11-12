@@ -1,12 +1,9 @@
-import sbt._
-import Keys._
+import sbt.*
+import Keys.*
+
 
 object Dependencies {
-  lazy val testDependencies = Def.setting(Seq(
-    verify % Test,
-    scalacheck % Test,
-    scalatest % Test,
-  ))
+  lazy val testDependencies = Def.setting(Seq(verify % Test, scalacheck % Test, scalatest % Test))
   def scalaCheckVersion = "1.18.1"
   lazy val scalacheck = "org.scalacheck" %% "scalacheck" % scalaCheckVersion
   def scalaTestVersion = "3.2.19"

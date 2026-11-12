@@ -20,6 +20,8 @@ trait ImplicitHashWriters {
   implicit def implicitHashWriter[A](implicit jsonWriter: JsonWriter[A]): HashWriter[A] =
     new HashWriter[A] {
       override def write[J](obj: A, builder: Builder[J]): Unit = jsonWriter.write(obj, builder)
-      override def addField[J](name: String, obj: A, builder: Builder[J]): Unit = jsonWriter.addField(name, obj, builder)
+
+      override def addField[J](name: String, obj: A, builder: Builder[J]): Unit =
+        jsonWriter.addField(name, obj, builder)
     }
 }

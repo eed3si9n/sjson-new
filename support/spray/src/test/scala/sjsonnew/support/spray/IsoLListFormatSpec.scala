@@ -19,37 +19,44 @@ package support.spray
 
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
 
+
 object IsoLListFormatSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
 
   sealed trait Contact
+
   case class Person(name: String, value: Option[Int]) extends Contact
+
   case class Organization(name: String, value: Option[Int]) extends Contact
 
   implicit val personIso: IsoLList.Aux[Person, String :*: Option[Int] :*: LNil] = LList.isoCurried(
-    { (p: Person) => ("name", p.name) :*: ("value", p.value) :*: LNil })
-    { in => Person(
-      in.find[String]("name").get,
-      in.find[Option[Int]]("value").flatten) }
+    { (p: Person) => ("name", p.name) :*: ("value", p.value) :*: LNil }
+  )
+    { in => Person(in.find[String]("name").get, in.find[Option[Int]]("value").flatten) }
 
-  implicit val organizationIso: IsoLList.Aux[Organization, String :*: Option[Int] :*: LNil] = LList.isoCurried(
-    { (o: Organization) => ("name", o.name) :*: ("value", o.value) :*: LNil })
-    { in => Organization(
-      in.find[String]("name").get,
-      in.find[Option[Int]]("value").flatten) }
+  implicit val organizationIso: IsoLList.Aux[Organization, String :*: Option[Int] :*: LNil] =
+    LList.isoCurried({ (o: Organization) => ("name", o.name) :*: ("value", o.value) :*: LNil })
+      { in => Organization(in.find[String]("name").get, in.find[Option[Int]]("value").flatten) }
 
-  implicit val ContactFormat: JsonFormat[Contact] = flatUnionFormat2[Contact, Person, Organization]("$type")
+  implicit val ContactFormat: JsonFormat[Contact] =
+    flatUnionFormat2[Contact, Person, Organization]("$type")
 
   val p1 = Person("Alice", Some(1))
-  val personJs = JsObject("$fields" -> JsArray(JsString("name"), JsString("value")),
-    "name" -> JsString("Alice"), "value" -> JsNumber(1))
+
+  val personJs = JsObject(
+    "$fields" -> JsArray(JsString("name"), JsString("value")),
+    "name" -> JsString("Alice"),
+    "value" -> JsNumber(1),
+  )
+
   val c1: Contact = Organization("Company", None)
-  val contactJs =
-    JsObject(
-      "$type" -> JsString("Organization"),
-      "$fields" -> JsArray(JsString("name"), JsString("value")),
-      "name" -> JsString("Company")
-    )
+
+  val contactJs = JsObject(
+    "$type" -> JsString("Organization"),
+    "$fields" -> JsArray(JsString("name"), JsString("value")),
+    "name" -> JsString("Company"),
+  )
+
   test("The isomorphism from a custom type to LList") {
     // "convert from value to JObject"
     Predef.assert(Converter.toJsonUnsafe(p1) == personJs)

@@ -20,8 +20,9 @@ package support.murmurhash
 import java.io.File
 import java.nio.file.Paths
 import org.scalatest.flatspec.AnyFlatSpec
-import BUtil._
-import LList._
+import BUtil.*
+import LList.*
+
 
 class MurmurhashSpec extends AnyFlatSpec {
   import IsoStringLong.isWindows
@@ -66,12 +67,14 @@ class MurmurhashSpec extends AnyFlatSpec {
   it should "convert false to an int hash 0xc2" in {
     assert(Hasher.hashUnsafe(false) === falseMessage)
   }
+
   lazy val trueMessage = 0xc3
   lazy val falseMessage = 0xc2
 
   "The StringJsonFormat" should "convert a String to a length delimited string" in {
     assert(Hasher.hashUnsafe("Hello") === stringHash)
   }
+
   lazy val stringHash = 1509011998
 
   "The optionFormat" should "convert None to the nil hash" in {
@@ -80,6 +83,7 @@ class MurmurhashSpec extends AnyFlatSpec {
   it should "convert Some(Hello) to an int hash" in {
     assert(Hasher.hashUnsafe(Some("Hello").asInstanceOf[Option[String]]) === stringHash)
   }
+
   lazy val nullHash = 0xc0
 
   val map = Map("a" -> 1, "b" -> 2)
@@ -107,6 +111,7 @@ class MurmurhashSpec extends AnyFlatSpec {
       assert(Hasher.hashUnsafe(complexList) === complexListHash)
     }
   }
+
   lazy val list = List(1, 2)
   lazy val complexList = List(map)
   lazy val listHash = -528206911
@@ -122,6 +127,7 @@ class MurmurhashSpec extends AnyFlatSpec {
       assert(Hasher.hashUnsafe(a1) === a1Hash)
     }
   }
+
   lazy val emptyList = LNil
   lazy val emptyHash = -1609326920
   lazy val a1 = ("a", 1) :*: LNil

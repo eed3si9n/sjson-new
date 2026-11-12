@@ -5,6 +5,7 @@ import java.io.File
 import org.openjdk.jmh.annotations.Benchmark
 import sjsonnew.IsoStringLong
 
+
 class FileIsoStringLongBenchmark {
 
   @Benchmark

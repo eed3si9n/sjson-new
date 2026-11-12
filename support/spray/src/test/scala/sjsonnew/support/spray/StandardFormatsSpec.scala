@@ -21,10 +21,12 @@ package support.spray
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import scala.Right
 
+
 object StandardFormatsSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
 
   case class Person(name: Option[String], value: Option[Int])
+
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
       builder.beginObject()
@@ -32,6 +34,7 @@ object StandardFormatsSpec extends verify.BasicTestSuite {
       builder.addField("value", x.value)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
       jsOpt match {
         case Some(js) =>
@@ -53,7 +56,9 @@ object StandardFormatsSpec extends verify.BasicTestSuite {
     Predef.assert(Converter.fromJsonUnsafe[Option[Int]](JsNull) == None)
 
     // "convert Some(Hello) to JsString(Hello)"
-    Predef.assert(Converter.toJsonUnsafe(Some("Hello").asInstanceOf[Option[String]]) == JsString("Hello"))
+    Predef.assert(
+      Converter.toJsonUnsafe(Some("Hello").asInstanceOf[Option[String]]) == JsString("Hello")
+    )
 
     // "convert JsString(Hello) to Some(Hello)"
     Predef.assert(Converter.fromJsonUnsafe[Option[String]](JsString("Hello")) == Some("Hello"))
@@ -76,6 +81,8 @@ object StandardFormatsSpec extends verify.BasicTestSuite {
     Predef.assert(Converter.fromJsonUnsafe[Either[Int, String]](JsNumber(42)) == Left(42))
 
     // "convert the right side of an Either value from Json"
-    Predef.assert(Converter.fromJsonUnsafe[Either[Int, String]](JsString("Hello")) == Right("Hello"))
+    Predef.assert(
+      Converter.fromJsonUnsafe[Either[Int, String]](JsString("Hello")) == Right("Hello")
+    )
   }
 }

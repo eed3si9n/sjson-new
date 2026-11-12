@@ -19,7 +19,8 @@ package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import java.util.{ Calendar, TimeZone }
-import java.time._
+import java.time.*
+
 
 object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
   // JDK 8 / Joda dates
@@ -55,7 +56,9 @@ object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol 
   }
 
   test("convert the JsString back to the OffsetDateTime with milliseconds") {
-    Predef.assert(Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00.001Z")) == omillis)
+    Predef.assert(
+      Converter.fromJsonUnsafe[OffsetDateTime](JsString("1999-01-01T00:00:00.001Z")) == omillis
+    )
   }
 
   test("convert a ZonedDateTime to JsString") {
@@ -63,7 +66,9 @@ object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol 
   }
 
   test("convert the JsString back to the ZonedDateTime") {
-    Predef.assert(Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00Z[UTC]")) == zdt)
+    Predef.assert(
+      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00Z[UTC]")) == zdt
+    )
   }
 
   test("convert a ZonedDateTime with milliseconds to JsString") {
@@ -71,7 +76,9 @@ object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol 
   }
 
   test("convert the JsString back to the ZonedDateTime with milliseconds") {
-    Predef.assert(Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) == zmillis)
+    Predef.assert(
+      Converter.fromJsonUnsafe[ZonedDateTime](JsString("1999-01-01T00:00:00.001Z[UTC]")) == zmillis
+    )
   }
 
   test("convert an Instant to JsString") {
@@ -95,7 +102,9 @@ object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol 
   }
 
   test("convert the JsString with no time back to the LocalDateTime") {
-    Predef.assert(Converter.fromJsonUnsafe[LocalDateTime](JsString("1999-01-01T00:00:00.001")) == ldt)
+    Predef.assert(
+      Converter.fromJsonUnsafe[LocalDateTime](JsString("1999-01-01T00:00:00.001")) == ldt
+    )
   }
 
   test("convert a Date to JsString") {
@@ -107,14 +116,26 @@ object CalendarFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol 
   }
 
   test("convert the JsString back to the Date") {
-    Predef.assert(Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00Z")).getTimeInMillis == seconds.getTimeInMillis)
+    Predef.assert(
+      Converter.fromJsonUnsafe[Calendar](
+        JsString("1999-02-01T00:00:00Z")
+      ).getTimeInMillis == seconds.getTimeInMillis
+    )
   }
 
   test("convert the JsString with milliseconds back to the Date") {
-    Predef.assert(Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01T00:00:00.001Z")).getTimeInMillis == milliseconds.getTimeInMillis)
+    Predef.assert(
+      Converter.fromJsonUnsafe[Calendar](
+        JsString("1999-02-01T00:00:00.001Z")
+      ).getTimeInMillis == milliseconds.getTimeInMillis
+    )
   }
 
   test("convert the JsString with no time back to the Date") {
-    Predef.assert(Converter.fromJsonUnsafe[Calendar](JsString("1999-02-01Z")).getTimeInMillis == seconds.getTimeInMillis)
+    Predef.assert(
+      Converter.fromJsonUnsafe[Calendar](
+        JsString("1999-02-01Z")
+      ).getTimeInMillis == seconds.getTimeInMillis
+    )
   }
 }

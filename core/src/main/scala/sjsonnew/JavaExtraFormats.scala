@@ -18,8 +18,9 @@ package sjsonnew
 
 import java.net.{ URI, URL }
 import java.io.File
-import java.math.{ BigInteger, BigDecimal => JBigDecimal }
+import java.math.{ BigInteger, BigDecimal as JBigDecimal }
 import java.util.{ Optional, UUID }
+
 
 trait JavaExtraFormats {
   this: PrimitiveFormats & AdditionalFormats & IsoFormats =>
@@ -32,24 +33,29 @@ trait JavaExtraFormats {
   implicit val javaBigDecimalFormat: JF[JBigDecimal] =
     projectFormat[JBigDecimal, BigDecimal](BigDecimal.apply, _.bigDecimal)
 
-  implicit val uuidStringIso: IsoString[UUID] = IsoString.iso[UUID](
-    _.toString, UUID.fromString)
-  implicit val uriStringIso: IsoString[URI] = IsoString.iso[URI](
-    _.toASCIIString, new URI(_))
-  implicit val urlStringIso: IsoString[URL] = IsoString.iso[URL](
-    _.toURI.toASCIIString, (s: String) => (new URI(s)).toURL)
+  implicit val uuidStringIso: IsoString[UUID] = IsoString.iso[UUID](_.toString, UUID.fromString)
+  implicit val uriStringIso: IsoString[URI] = IsoString.iso[URI](_.toASCIIString, new URI(_))
 
-  implicit def optionalFormat[A :JF]: JF[Optional[A]] = new OptionalFormat[A]
-  final class OptionalFormat[A :JF] extends JF[Optional[A]] {
+  implicit val urlStringIso: IsoString[URL] = IsoString.iso[URL](
+    _.toURI.toASCIIString,
+    (s: String) => (new URI(s)).toURL,
+  )
+
+  implicit def optionalFormat[A: JF]: JF[Optional[A]] = new OptionalFormat[A]
+
+  final class OptionalFormat[A: JF] extends JF[Optional[A]] {
     lazy val elemFormat = implicitly[JF[A]]
+
     def write[J](o: Optional[A], builder: Builder[J]): Unit =
       if (o.isPresent) elemFormat.write(o.get, builder)
       else builder.writeNull()
+
     override def addField[J](name: String, o: Optional[A], builder: Builder[J]): Unit =
       if (o.isPresent) {
         builder.addFieldName(name)
         write(o, builder)
       } else ()
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Optional[A] =
       jsOpt match {
         case Some(js) =>

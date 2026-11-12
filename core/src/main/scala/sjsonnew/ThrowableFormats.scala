@@ -37,6 +37,7 @@ trait ThrowableFormats {
         builder.addField("stackTrace", t.getStackTrace.toVector)
         builder.endObject()
       }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Throwable =
       jsOpt match {
         case Some(js) =>
@@ -63,6 +64,7 @@ trait ThrowableFormats {
         builder.addField("lineNumber", Option(a.getLineNumber))
         builder.endObject()
       }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): StackTraceElement =
       jsOpt match {
         case Some(js) =>
@@ -72,14 +74,15 @@ trait ThrowableFormats {
           val fileName = unbuilder.readField[Option[String]]("fileName")
           val lineNumber = unbuilder.readField[Int]("lineNumber")
           unbuilder.endObject()
-          new StackTraceElement(className.orNull, methodName.orNull,
-            fileName.orNull, lineNumber)
+          new StackTraceElement(className.orNull, methodName.orNull, fileName.orNull, lineNumber)
         case None => deserializationError("Expected JsObject, but got None")
       }
   }
 }
 
+
 final class PersistedException(
-  message: String,
-  cause: Throwable,
-  val className: String) extends Throwable(message, cause)
+    message: String,
+    cause: Throwable,
+    val className: String,
+) extends Throwable(message, cause)

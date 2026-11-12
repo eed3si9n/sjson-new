@@ -19,18 +19,17 @@ package sjsonnew
 package support.scalajson.unsafe
 
 import annotation.tailrec
-import shaded.scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe.*
 
-/**
-  * A JsonPrinter that produces a nicely readable JSON source.
- */
+
+/** A JsonPrinter that produces a nicely readable JSON source. */
 trait PrettyPrinter extends JsonPrinter {
   val Indent = 2
 
   def print(x: JValue, sb: Appendable): Unit = {
     print(x, sb, 0)
   }
-  
+
   protected def print(x: JValue, sb: Appendable, indent: Int): Unit = {
     x match {
       case JObject(x) => printJObject(x, sb, indent)
@@ -40,7 +39,7 @@ trait PrettyPrinter extends JsonPrinter {
   }
 
   protected def printJObject(members: Array[JField], sb: Appendable, indent: Int): Unit = {
-    sb.append("{\n")    
+    sb.append("{\n")
     printArray(members, sb.append(",\n")) { m =>
       printIndent(sb, indent + Indent)
       printString(m.field, sb)
@@ -51,13 +50,13 @@ trait PrettyPrinter extends JsonPrinter {
     printIndent(sb, indent)
     sb.append("}")
   }
-  
+
   protected def printJArray(elements: Array[JValue], sb: Appendable, indent: Int): Unit = {
     sb.append('[')
     printArray(elements, sb.append(", "))(print(_, sb, indent))
     sb.append(']')
   }
-  
+
   protected def printIndent(sb: Appendable, indent: Int): Unit = {
     @tailrec def rec(indent: Int): Unit =
       if (indent > 0) {

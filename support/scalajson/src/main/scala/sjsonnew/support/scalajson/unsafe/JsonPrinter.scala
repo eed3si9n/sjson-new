@@ -19,19 +19,20 @@ package sjsonnew
 package support.scalajson.unsafe
 
 import annotation.tailrec
-import java.lang.{Appendable, StringBuilder => JStringBuilder}
-import shaded.scalajson.ast.unsafe._
+import java.lang.{ Appendable, StringBuilder as JStringBuilder }
+import shaded.scalajson.ast.unsafe.*
 
-/**
-  * A JsonPrinter serializes a JSON AST to a String.
- */
+
+/** A JsonPrinter serializes a JSON AST to a String. */
 trait JsonPrinter extends (JValue => String) {
 
   def apply(x: JValue): String = apply(x, None)
 
-  def apply(x: JValue,
-            jsonpCallback: Option[String] = None,
-            sb: JStringBuilder = new JStringBuilder(256)): String = {
+  def apply(
+      x: JValue,
+      jsonpCallback: Option[String] = None,
+      sb: JStringBuilder = new JStringBuilder(256),
+  ): String = {
     jsonpCallback match {
       case Some(callback) =>
         sb.append(callback).append('(')
@@ -56,30 +57,32 @@ trait JsonPrinter extends (JValue => String) {
   }
 
   protected def printString(s: String, sb: Appendable): Unit = {
-    import JsonPrinter._
+    import JsonPrinter.*
     @tailrec def firstToBeEncoded(ix: Int = 0): Int =
-      if (ix == s.length) -1 else if (requiresEncoding(s.charAt(ix))) ix else firstToBeEncoded(ix + 1)
+      if (ix == s.length) -1 else if (requiresEncoding(s.charAt(ix))) ix else firstToBeEncoded(
+        ix + 1
+      )
 
     sb.append('"')
     firstToBeEncoded() match {
-      case -1 => sb.append(s)
+      case -1    => sb.append(s)
       case first =>
         sb.append(s, 0, first)
         @tailrec def append(ix: Int): Unit =
           if (ix < s.length) {
             s.charAt(ix) match {
               case c if !requiresEncoding(c) => sb.append(c)
-              case '"' => sb.append("\\\"")
-              case '\\' => sb.append("\\\\")
-              case '\b' => sb.append("\\b")
-              case '\f' => sb.append("\\f")
-              case '\n' => sb.append("\\n")
-              case '\r' => sb.append("\\r")
-              case '\t' => sb.append("\\t")
-              case x if x <= 0xF => sb.append("\\u000").append(Integer.toHexString(x))
-              case x if x <= 0xFF => sb.append("\\u00").append(Integer.toHexString(x))
-              case x if x <= 0xFFF => sb.append("\\u0").append(Integer.toHexString(x))
-              case x => sb.append("\\u").append(Integer.toHexString(x))
+              case '"'                       => sb.append("\\\"")
+              case '\\'                      => sb.append("\\\\")
+              case '\b'                      => sb.append("\\b")
+              case '\f'                      => sb.append("\\f")
+              case '\n'                      => sb.append("\\n")
+              case '\r'                      => sb.append("\\r")
+              case '\t'                      => sb.append("\\t")
+              case x if x <= 0xF             => sb.append("\\u000").append(Integer.toHexString(x))
+              case x if x <= 0xFF            => sb.append("\\u00").append(Integer.toHexString(x))
+              case x if x <= 0xFFF           => sb.append("\\u0").append(Integer.toHexString(x))
+              case x                         => sb.append("\\u").append(Integer.toHexString(x))
             }
             append(ix + 1)
           }

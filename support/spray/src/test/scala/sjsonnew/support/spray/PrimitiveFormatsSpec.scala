@@ -20,6 +20,7 @@ package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse }
 
+
 object PritimiveFormatsSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
 
@@ -33,10 +34,14 @@ object PritimiveFormatsSpec extends verify.BasicTestSuite {
 
   test("The LongJsonFormat") {
     // "convert a Long to a JsNumber"
-    Predef.assert(Converter.toJsonUnsafe[Long](7563661897011259335L) == JsNumber(7563661897011259335L))
+    Predef.assert(
+      Converter.toJsonUnsafe[Long](7563661897011259335L) == JsNumber(7563661897011259335L)
+    )
 
     // "convert a JsNumber to a Long"
-    Predef.assert(Converter.fromJsonUnsafe[Long](JsNumber(7563661897011259335L)) == 7563661897011259335L)
+    Predef.assert(
+      Converter.fromJsonUnsafe[Long](JsNumber(7563661897011259335L)) == 7563661897011259335L
+    )
   }
 
   test("The FloatJsonFormat") {

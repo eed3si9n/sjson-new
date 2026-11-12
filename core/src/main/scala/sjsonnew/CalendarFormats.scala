@@ -17,8 +17,9 @@
 package sjsonnew
 
 import java.util.{ Calendar, GregorianCalendar }
-import java.time._
+import java.time.*
 import java.time.format.DateTimeFormatter
+
 
 trait CalendarFormats {
   self: IsoFormats =>
@@ -27,7 +28,7 @@ trait CalendarFormats {
 
   /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
   implicit val offsetDateTimeStringIso: IsoString[OffsetDateTime] = {
-    IsoString.iso[OffsetDateTime]( (odt: OffsetDateTime) => {
+    IsoString.iso[OffsetDateTime]((odt: OffsetDateTime) => {
         val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         odt.format(datetimefmt)
       },
@@ -39,7 +40,7 @@ trait CalendarFormats {
 
   /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
   implicit val instantStringIso: IsoString[Instant] = {
-    IsoString.iso[Instant]( (i: Instant) => {
+    IsoString.iso[Instant]((i: Instant) => {
         val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         val odt = OffsetDateTime.ofInstant(i, utc)
         odt.format(datetimefmt)
@@ -53,7 +54,7 @@ trait CalendarFormats {
 
   /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001Z */
   implicit val calendarStringIso: IsoString[Calendar] = {
-    IsoString.iso[Calendar]( (c: Calendar) => {
+    IsoString.iso[Calendar]((c: Calendar) => {
         val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         // https://docs.oracle.com/javase/tutorial/datetime/iso/legacy.html
         val i = c.toInstant
@@ -64,22 +65,22 @@ trait CalendarFormats {
       (s: String) => {
         val datetimefmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         val datefmt = DateTimeFormatter.ISO_DATE
-        val zdt = if (s contains "T") ZonedDateTime.parse(s, datetimefmt)         
-                  else {
-                    val ld = LocalDate.parse(s, datefmt)
-                    ld.atStartOfDay(utc)
-                  }
+        val zdt =
+          if (s contains "T") ZonedDateTime.parse(s, datetimefmt)
+                    else {
+                      val ld = LocalDate.parse(s, datefmt)
+                      ld.atStartOfDay(utc)
+                    }
         GregorianCalendar.from(zdt)
       })
   }
 
-  /**
-   * As far as I know, the output this produces is not ISO 8601 compilant.
-   * It appends timezone designator e.g. 1999-01-01T00:00:00.001Z[UTC],
-   * which is used to identify the ZoneId, which denotes the local summer time rules etc.
+  /** As far as I know, the output this produces is not ISO 8601 compilant.
+   *  It appends timezone designator e.g. 1999-01-01T00:00:00.001Z[UTC],
+   *  which is used to identify the ZoneId, which denotes the local summer time rules etc.
    */
   implicit val zonedDateTimeStringIso: IsoString[ZonedDateTime] =
-    IsoString.iso[ZonedDateTime]( (zdt: ZonedDateTime) => {
+    IsoString.iso[ZonedDateTime]((zdt: ZonedDateTime) => {
       val datetimefmt = DateTimeFormatter.ISO_DATE_TIME
       zdt.format(datetimefmt)
     },
@@ -87,7 +88,7 @@ trait CalendarFormats {
       val datetimefmt = DateTimeFormatter.ISO_DATE_TIME
       val datefmt = DateTimeFormatter.ISO_DATE
       if (s contains "T") {
-        ZonedDateTime.parse(s, datetimefmt)         
+        ZonedDateTime.parse(s, datetimefmt)
       } else {
         val ld = LocalDate.parse(s, datefmt)
         ld.atStartOfDay(utc)
@@ -96,7 +97,7 @@ trait CalendarFormats {
 
   /** This output is ISO 8601 compilant, e.g. 1999-01-01 */
   implicit val localDateStringIso: IsoString[LocalDate] = {
-    IsoString.iso[LocalDate]( (ld: LocalDate) => {
+    IsoString.iso[LocalDate]((ld: LocalDate) => {
         val datetimefmt = DateTimeFormatter.ISO_LOCAL_DATE
         ld.format(datetimefmt)
       },
@@ -108,7 +109,7 @@ trait CalendarFormats {
 
   /** This output is ISO 8601 compilant, e.g. 1999-01-01T00:00:00.001 */
   implicit val localDateTimeStringIso: IsoString[LocalDateTime] = {
-    IsoString.iso[LocalDateTime]( (ld: LocalDateTime) => {
+    IsoString.iso[LocalDateTime]((ld: LocalDateTime) => {
         val datetimefmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME
         ld.format(datetimefmt)
       },

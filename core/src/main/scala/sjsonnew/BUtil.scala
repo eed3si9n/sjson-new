@@ -16,17 +16,14 @@ object BUtil {
         }
       doFromHex(hex0.replaceAll("\\s", ""))
     }
+
   private def fromHex(c: Char): Int =
     {
       val b =
-        if (c >= '0' && c <= '9')
-          (c - '0')
-        else if (c >= 'a' && c <= 'f')
-          (c - 'a') + 10
-        else if (c >= 'A' && c <= 'F')
-          (c - 'A') + 10
-        else
-          throw new RuntimeException("Invalid hex character: '" + c + "'.")
+        if (c >= '0' && c <= '9') (c - '0')
+        else if (c >= 'a' && c <= 'f') (c - 'a') + 10
+        else if (c >= 'A' && c <= 'F') (c - 'A') + 10
+        else throw new RuntimeException("Invalid hex character: '" + c + "'.")
       b
     }
 
@@ -45,9 +42,7 @@ object BUtil {
   private def toHex(b: Byte): Char =
     {
       require(b >= 0 && b <= 15, "Byte " + b + " was not between 0 and 15")
-      if (b < 10)
-        ('0'.asInstanceOf[Int] + b).asInstanceOf[Char]
-      else
-        ('A'.asInstanceOf[Int] + (b - 10)).asInstanceOf[Char]
+      if (b < 10) ('0'.asInstanceOf[Int] + b).asInstanceOf[Char]
+      else ('A'.asInstanceOf[Int] + (b - 10)).asInstanceOf[Char]
     }
 }

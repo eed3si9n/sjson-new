@@ -17,18 +17,18 @@
 package sjsonnew
 
 trait IsoFormats {
-  implicit def isolistFormat[A: IsoLList]: JsonFormat[A] =new JsonFormat[A] {
+  implicit def isolistFormat[A: IsoLList]: JsonFormat[A] = new JsonFormat[A] {
     val iso = implicitly[IsoLList[A]]
-    def write[J](x: A, builder: Builder[J]): Unit =
-      iso.jsonFormat.write(iso.to(x), builder)
+    def write[J](x: A, builder: Builder[J]): Unit = iso.jsonFormat.write(iso.to(x), builder)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       iso.from(iso.jsonFormat.read(jsOpt, unbuilder))
   }
 
   implicit def isoStringFormat[A: IsoString]: JsonFormat[A] = new JsonFormat[A] {
     val iso = implicitly[IsoString[A]]
-    def write[J](x: A, builder: Builder[J]): Unit =
-      builder.writeString(iso.to(x))
+    def write[J](x: A, builder: Builder[J]): Unit = builder.writeString(iso.to(x))
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       jsOpt match {
         case Some(js) => iso.from(unbuilder.readString(js))
@@ -36,5 +36,6 @@ trait IsoFormats {
       }
   }
 
-  implicit def isoStringKeyFormat[A](implicit z: IsoString[A]): JsonKeyFormat[A] = JsonKeyFormat(z.to, z.from)
+  implicit def isoStringKeyFormat[A](implicit z: IsoString[A]): JsonKeyFormat[A] =
+    JsonKeyFormat(z.to, z.from)
 }

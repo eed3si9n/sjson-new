@@ -1,11 +1,12 @@
 package sjsonnew
 package support.scalajson.unsafe
 
-import shaded.scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe.*
 
 import org.scalatest.flatspec.AnyFlatSpec
 
-import BasicJsonProtocol._
+import BasicJsonProtocol.*
+
 
 class ScalaJsonSpec extends AnyFlatSpec {
 
@@ -30,29 +31,40 @@ class ScalaJsonSpec extends AnyFlatSpec {
 
   implicit val PeepIso: IsoLList.Aux[Peep, PeepRepr] = LList.iso(
     { (p: Peep) => ("name", p.name) :*: ("age", p.age) :*: LNil },
-    { case (_, name) :*: (_, age) :*: LNil => Peep(name, age) }
+    { case (_, name) :*: (_, age) :*: LNil => Peep(name, age) },
   )
 
   val bob = Peep("Bob", 23)
 
-  val bobJson = JObject(JField("$fields", JArray(JString("name"), JString("age"))),
-    JField("name", JString("Bob")), JField("age", JNumber(23)))
+  val bobJson = JObject(
+    JField("$fields", JArray(JString("name"), JString("age"))),
+    JField("name", JString("Bob")),
+    JField("age", JNumber(23)),
+  )
 
-  val bobJsonStr              = """{"$fields":["name","age"],"name":"Bob","age":23}"""
-  val bobJsonStrMixedFields   = """{"$fields":["name","age"],"age":23,"name":"Bob"}"""
+  val bobJsonStr = """{"$fields":["name","age"],"name":"Bob","age":23}"""
+  val bobJsonStrMixedFields = """{"$fields":["name","age"],"age":23,"name":"Bob"}"""
   val bobJsonStrWithoutFields = """{"name":"Bob","age":23}"""
 
-  it should "Peep.toJson correctly"                             in assert(bob.toJson === bobJson)
-  it should "Peep.toJsonStr correctly"                          in assert(bob.toJsonStr === bobJsonStr)
-  it should "String.toJson correctly"                           in assert(bobJsonStr.toJson === bobJson)
-  it should "String.fromJsonStr[Peep] correctly"                in assert(bobJsonStr.fromJsonStr[Peep] === bob)
-  it should "String.fromJsonStr[Peep] mixed fields correctly"   in assert(bobJsonStrMixedFields.fromJsonStr[Peep] === bob)
-  it should "String.fromJsonStr[Peep] without fields correctly" in assert(bobJsonStrWithoutFields.fromJsonStr[Peep] === bob)
-  it should "Peep.jsonRoundTrip correctly"                      in assertRoundTrip(bob)
-  it should "Peep.jsonPrettyRoundTrip correctly"                in assertPrettyRoundTrip(bob)
-  it should "Peep.jsonBinaryRoundTrip correctly"                in assertBinaryRoundTrip(bob)
+  it should "Peep.toJson correctly" in assert(bob.toJson === bobJson)
+  it should "Peep.toJsonStr correctly" in assert(bob.toJsonStr === bobJsonStr)
+  it should "String.toJson correctly" in assert(bobJsonStr.toJson === bobJson)
+  it should "String.fromJsonStr[Peep] correctly" in assert(bobJsonStr.fromJsonStr[Peep] === bob)
+  it should "String.fromJsonStr[Peep] mixed fields correctly" in assert(
+    bobJsonStrMixedFields.fromJsonStr[Peep] === bob
+  )
+  it should "String.fromJsonStr[Peep] without fields correctly" in assert(
+    bobJsonStrWithoutFields.fromJsonStr[Peep] === bob
+  )
+  it should "Peep.jsonRoundTrip correctly" in assertRoundTrip(bob)
+  it should "Peep.jsonPrettyRoundTrip correctly" in assertPrettyRoundTrip(bob)
+  it should "Peep.jsonBinaryRoundTrip correctly" in assertBinaryRoundTrip(bob)
 
-  private def assertRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonRoundTrip)
-  private def assertPrettyRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonPrettyRoundTrip)
-  private def assertBinaryRoundTrip[A: JsonWriter : JsonReader](x: A) = assert(x === x.jsonBinaryRoundTrip)
+  private def assertRoundTrip[A: JsonWriter: JsonReader](x: A) = assert(x === x.jsonRoundTrip)
+
+  private def assertPrettyRoundTrip[A: JsonWriter: JsonReader](x: A) =
+    assert(x === x.jsonPrettyRoundTrip)
+
+  private def assertBinaryRoundTrip[A: JsonWriter: JsonReader](x: A) =
+    assert(x === x.jsonBinaryRoundTrip)
 }

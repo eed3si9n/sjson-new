@@ -18,6 +18,7 @@ package sjsonnew
 
 import scala.reflect.ClassTag
 
+
 /** Heterogeneous list (of json serializable stuff) with labels. */
 sealed trait LList {
   def find[A1: ClassTag](n: String): Option[A1]
@@ -27,6 +28,7 @@ sealed trait LList {
 object LList extends LListFormats {
   @deprecated("Switch to the type alias in the sjsonnew root package", "0.8.0")
   type :*:[A1, A2 <: LList] = LCons[A1, A2]
+
   final val :*: = sjsonnew.:*:
 
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): IsoLList.Aux[A, R0] =
@@ -38,8 +40,10 @@ object LList extends LListFormats {
 
   // This is so the return type of LNil becomes LNil, instead of LNil.type.
   val LNil0: LNil0 = new LNil0 {}
+
   sealed trait LNil0 extends LList {
-    def :*:[A1: JsonFormat: ClassTag](labelled: (String, A1)): LCons[A1, LNil] = LCons(labelled._1, labelled._2, this)
+    def :*:[A1: JsonFormat: ClassTag](labelled: (String, A1)): LCons[A1, LNil] =
+      LCons(labelled._1, labelled._2, this)
 
     override def toString: String = "LNil"
     override def find[A1: ClassTag](n: String): Option[A1] = None
@@ -49,59 +53,83 @@ object LList extends LListFormats {
   implicit def llistOps[L <: LList](l: L): LListOps[L] = new LListOps(l)
 }
 
+
 final class LCons[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](
     val name: String,
     val head: A1,
-    val tail: A2) extends LList with Product with Serializable with Equals {
-  def :*:[B1: JsonFormat: ClassTag](labelled: (String, B1)): B1 :*: A1 :*: A2 = LCons(labelled._1, labelled._2, this)
+    val tail: A2,
+) extends LList with Product with Serializable with Equals {
+  def :*:[B1: JsonFormat: ClassTag](labelled: (String, B1)): B1 :*: A1 :*: A2 =
+    LCons(labelled._1, labelled._2, this)
+
   override def toString: String = s"($name, $head) :*: $tail"
   override def productPrefix: String = "LCons"
+
   override def find[B1: ClassTag](n: String): Option[B1] =
-    if (name == n && implicitly[ClassTag[A1]] == implicitly[ClassTag[B1]]) Option(head match { case x: B1 @unchecked => x })
+    if (name == n && implicitly[ClassTag[A1]] == implicitly[ClassTag[B1]]) Option(
+      head match { case x: B1 @unchecked => x }
+    )
     else tail.find[B1](n)
+
   override def fieldNames: List[String] = name :: tail.fieldNames
-  override def canEqual(that: Any): Boolean = that.isInstanceOf[LCons[_, _]]
+  override def canEqual(that: Any): Boolean = that.isInstanceOf[LCons[?, ?]]
   override def productArity: Int = 3
-  override def productElement(n: Int): Any = n match {
-    case 0 => name
-    case 1 => head
-    case 2 => tail
-    case _ => throw new IndexOutOfBoundsException(Integer.toString(n))
-  }
+
+  override def productElement(n: Int): Any =
+    n match {
+      case 0 => name
+      case 1 => head
+      case 2 => tail
+      case _ => throw new IndexOutOfBoundsException(Integer.toString(n))
+    }
+
   def copy[B1: JsonFormat: ClassTag, B2 <: LList: JsonFormat](
       name: String = name,
       head: B1 = head,
-      tail: B2 = tail): LCons[B1, B2] =
+      tail: B2 = tail,
+  ): LCons[B1, B2] =
     new LCons[B1, B2](name, head, tail)
+
   override def hashCode(): Int = scala.runtime.ScalaRunTime._hashCode(this)
-  override def equals(x: Any): Boolean = x match {
-    case that: LCons[_, _] =>
-      (this.name == that.name) && (this.head == that.head) && (this.tail == that.tail)
-    case _ =>
-      false
-  }
+
+  override def equals(x: Any): Boolean =
+    x match {
+      case that: LCons[?, ?] =>
+        (this.name == that.name) && (this.head == that.head) && (this.tail == that.tail)
+      case _ =>
+        false
+    }
 }
 
 object LCons {
   override def toString: String = "LCons"
+
   def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](
       name: String,
       head: A1,
-      tail: A2): LCons[A1, A2] =
-    new LCons[A1, A2](name = name, head = head, tail = tail)
+      tail: A2,
+  ): LCons[A1, A2] =
+    new LCons[A1, A2](
+      name = name,
+      head = head,
+      tail = tail,
+    )
+
   def unapply[A1, A2 <: LList](x: LCons[A1, A2]): Option[(String, A1, A2)] =
     if (x == null) None
     else Some((x.name, x.head, x.tail))
 }
 
+
 trait LListFormats {
-  import BasicJsonProtocol._
+  import BasicJsonProtocol.*
 
   implicit val lnilFormat: JsonFormat[LNil] = new JsonFormat[LNil] {
     def write[J](x: LNil, builder: Builder[J]): Unit = {
       if (!builder.isInObject) builder.beginObject()
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): LNil = {
       if (unbuilder.isInObject) unbuilder.endObject()
       LNil
@@ -110,7 +138,10 @@ trait LListFormats {
 
   private val fieldNamesField = "$fields"
 
-  implicit def lconsFormat[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat]: JsonFormat[LCons[A1, A2]] =
+  implicit def lconsFormat[
+      A1: JsonFormat: ClassTag,
+      A2 <: LList: JsonFormat,
+  ]: JsonFormat[LCons[A1, A2]] =
     new JsonFormat[LCons[A1, A2]] {
       val a1Format: JsonFormat[A1] = implicitly
       val a2Format: JsonFormat[A2] = implicitly
@@ -136,7 +167,9 @@ trait LListFormats {
             def objectPreamble(x: J, inner: Boolean) = {
               unbuilder.beginPreObject(x)
               val jf = implicitly[JsonFormat[Vector[String]]]
-              val fieldNames = unbuilder.lookupField(fieldNamesField).map(x => jf.read(Some(x), unbuilder))
+              val fieldNames = unbuilder
+                .lookupField(fieldNamesField)
+                .map(x => jf.read(Some(x), unbuilder))
               unbuilder.endPreObject()
               if (fieldNames.nonEmpty || !inner) {
                 // call beginObject the second time, only for the nested LList cases
@@ -162,8 +195,10 @@ trait LListFormats {
     }
 }
 
+
 final class LListOps[L <: LList](l: L) {
-  import Nat._
+  import Nat.*
+
   def _1(implicit at: At[L, _0]): at.Out = at(l)
   def _2(implicit at: At[L, _1]): at.Out = at(l)
   def _3(implicit at: At[L, _2]): at.Out = at(l)
@@ -188,18 +223,21 @@ final class LListOps[L <: LList](l: L) {
   def _22(implicit at: At[L, _21]): at.Out = at(l)
 }
 
+
 trait At[L <: LList, N <: Nat] {
   type Out
+
   def apply(t: L): Out
 }
 
 object At {
-  import Nat._
+  import Nat.*
   type Aux[L <: LList, N <: Nat, Out0] = At[L, N] { type Out = Out0 }
 
   implicit def at0[H, T <: LList]: Aux[H :*: T, _0, H] =
     new At[H :*: T, _0] {
       type Out = H
+
       def apply(l: H :*: T): Out = l.head
     }
 
@@ -207,13 +245,17 @@ object At {
       (implicit att: Aux[T, N, AtOut]): Aux[H :*: T, Succ[N], AtOut] =
     new At[H :*: T, Succ[N]] {
       type Out = AtOut
+
       def apply(l: H :*: T): Out = att(l.tail)
     }
 }
 
+
 trait Nat { type N <: Nat }
+
 object Nat {
   final class _0 extends Nat { type N = _0 }
+
   final case class Succ[P <: Nat]() extends Nat { type N = Succ[P] }
 
   type _1 = Succ[_0]; type _2 = Succ[_1]; type _3 = Succ[_2]; type _4 = Succ[_3]

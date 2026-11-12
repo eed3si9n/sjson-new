@@ -18,25 +18,26 @@
 
 package sjsonnew
 
-import scala.{Left, Right}
+import scala.{ Left, Right }
 
-/**
-  * Provides the JsonFormats for the non-collection standard types.
- */
+
+/** Provides the JsonFormats for the non-collection standard types. */
 trait StandardFormats {
   this: AdditionalFormats & IsoFormats =>
 
   private[this] type JF[A] = JsonFormat[A] // simple alias for reduced verbosity
 
-  implicit def optionFormat[A :JF]: JF[Option[A]] = new OptionFormat[A]
+  implicit def optionFormat[A: JF]: JF[Option[A]] = new OptionFormat[A]
 
-  final class OptionFormat[A :JF] extends JF[Option[A]] {
+  final class OptionFormat[A: JF] extends JF[Option[A]] {
     lazy val elemFormat = implicitly[JF[A]]
+
     def write[J](option: Option[A], builder: Builder[J]): Unit =
       option match {
         case Some(x) => elemFormat.write(x, builder)
         case None    => builder.writeNull()
       }
+
     override def addField[J](name: String, option: Option[A], builder: Builder[J]): Unit =
       option match {
         case Some(x) =>
@@ -44,6 +45,7 @@ trait StandardFormats {
           write(option, builder)
         case None => ()
       }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Option[A] =
       jsOpt match {
         case Some(js) =>
@@ -53,20 +55,26 @@ trait StandardFormats {
       }
   }
 
-  implicit def eitherFormat[A :JF, B :JF]: JF[Either[A, B]] = new JF[Either[A, B]] {
+  implicit def eitherFormat[A: JF, B: JF]: JF[Either[A, B]] = new JF[Either[A, B]] {
     lazy val leftFormat = implicitly[JF[A]]
     lazy val rightFormat = implicitly[JF[B]]
+
     def write[J](either: Either[A, B], builder: Builder[J]): Unit =
       either match {
         case Left(a)  => leftFormat.write(a, builder)
         case Right(b) => rightFormat.write(b, builder)
       }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Either[A, B] =
       (safeReader[A].read(jsOpt, unbuilder), safeReader[B].read(jsOpt, unbuilder)) match {
-        case (Right(a), _: Left[_, _]) => Left(a)
-        case (_: Left[_, _], Right(b)) => Right(b)
-        case (_: Right[_, _], _: Right[_, _]) => deserializationError("Ambiguous Either value: can be read as both, Left and Right, values")
-        case (Left(ea), Left(eb)) => deserializationError("Could not read Either value:\n" + ea + "---------- and ----------\n" + eb)
+        case (Right(a), _: Left[?, ?])        => Left(a)
+        case (_: Left[?, ?], Right(b))        => Right(b)
+        case (_: Right[?, ?], _: Right[?, ?]) => deserializationError(
+          "Ambiguous Either value: can be read as both, Left and Right, values"
+        )
+        case (Left(ea), Left(eb)) => deserializationError(
+          "Could not read Either value:\n" + ea + "---------- and ----------\n" + eb
+        )
       }
   }
 }

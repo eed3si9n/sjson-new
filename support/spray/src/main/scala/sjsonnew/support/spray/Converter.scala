@@ -1,10 +1,12 @@
 package sjsonnew
 package support.spray
 
-import spray.json.{ deserializationError => _, _ }
+import spray.json.{ deserializationError as _, * }
+
 
 object Converter extends SupportConverter[JsValue] {
   val facade: Facade[JsValue] = FacadeImpl
+
   private object FacadeImpl extends SimpleFacade[JsValue] {
     def jnull(): JsNull.type = JsNull
     def jfalse(): JsFalse.type = JsFalse
@@ -18,6 +20,7 @@ object Converter extends SupportConverter[JsValue] {
     def jstring(s: String): JsString = JsString(s)
     def jarray(vs: List[JsValue]): JsArray = JsArray(vs*)
     def jobject(vs: Map[String, JsValue]): JsObject = JsObject(vs)
+
     def isJnull(value: JsValue): Boolean =
       value match {
         case JsNull => true
@@ -29,50 +32,59 @@ object Converter extends SupportConverter[JsValue] {
         case JsObject(_) => true
         case _           => false
       }
+
     def extractInt(value: JsValue): Int =
       value match {
         case JsNumber(x) => x.intValue
-        case x => deserializationError("Expected Int as JsNumber, but got " + x)
+        case x           => deserializationError("Expected Int as JsNumber, but got " + x)
       }
+
     def extractLong(value: JsValue): Long =
       value match {
         case JsNumber(x) => x.longValue
-        case x => deserializationError("Expected Long as JsNumber, but got " + x)
+        case x           => deserializationError("Expected Long as JsNumber, but got " + x)
       }
+
     def extractFloat(value: JsValue): Float =
       value match {
         case JsNumber(x) => x.floatValue
         case JsNull      => Float.NaN
-        case x => deserializationError("Expected Float as JsNumber, but got " + x)
+        case x           => deserializationError("Expected Float as JsNumber, but got " + x)
       }
+
     def extractDouble(value: JsValue): Double =
       value match {
         case JsNumber(x) => x.doubleValue
         case JsNull      => Double.NaN
-        case x => deserializationError("Expected Double as JsNumber, but got " + x)
+        case x           => deserializationError("Expected Double as JsNumber, but got " + x)
       }
+
     def extractBigDecimal(value: JsValue): BigDecimal =
       value match {
         case JsNumber(x) => x
-        case x => deserializationError("Expected BigDecimal as JsNumber, but got " + x)
+        case x           => deserializationError("Expected BigDecimal as JsNumber, but got " + x)
       }
+
     def extractBoolean(value: JsValue): Boolean =
       value match {
-        case JsTrue => true
+        case JsTrue  => true
         case JsFalse => false
-        case x => deserializationError("Expected JsBoolean, but got " + x)
+        case x       => deserializationError("Expected JsBoolean, but got " + x)
       }
+
     def extractString(value: JsValue): String =
       value match {
         case JsString(x) => x
-        case x => deserializationError("Expected String as JsString, but got " + x)
+        case x           => deserializationError("Expected String as JsString, but got " + x)
       }
+
     def extractArray(value: JsValue): Vector[JsValue] =
       value match {
         case JsArray(elements) => elements
         case JsNull            => Vector.empty
-        case x => deserializationError("Expected List as JsArray, but got " + x)
+        case x                 => deserializationError("Expected List as JsArray, but got " + x)
       }
+
     def extractObject(value: JsValue): (Map[String, JsValue], Vector[String]) =
       value match {
         case x: JsObject =>
@@ -83,7 +95,7 @@ object Converter extends SupportConverter[JsValue] {
           }
           (fields, vectorBuilder.result())
         case JsNull => (Map.empty, Vector.empty)
-        case x => deserializationError("Expected Map as JsObject, but got " + x)
+        case x      => deserializationError("Expected Map as JsObject, but got " + x)
       }
   }
 }

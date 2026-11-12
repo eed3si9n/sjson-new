@@ -20,9 +20,10 @@ package support.spray
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
 import java.io.File
 
+
 object PathOnlyFormatsSpec extends verify.BasicTestSuite {
   import IsoStringLong.isWindows
-  import PathOnlyFormats._
+  import PathOnlyFormats.*
 
   test("The PathOnlyFormats can override the default") {
     val f = new File("/tmp")
@@ -41,15 +42,27 @@ object PathOnlyFormatsSpec extends verify.BasicTestSuite {
     Predef.assert(Converter.fromJsonUnsafe[File](JsString("src/main")) == f2)
 
     // "convert an absolute path on Windows" in {
-    if (isWindows) Predef.assert(Converter.toJsonUnsafe(new File("""C:\Documents and Settings\""")) == JsString("file:///C:/Documents%20and%20Settings"))
+    if (isWindows) Predef.assert(
+      Converter.toJsonUnsafe(new File("""C:\Documents and Settings\""")) == JsString(
+        "file:///C:/Documents%20and%20Settings"
+      )
+    )
     else ()
 
     // "convert a relative path on Windows" in {
-    if (isWindows) Predef.assert(Converter.toJsonUnsafe(new File("""..\My Documents\test""")) == JsString("../My%20Documents/test"))
+    if (isWindows) Predef.assert(
+      Converter.toJsonUnsafe(new File("""..\My Documents\test""")) == JsString(
+        "../My%20Documents/test"
+      )
+    )
     else ()
 
     // "convert a UNC path on Windows" in {
-    if (isWindows) Predef.assert(Converter.toJsonUnsafe(new File("""\\laptop\My Documents\Some.doc""")) == JsString("file://laptop/My%20Documents/Some.doc"))
+    if (isWindows) Predef.assert(
+      Converter.toJsonUnsafe(new File("""\\laptop\My Documents\Some.doc""")) == JsString(
+        "file://laptop/My%20Documents/Some.doc"
+      )
+    )
     else ()
   }
 }

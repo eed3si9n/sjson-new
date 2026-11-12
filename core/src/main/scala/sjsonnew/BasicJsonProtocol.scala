@@ -18,9 +18,7 @@
 
 package sjsonnew
 
-/**
-  * Provides all the predefined JsonFormats.
- */
+/** Provides all the predefined JsonFormats. */
 trait BasicJsonProtocol
         extends PrimitiveFormats
         with StandardFormats

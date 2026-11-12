@@ -18,13 +18,11 @@
 
 package sjsonnew
 
-/**
-  * Provides the JsonFormats for the most important Scala types.
- */
+/** Provides the JsonFormats for the most important Scala types. */
 trait PrimitiveFormats {
   implicit object IntJsonFormat extends JsonFormat[Int] {
-    def write[J](x: Int, builder: Builder[J]): Unit =
-      builder.writeInt(x)
+    def write[J](x: Int, builder: Builder[J]): Unit = builder.writeInt(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Int =
       jsOpt match {
         case Some(js) => unbuilder.readInt(js)
@@ -33,8 +31,8 @@ trait PrimitiveFormats {
   }
 
   implicit object LongJsonFormat extends JsonFormat[Long] {
-    def write[J](x: Long, builder: Builder[J]): Unit =
-      builder.writeLong(x)
+    def write[J](x: Long, builder: Builder[J]): Unit = builder.writeLong(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Long =
       jsOpt match {
         case Some(js) => unbuilder.readLong(js)
@@ -43,8 +41,8 @@ trait PrimitiveFormats {
   }
 
   implicit object FloatJsonFormat extends JsonFormat[Float] {
-    def write[J](x: Float, builder: Builder[J]): Unit =
-      builder.writeDouble(x)
+    def write[J](x: Float, builder: Builder[J]): Unit = builder.writeDouble(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Float =
       jsOpt match {
         case Some(js) => unbuilder.readFloat(js)
@@ -53,8 +51,8 @@ trait PrimitiveFormats {
   }
 
   implicit object DoubleJsonFormat extends JsonFormat[Double] {
-    def write[J](x: Double, builder: Builder[J]): Unit =
-      builder.writeDouble(x)
+    def write[J](x: Double, builder: Builder[J]): Unit = builder.writeDouble(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Double =
       jsOpt match {
         case Some(js) => unbuilder.readDouble(js)
@@ -63,8 +61,8 @@ trait PrimitiveFormats {
   }
 
   implicit object ByteJsonFormat extends JsonFormat[Byte] {
-    def write[J](x: Byte, builder: Builder[J]): Unit =
-      builder.writeInt(x)
+    def write[J](x: Byte, builder: Builder[J]): Unit = builder.writeInt(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Byte =
       jsOpt match {
         case Some(js) => unbuilder.readInt(js).toByte
@@ -73,8 +71,8 @@ trait PrimitiveFormats {
   }
 
   implicit object ShortJsonFormat extends JsonFormat[Short] {
-    def write[J](x: Short, builder: Builder[J]): Unit =
-      builder.writeInt(x)
+    def write[J](x: Short, builder: Builder[J]): Unit = builder.writeInt(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Short =
       jsOpt match {
         case Some(js) => unbuilder.readInt(js).toShort
@@ -83,8 +81,8 @@ trait PrimitiveFormats {
   }
 
   implicit object BigDecimalJsonFormat extends JsonFormat[BigDecimal] {
-    def write[J](x: BigDecimal, builder: Builder[J]): Unit =
-      builder.writeBigDecimal(x)
+    def write[J](x: BigDecimal, builder: Builder[J]): Unit = builder.writeBigDecimal(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): BigDecimal =
       jsOpt match {
         case Some(js) => unbuilder.readBigDecimal(js)
@@ -97,6 +95,7 @@ trait PrimitiveFormats {
       require(x ne null)
       builder.writeBigDecimal(BigDecimal(x))
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): BigInt =
       jsOpt match {
         case Some(js) => unbuilder.readBigDecimal(js).toBigInt
@@ -105,14 +104,13 @@ trait PrimitiveFormats {
   }
 
   implicit object UnitJsonFormat extends JsonFormat[Unit] {
-    def write[J](x: Unit, builder: Builder[J]): Unit =
-      builder.writeInt(1)
+    def write[J](x: Unit, builder: Builder[J]): Unit = builder.writeInt(1)
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Unit = ()
   }
 
   implicit object BooleanJsonFormat extends JsonFormat[Boolean] {
-    def write[J](x: Boolean, builder: Builder[J]): Unit =
-      builder.writeBoolean(x)
+    def write[J](x: Boolean, builder: Builder[J]): Unit = builder.writeBoolean(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Boolean =
       jsOpt match {
         case Some(js) => unbuilder.readBoolean(js)
@@ -121,21 +119,23 @@ trait PrimitiveFormats {
   }
 
   implicit object CharJsonFormat extends JsonFormat[Char] {
-    def write[J](x: Char, builder: Builder[J]): Unit =
-      builder.writeString(String.valueOf(x))
+    def write[J](x: Char, builder: Builder[J]): Unit = builder.writeString(String.valueOf(x))
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Char =
       jsOpt match {
         case Some(js) =>
           val str = unbuilder.readString(js)
           if (str.length == 1) str.charAt(0)
           else deserializationError("Expected Char as single-character JsString, but got " + str)
-        case None => deserializationError("Expected Char as single-character JsString, but got None")
+        case None => deserializationError(
+          "Expected Char as single-character JsString, but got None"
+        )
       }
   }
 
   implicit object StringJsonFormat extends JsonFormat[String] {
-    def write[J](x: String, builder: Builder[J]): Unit =
-      builder.writeString(x)
+    def write[J](x: String, builder: Builder[J]): Unit = builder.writeString(x)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): String =
       jsOpt match {
         case Some(js) => unbuilder.readString(js)
@@ -144,8 +144,8 @@ trait PrimitiveFormats {
   }
 
   implicit object SymbolJsonFormat extends JsonFormat[Symbol] {
-    def write[J](x: Symbol, builder: Builder[J]): Unit =
-      builder.writeString(x.name)
+    def write[J](x: Symbol, builder: Builder[J]): Unit = builder.writeString(x.name)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Symbol =
       jsOpt match {
         case Some(js) =>
@@ -155,19 +155,21 @@ trait PrimitiveFormats {
       }
   }
 
-  implicit val StringJsonKeyFormat: JsonKeyFormat[String]         = JsonKeyFormat(identity, identity)
-  implicit val SymbolJsonKeyFormat: JsonKeyFormat[Symbol]         = JsonKeyFormat(_.name, Symbol(_))
+  implicit val StringJsonKeyFormat: JsonKeyFormat[String] = JsonKeyFormat(identity, identity)
+  implicit val SymbolJsonKeyFormat: JsonKeyFormat[Symbol] = JsonKeyFormat(_.name, Symbol(_))
 
-  implicit val UnitJsonKeyFormat: JsonKeyFormat[Unit]             = JsonKeyFormat(_ => "\"\"", _ => ())
-  implicit val BooleanJsonKeyFormat: JsonKeyFormat[Boolean]       = JsonKeyFormat(_.toString, _.toBoolean)
-  implicit val ByteJsonKeyFormat: JsonKeyFormat[Byte]             = JsonKeyFormat(_.toString, _.toByte)
-  implicit val ShortJsonKeyFormat: JsonKeyFormat[Short]           = JsonKeyFormat(_.toString, _.toShort)
-  implicit val CharJsonKeyFormat: JsonKeyFormat[Char]             = JsonKeyFormat(_.toString, _.head)
-  implicit val IntJsonKeyFormat: JsonKeyFormat[Int]               = JsonKeyFormat(_.toString, _.toInt)
-  implicit val LongJsonKeyFormat: JsonKeyFormat[Long]             = JsonKeyFormat(_.toString, _.toLong)
-  implicit val FloatJsonKeyFormat: JsonKeyFormat[Float]           = JsonKeyFormat(_.toString, _.toFloat)
-  implicit val DoubleJsonKeyFormat: JsonKeyFormat[Double]         = JsonKeyFormat(_.toString, _.toDouble)
+  implicit val UnitJsonKeyFormat: JsonKeyFormat[Unit] = JsonKeyFormat(_ => "\"\"", _ => ())
+  implicit val BooleanJsonKeyFormat: JsonKeyFormat[Boolean] = JsonKeyFormat(_.toString, _.toBoolean)
+  implicit val ByteJsonKeyFormat: JsonKeyFormat[Byte] = JsonKeyFormat(_.toString, _.toByte)
+  implicit val ShortJsonKeyFormat: JsonKeyFormat[Short] = JsonKeyFormat(_.toString, _.toShort)
+  implicit val CharJsonKeyFormat: JsonKeyFormat[Char] = JsonKeyFormat(_.toString, _.head)
+  implicit val IntJsonKeyFormat: JsonKeyFormat[Int] = JsonKeyFormat(_.toString, _.toInt)
+  implicit val LongJsonKeyFormat: JsonKeyFormat[Long] = JsonKeyFormat(_.toString, _.toLong)
+  implicit val FloatJsonKeyFormat: JsonKeyFormat[Float] = JsonKeyFormat(_.toString, _.toFloat)
+  implicit val DoubleJsonKeyFormat: JsonKeyFormat[Double] = JsonKeyFormat(_.toString, _.toDouble)
 
-  implicit val BigDecimalJsonKeyFormat: JsonKeyFormat[BigDecimal] = JsonKeyFormat(_.toString, BigDecimal(_))
-  implicit val BigIntJsonKeyFormat: JsonKeyFormat[BigInt]         = JsonKeyFormat(_.toString, BigInt(_))
+  implicit val BigDecimalJsonKeyFormat: JsonKeyFormat[BigDecimal] =
+    JsonKeyFormat(_.toString, BigDecimal(_))
+
+  implicit val BigIntJsonKeyFormat: JsonKeyFormat[BigInt] = JsonKeyFormat(_.toString, BigInt(_))
 }
