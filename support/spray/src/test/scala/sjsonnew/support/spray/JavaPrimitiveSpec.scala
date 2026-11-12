@@ -18,9 +18,10 @@ package sjsonnew
 package support.spray
 
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsObject }
-import java.lang.{ Integer => JInteger, Long => JLong, Boolean => JBoolean,
-  Float => JFloat, Double => JDouble, Byte => JByte, Short => JShort,
-  Character => JCharacter }
+import java.lang.{ Integer as JInteger, Long as JLong, Boolean as JBoolean,
+  Float as JFloat, Double as JDouble, Byte as JByte, Short as JShort,
+  Character as JCharacter }
+
 
 object JavaPrimitiveFormatsSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
@@ -35,10 +36,16 @@ object JavaPrimitiveFormatsSpec extends verify.BasicTestSuite {
 
   test("The JLongJsonFormat") {
     // "convert a JLong to a JsNumber" in {
-    Predef.assert(Converter.toJsonUnsafe[JLong](7563661897011259335L: JLong) == JsNumber(7563661897011259335L))
+    Predef.assert(
+      Converter.toJsonUnsafe[JLong](7563661897011259335L: JLong) == JsNumber(7563661897011259335L)
+    )
 
     // "convert a JsNumber to a JLong" in {
-    Predef.assert(Converter.fromJsonUnsafe[JLong](JsNumber(7563661897011259335L)) == (7563661897011259335L: JLong))
+    Predef.assert(
+      Converter.fromJsonUnsafe[JLong](
+        JsNumber(7563661897011259335L)
+      ) == (7563661897011259335L: JLong)
+    )
   }
 
   // TODO: Builder doesn't capture Float

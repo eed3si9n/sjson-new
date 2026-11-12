@@ -21,6 +21,7 @@ package support.spray
 import spray.json.{ JsValue, JsNumber, JsString, JsNull, JsTrue, JsFalse, JsArray }
 import scala.Right
 
+
 object TupleFormatsSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
 

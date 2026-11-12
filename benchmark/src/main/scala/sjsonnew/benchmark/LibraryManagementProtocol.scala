@@ -1,24 +1,31 @@
 package sjsonnew
 package benchmark
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import java.net.URL
 
+
 trait LibraryManagementProtocol extends BasicJsonProtocol {
-  implicit val configrefStringIso: IsoString[ConfigRef] = IsoString.iso[ConfigRef](_.name, ConfigRef(_))
-  implicit val configurationStringIso: IsoString[Configuration] = IsoString.iso[Configuration](_.name,
-    x => Configuration.of(x, x))
-  implicit val crossVersionStringIso: IsoString[CrossVersion] = IsoString.iso[CrossVersion](
-    _ match {
-      case CrossVersion.Disabled => "disabled"
-      case x => x.toString
-    },
-    _ match {
-      case "disabled" => CrossVersion.disabled
-      case "full"     => CrossVersion.full
-      case "binary"   => CrossVersion.binary
-      case ""         => CrossVersion.disabled
-    })
+  implicit val configrefStringIso: IsoString[ConfigRef] =
+    IsoString.iso[ConfigRef](_.name, ConfigRef(_))
+
+  implicit val configurationStringIso: IsoString[Configuration] = IsoString.iso[Configuration](
+    _.name,
+    x => Configuration.of(x, x),
+  )
+
+  implicit val crossVersionStringIso: IsoString[CrossVersion] =
+    IsoString.iso[CrossVersion](
+      _ match {
+        case CrossVersion.Disabled => "disabled"
+        case x                     => x.toString
+      },
+      _ match {
+        case "disabled" => CrossVersion.disabled
+        case "full"     => CrossVersion.full
+        case "binary"   => CrossVersion.binary
+        case ""         => CrossVersion.disabled
+      })
 
   // final case class Artifact(name: String, `type`: String, extension: String, classifier: Option[String],
   //   configurations: Iterable[Configuration], url: Option[URL], extraAttributes: Map[String, String]) {
@@ -36,6 +43,7 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
       builder.addField("extraAttributes", x.extraAttributes)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Artifact =
       jsOpt match {
         case Some(js) =>
@@ -48,7 +56,16 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
           val url = unbuilder.readField[Option[URL]]("url")
           val extraAttributes = unbuilder.readField[Map[String, String]]("extraAttributes")
           unbuilder.endObject()
-          Artifact(name, `type`, extension, classifier, configurations, url, extraAttributes, checksum = None)
+          Artifact(
+            name,
+            `type`,
+            extension,
+            classifier,
+            configurations,
+            url,
+            extraAttributes,
+            checksum = None,
+          )
         case None => deserializationError(s"Expected JsObject but got None")
       }
   }
@@ -57,6 +74,7 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
   // configurations: Seq[String] = Nil)
   implicit object InclExclRuleFormat extends JsonFormat[InclExclRule] {
     val emptyRule = InclExclRule()
+
     def write[J](x: InclExclRule, builder: Builder[J]): Unit = {
       builder.beginObject()
       builder.addField("organization", x.organization)
@@ -65,6 +83,7 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
       builder.addField("configurations", x.configurations)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): InclExclRule =
       jsOpt match {
         case Some(js) =>
@@ -74,7 +93,13 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
           val artifact = unbuilder.readField[String]("artifact")
           val configurations = unbuilder.readField[Seq[ConfigRef]]("configurations").toVector
           unbuilder.endObject()
-          InclExclRule(organization, name, artifact, configurations, crossVersion = CrossVersion.binary)
+          InclExclRule(
+            organization,
+            name,
+            artifact,
+            configurations,
+            crossVersion = CrossVersion.binary,
+          )
         case None => emptyRule
       }
   }
@@ -123,6 +148,7 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
       builder.addField("branchName", x.branchName)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ModuleID =
       jsOpt match {
         case Some(js) =>
@@ -150,9 +176,21 @@ trait LibraryManagementProtocol extends BasicJsonProtocol {
           val crossVersion = unbuilder.readField[CrossVersion]("crossVersion")
           val branchName = unbuilder.readField[Option[String]]("branchName")
           unbuilder.endObject()
-          ModuleID(organization, name, revision, configurations,
-            isChanging, isTransitive, isForce, explicitArtifacts.toVector,
-            inclusions, exclusions, extraAttributes, crossVersion, branchName)
+          ModuleID(
+            organization,
+            name,
+            revision,
+            configurations,
+            isChanging,
+            isTransitive,
+            isForce,
+            explicitArtifacts.toVector,
+            inclusions,
+            exclusions,
+            extraAttributes,
+            crossVersion,
+            branchName,
+          )
         case None => deserializationError(s"Expected JsObject but got None")
       }
   }

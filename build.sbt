@@ -1,5 +1,5 @@
-import Dependencies._
-import com.typesafe.tools.mima.core._
+import Dependencies.*
+import com.typesafe.tools.mima.core.*
 import sbt.internal.ProjectMatrix
 
 val scala212 = "2.12.21"
@@ -8,6 +8,7 @@ val scala3 = "3.9.0"
 
 ThisBuild / version := "0.14.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala212
+
 lazy val allScalaVersions = Seq(scala212, scala213, scala3)
 
 lazy val root = (project in file("."))
@@ -41,13 +42,7 @@ lazy val core = (projectMatrix in file("core"))
           Seq("-Xsource:3", "-release:8")
       }
     },
-    scalacOptions ++= Seq(
-      "-feature",
-      "-unchecked",
-      "-deprecation",
-      "-encoding",
-      "utf8"
-    ),
+    scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation", "-encoding", "utf8"),
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
       ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.BasicJsonProtocol.<clinit>"),
@@ -56,53 +51,65 @@ lazy val core = (projectMatrix in file("core"))
       ProblemFilters.exclude[DirectMissingMethodProblem]("sjsonnew.HashUtil.farmHash"),
     ),
   )
-  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value,
-  ))
+  .jvmPlatform(
+    scalaVersions = allScalaVersions,
+    settings = Seq(
+      libraryDependencies ++= testDependencies.value
+    ),
+  )
 
-def support(n: String) =
-  ProjectMatrix(id = n, base = file(s"support/$n"))
-    .dependsOn(core)
-    .settings(
-      name := s"sjson-new-$n",
-      scalacOptions ++= {
-        scalaBinaryVersion.value match {
-          case "3" =>
-            Nil
-          case _ =>
-            Seq("-Xsource:3", "-release:8")
-        }
-      },
-      scalacOptions ++= Seq(
-        "-feature",
-        "-unchecked",
-        "-deprecation",
-        "-encoding",
-        "utf8"),
-      mimaSettings,
-    )
+def support(n: String) = ProjectMatrix(
+  id = n,
+  base = file(s"support/$n"),
+)
+  .dependsOn(core)
+  .settings(
+    name := s"sjson-new-$n",
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Nil
+        case _ =>
+          Seq("-Xsource:3", "-release:8")
+      }
+    },
+    scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation", "-encoding", "utf8"),
+    mimaSettings,
+  )
 
 lazy val supportSpray = support("spray")
-  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value ++ Seq(sprayJson),
-  ))
+  .jvmPlatform(
+    scalaVersions = allScalaVersions,
+    settings = Seq(
+      libraryDependencies ++= testDependencies.value ++ Seq(sprayJson)
+    ),
+  )
 
 lazy val supportScalaJson = support("scalajson")
-  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value ++ Seq(scalaJson, shadedJawnParser),
-  ))
+  .jvmPlatform(
+    scalaVersions = allScalaVersions,
+    settings = Seq(
+      libraryDependencies ++= testDependencies.value ++ Seq(scalaJson, shadedJawnParser)
+    ),
+  )
 
 lazy val supportMsgpack = support("msgpack")
-  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value ++ Seq(msgpackCore),
-  ))
+  .jvmPlatform(
+    scalaVersions = allScalaVersions,
+    settings = Seq(
+      libraryDependencies ++= testDependencies.value ++ Seq(msgpackCore)
+    ),
+  )
 
 lazy val supportMurmurhash = support("murmurhash")
-  .jvmPlatform(scalaVersions = allScalaVersions, settings = Seq(
-    libraryDependencies ++= testDependencies.value,
-    Test / fork := true,
-    Test / javaOptions += s"-Dscala.version=${scalaVersion.value}",
-  ))
+  .jvmPlatform(
+    scalaVersions = allScalaVersions,
+    settings = Seq(
+      libraryDependencies ++= testDependencies.value,
+      Test / fork := true,
+      Test / javaOptions += s"-Dscala.version=${scalaVersion.value}",
+    ),
+  )
 
 lazy val benchmark = (projectMatrix in file("benchmark"))
   .dependsOn(supportSpray, supportScalaJson, supportMsgpack)
@@ -112,13 +119,17 @@ lazy val benchmark = (projectMatrix in file("benchmark"))
     Jmh / run / javaOptions ++= Seq("-Xmx1G", "-Dfile.encoding=UTF8"),
     publish / skip := true,
   )
-  .jvmPlatform(scalaVersions = Seq(scala212))
+  .jvmPlatform(
+    scalaVersions = Seq(scala212)
+  )
 
 ThisBuild / organization := "com.eed3si9n"
 ThisBuild / organizationName := "eed3si9n"
 ThisBuild / organizationHomepage := Some(url("http://eed3si9n.com/"))
 ThisBuild / homepage := scmInfo.value map (_.browseUrl)
-ThisBuild / scmInfo := Some(ScmInfo(url("https://github.com/eed3si9n/sjson-new"), "git@github.com:eed3si9n/sjson-new.git"))
+ThisBuild / scmInfo := Some(
+  ScmInfo(url("https://github.com/eed3si9n/sjson-new"), "git@github.com:eed3si9n/sjson-new.git")
+)
 ThisBuild / developers := List(
   Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n"))
 )

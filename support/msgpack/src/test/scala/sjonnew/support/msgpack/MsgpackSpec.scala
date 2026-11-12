@@ -18,7 +18,8 @@ package sjsonnew
 package support.msgpack
 
 import org.scalatest.flatspec.AnyFlatSpec
-import BUtil._
+import BUtil.*
+
 
 class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   "The IntJsonFormat" should "convert an Int to an int message" in {
@@ -27,6 +28,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back to Int" in {
     assert(Converter.fromBinaryUnsafe[Int](intMessage) === 150)
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md
   lazy val intMessage = fromHex("CC 96")
 
@@ -36,6 +38,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back to Long" in {
     assert(Converter.fromBinaryUnsafe[Long](longMessage) === 0x200000000L)
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md
   lazy val longMessage = fromHex("CF 00 00 00 02 00 00 00 00")
 
@@ -48,6 +51,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert a Float.NaN to a NaN messge" in {
     assert(Converter.toBinaryUnsafe[Float](Float.NaN) === nanMessage)
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md
   lazy val floatMessage = fromHex("CB 4010CCCCC0000000 ")
   lazy val nanMessage = fromHex("CB 7FF8000000000000")
@@ -64,6 +68,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back a BigDecimal" in {
     assert(Converter.fromBinaryUnsafe[BigDecimal](bigDecimalMessage) === BigDecimal(42))
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md#str-format-family
   // UTF-8 for "42" is 0x3432
   lazy val bigDecimalMessage = fromHex("A2 3432")
@@ -74,6 +79,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back the Unit" in {
     assert(Converter.fromBinaryUnsafe[Unit](oneMessage) === ((): Unit))
   }
+
   lazy val oneMessage = fromHex("01")
 
   "The BooleanJsonFormat" should "convert true to true value" in {
@@ -88,6 +94,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert from 0 back to false" in {
     assert(Converter.fromBinaryUnsafe[Boolean](falseMessage) === false)
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md#bool-format-family
   lazy val trueMessage = fromHex("C3")
   lazy val falseMessage = fromHex("C2")
@@ -98,6 +105,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back to a String" in {
     assert(Converter.fromBinaryUnsafe[String](stringMessage) === "Hello")
   }
+
   // UTF-8 for "Hello" is 0x48656C6C6F
   lazy val stringMessage = fromHex("A5 48656C6C6F")
 
@@ -113,6 +121,7 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the message back to Some(Hello)" in {
     assert(Converter.fromBinaryUnsafe[Option[String]](stringMessage) === Some("Hello"))
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md#nil-format
   lazy val nullMessage = fromHex("C0")
 
@@ -123,13 +132,14 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back to a Map[String, Int]" in {
     assert(Converter.fromBinaryUnsafe[Map[String, Int]](mapMessage) === map)
   }
+
   // https://github.com/msgpack/msgpack/blob/master/spec.md#map-format-family
   lazy val mapMessage = fromHex(
-    "82 " +    // Fix map for 2 entries
+    "82 " + // Fix map for 2 entries
     "A1 61 " + // string of length 1, "a"
-    "01" +     // 1
+    "01" + // 1
     "A1 62 " + // string of length 1, "b"
-    "02"       // 2
+    "02" // 2
     )
 
   "The listFormat" should "convert a List[Int] to a length delimited list" in {
@@ -144,10 +154,12 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back to List[Map[String, Int]]" in {
     assert(Converter.fromBinaryUnsafe[List[Map[String, Int]]](complexListMessage) === complexList)
   }
+
   lazy val list = List(1, 2)
   lazy val complexList = List(map)
   // https://github.com/msgpack/msgpack/blob/master/spec.md#array-format-family
   lazy val listMessage = fromHex("92 01 02")
+
   lazy val complexListMessage = fromHex(
     "91 " + // array with single item
     "82 A1 61 01 A1 62 02"
@@ -168,29 +180,32 @@ class MsgpackSpec extends AnyFlatSpec with BasicJsonProtocol {
   it should "convert the binary message back to the nested list" in {
     assert(Converter.fromBinaryUnsafe[(Int :*: LNil) :*: LNil](ba1Message) === ba1)
   }
+
   lazy val emptyList = LNil
   lazy val emptyMessage = fromHex("80")
   lazy val a1 = ("a", 1) :*: LNil
   lazy val ba1 = ("b", a1) :*: LNil
+
   lazy val a1Message = fromHex(
-    "82 " +    // Fix map for 2 entry
+    "82 " + // Fix map for 2 entry
     "A7 24 66 69 65 6C 64 73 " + // string of length 7, "$fields"
     "91 " + // array with single item
     "A1 61 " + // string of length 1, "a" (0x61)
     "A1 61 " + // string of length 1, "a" (0x61)
-    "01"       // 1
+    "01" // 1
     )
+
   lazy val ba1Message = fromHex(
-    "82 " +    // Fix map for 1 entry
+    "82 " + // Fix map for 1 entry
     "A7 24 66 69 65 6C 64 73 " + // string of length 7, "$fields"
     "91 " + // array with single item
     "A1 62 " + // string of length 1, "b" (0x62)
     "A1 62 " + // string of length 1, "b" (0x62)
-    "82 " +    // Fix map for 1 entry
+    "82 " + // Fix map for 1 entry
     "A7 24 66 69 65 6C 64 73 " + // string of length 7, "$fields"
     "91 " + // array with single item
-    "A1 61" +  // string of length 1, "a" (0x61)
-    "A1 61" +  // string of length 1, "a" (0x61)
-    "01"       // 1
+    "A1 61" + // string of length 1, "a" (0x61)
+    "A1 61" + // string of length 1, "a" (0x61)
+    "01" // 1
     )
 }

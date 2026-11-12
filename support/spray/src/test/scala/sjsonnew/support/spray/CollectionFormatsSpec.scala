@@ -22,11 +22,18 @@ import java.util.Arrays
 import scala.annotation.nowarn
 import spray.json.{ JsArray, JsNumber, JsObject, JsString, JsValue }
 
+
 object CollectionFormatsSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
 
-  case class Person(name: String, value: List[Int], ary: Array[Int],
-    m: Map[String, Int], vs: Vector[Int])
+  case class Person(
+      name: String,
+      value: List[Int],
+      ary: Array[Int],
+      m: Map[String, Int],
+      vs: Vector[Int],
+  )
+
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
       builder.beginObject()
@@ -37,6 +44,7 @@ object CollectionFormatsSpec extends verify.BasicTestSuite {
       builder.addField("vs", x.vs)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
       jsOpt match {
         case Some(js) =>
@@ -52,33 +60,40 @@ object CollectionFormatsSpec extends verify.BasicTestSuite {
           deserializationError("Expected JsObject but found None")
       }
   }
+
   val person = Person("x", Nil, Array(), Map(), Vector())
+
   val personJson = JsObject(
     "name" -> JsString("x"),
     "value" -> JsArray(),
     "ary" -> JsArray(),
     "m" -> JsObject(),
-    "vs" -> JsArray()
+    "vs" -> JsArray(),
   )
 
   case class Peep(name: String)
+
   implicit object PeepFormat extends JsonFormat[Peep] {
     def write[J](x: Peep, builder: Builder[J]) = {
       builder.beginObject()
       builder.addField("name", x.name)
       builder.endObject()
     }
-    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]) = jsOpt match {
-      case Some(js) =>
-        unbuilder.beginObject(js)
-        val name = unbuilder.readField[String]("name")
-        unbuilder.endObject()
-        Peep(name)
-      case None => deserializationError("Expected JsObject but found None")
-    }
+
+    def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]) =
+      jsOpt match {
+        case Some(js) =>
+          unbuilder.beginObject(js)
+          val name = unbuilder.readField[String]("name")
+          unbuilder.endObject()
+          Peep(name)
+        case None => deserializationError("Expected JsObject but found None")
+      }
   }
+
   @nowarn
   implicit val PeepKeyFormat: JsonKeyFormat[Peep] = JsonKeyFormat(_.name, Peep)
+
   val peep = Peep("x")
 
   test("The listFormat") {

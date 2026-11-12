@@ -18,16 +18,20 @@
 package sjsonnew
 package support.spray
 
-import spray.json.{JsonFormat => _, _}
+import spray.json.{ JsonFormat as _, * }
+
 
 object CaseClassFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol {
 
   private case class Foo(a: Int, b: String)
+
   private val foo = Foo(42, "bar")
 
   test("case class Json Object Format") {
-    implicit val instance: JsonFormat[Foo] =
-      BasicJsonProtocol.caseClass(Foo.apply _, (x: Foo) => Option((x.a, x.b)))("a", "b")
+    implicit val instance: JsonFormat[Foo] = BasicJsonProtocol.caseClass(
+      Foo.apply _,
+      (x: Foo) => Option((x.a, x.b)),
+    )("a", "b")
     val json = JsObject("a" -> JsNumber(42), "b" -> JsString("bar"))
 
     // "convert to a JsObject"
@@ -37,8 +41,10 @@ object CaseClassFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
   }
 
   test("case class Json Array Format") {
-    implicit val instance: JsonFormat[Foo] =
-      BasicJsonProtocol.caseClassArray(Foo.apply _, (x: Foo) => Option((x.a, x.b)))
+    implicit val instance: JsonFormat[Foo] = BasicJsonProtocol.caseClassArray(
+      Foo.apply _,
+      (x: Foo) => Option((x.a, x.b)),
+    )
 
     val json = JsArray(JsNumber(42), JsString("bar"))
 
@@ -49,10 +55,14 @@ object CaseClassFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
   }
 
   private case class Uno(a: Int)
+
   private val x = Uno(42)
 
   test("case class with 1 field") {
-    implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClass(Uno.apply _, (x: Uno) => Option(x.a))("a")
+    implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClass(
+      Uno.apply _,
+      (x: Uno) => Option(x.a),
+    )("a")
 
     val json = JsObject("a" -> JsNumber(42))
     // "convert case cass -> JsObject"
@@ -62,7 +72,10 @@ object CaseClassFormatsSpec extends verify.BasicTestSuite with BasicJsonProtocol
   }
 
   test("case class with 1 field") {
-    implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClassArray(Uno.apply _, (x: Uno) => Option(x.a))
+    implicit val jf: JsonFormat[Uno] = BasicJsonProtocol.caseClassArray(
+      Uno.apply _,
+      (x: Uno) => Option(x.a),
+    )
 
     val json = JsArray(JsNumber(42))
 

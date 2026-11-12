@@ -19,16 +19,20 @@ package sjsonnew
 /** Same as LabelledGeneric in shapeless. */
 trait IsoLList[A] {
   type R <: LList
+
   def to(a: A): R
   def from(r: R): A
   def jsonFormat: JsonFormat[R]
 }
 
 object IsoLList {
-  type Aux[A, R0] = IsoLList[A]{ type R = R0 }
+  type Aux[A, R0] = IsoLList[A] { type R = R0 }
+
   def apply[A](implicit iso: IsoLList[A]): Aux[A, iso.R] = iso
+
   def iso[A, R0 <: LList: JsonFormat](to0: A => R0, from0: R0 => A): Aux[A, R0] = new IsoLList[A] {
     type R = R0
+
     def to(a: A): R = to0(a)
     def from(r: R): A = from0(r)
     val jsonFormat: JsonFormat[R] = implicitly[JsonFormat[R]]

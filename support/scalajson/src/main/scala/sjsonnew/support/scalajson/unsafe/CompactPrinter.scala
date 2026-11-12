@@ -18,18 +18,17 @@
 package sjsonnew
 package support.scalajson.unsafe
 
-import shaded.scalajson.ast.unsafe._
+import shaded.scalajson.ast.unsafe.*
 
-/**
-  * A JsonPrinter that produces compact JSON source without any superfluous whitespace.
- */
+
+/** A JsonPrinter that produces compact JSON source without any superfluous whitespace. */
 trait CompactPrinter extends JsonPrinter {
 
   def print(x: JValue, sb: Appendable): Unit = {
     x match {
       case JObject(x) => printJObject(x, sb)
       case JArray(x)  => printJArray(x, sb)
-      case _ => printLeaf(x, sb)
+      case _          => printLeaf(x, sb)
     }
   }
 

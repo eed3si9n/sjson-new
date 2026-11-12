@@ -1,16 +1,17 @@
 package sjsonnew
 package benchmark
 
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
 import sbt.librarymanagement.ModuleID
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{ File, FileInputStream, FileOutputStream }
 
-import sbt.io.{IO, Using}
-import sbt.io.syntax._
+import sbt.io.{ IO, Using }
+import sbt.io.syntax.*
 
 import scala.util.Random
+
 
 @State(Scope.Benchmark)
 abstract class JsonBenchmark[J](converter: SupportConverter[J]) {
@@ -30,7 +31,7 @@ abstract class JsonBenchmark[J](converter: SupportConverter[J]) {
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
   def moduleId1SaveToFile: Unit = {
-    import LibraryManagementProtocol._
+    import LibraryManagementProtocol.*
     val js = converter.toJson(_modules)
     saveToFile(js.get, testFile)
   }
@@ -39,7 +40,7 @@ abstract class JsonBenchmark[J](converter: SupportConverter[J]) {
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
   def moduleId2LoadFromFile: Unit = {
-    import LibraryManagementProtocol._
+    import LibraryManagementProtocol.*
     val js = loadFromFile(testFile)
     converter.fromJson[Vector[ModuleID]](js)
   }
@@ -49,35 +50,45 @@ abstract class JsonBenchmark[J](converter: SupportConverter[J]) {
   def testFile: File
 }
 
+
 object BenchmarkData {
-  import sbt.librarymanagement.syntax._
+  import sbt.librarymanagement.syntax.*
+
   lazy val moduleIds = listOfModuleIds(200000)
+
   def listOfModuleIds(n: Int): Vector[ModuleID] =
     (1 to n).toVector map { x =>
       randomOrg % randomName % randomVersion
     }
+
   private val rand = new Random(1L)
   def randomOrg: String = Random.nextString(15)
   def randomName: String = Random.nextString(10)
+
   def randomVersion: String =
     s"${rand.nextInt % 10}.${rand.nextInt % 10}.${rand.nextInt % 10}"
 }
 
+
 class SprayBenchmark
     extends JsonBenchmark[spray.json.JsValue](sjsonnew.support.spray.Converter) {
-  import spray.json._
+  import spray.json.*
+
   lazy val testFile: File = file("target") / "test-spray.json"
-  def saveToFile(js: JsValue, f: File): Unit =
-    IO.write(f, CompactPrinter(js), IO.utf8)
+  def saveToFile(js: JsValue, f: File): Unit = IO.write(f, CompactPrinter(js), IO.utf8)
+
   def loadFromFile(f: File): JsValue =
     org.typelevel.jawn.support.spray.Parser.parseFromFile(f).get
 }
 
+
 class GzipSprayBenchmark
     extends JsonBenchmark[spray.json.JsValue](sjsonnew.support.spray.Converter) {
-  import java.io.{OutputStreamWriter, StringWriter}
-  import spray.json._
+  import java.io.{ OutputStreamWriter, StringWriter }
+  import spray.json.*
+
   lazy val testFile: File = file("target") / "test-spray.json.gz"
+
   def saveToFile(js: JsValue, f: File): Unit =
     Using.fileOutputStream(false)(f) { out =>
       Using.gzipOutputStream(out) { gz =>
@@ -90,6 +101,7 @@ class GzipSprayBenchmark
         }
       }
     }
+
   def loadFromFile(f: File): JsValue =
     Using.fileInputStream(f) { in =>
       Using.gzipInputStream(in) { gz =>
@@ -107,25 +119,32 @@ class GzipSprayBenchmark
     }
 }
 
+
 class ScalaJsonBenchmark
     extends JsonBenchmark[shaded.scalajson.ast.unsafe.JValue](
-      sjsonnew.support.scalajson.unsafe.Converter) {
-  import shaded.scalajson.ast.unsafe._
-  import sjsonnew.support.scalajson.unsafe.{CompactPrinter, Parser}
+      sjsonnew.support.scalajson.unsafe.Converter
+    ) {
+  import shaded.scalajson.ast.unsafe.*
+  import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Parser }
+
   lazy val testFile: File = file("target") / "test-scalajson.json"
-  def saveToFile(js: JValue, f: File): Unit =
-    IO.write(f, CompactPrinter(js), IO.utf8)
+  def saveToFile(js: JValue, f: File): Unit = IO.write(f, CompactPrinter(js), IO.utf8)
+
   def loadFromFile(f: File): JValue =
     Parser.parseFromFile(f).get
 }
 
+
 class GzipScalaJsonBenchmark
     extends JsonBenchmark[shaded.scalajson.ast.unsafe.JValue](
-      sjsonnew.support.scalajson.unsafe.Converter) {
-  import java.io.{OutputStreamWriter, StringWriter}
-  import shaded.scalajson.ast.unsafe._
-  import sjsonnew.support.scalajson.unsafe.{CompactPrinter, Parser}
+      sjsonnew.support.scalajson.unsafe.Converter
+    ) {
+  import java.io.{ OutputStreamWriter, StringWriter }
+  import shaded.scalajson.ast.unsafe.*
+  import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Parser }
+
   lazy val testFile: File = file("target") / "test-scalajson.json.gz"
+
   def saveToFile(js: JValue, f: File): Unit =
     Using.fileOutputStream(false)(f) { out =>
       Using.gzipOutputStream(out) { gz =>
@@ -138,6 +157,7 @@ class GzipScalaJsonBenchmark
         }
       }
     }
+
   def loadFromFile(f: File): JValue =
     Using.fileInputStream(f) { in =>
       Using.gzipInputStream(in) { gz =>
@@ -155,17 +175,20 @@ class GzipScalaJsonBenchmark
     }
 }
 
+
 class MessagePackBenchmark
-    extends JsonBenchmark[org.msgpack.value.Value](
-      sjsonnew.support.msgpack.Converter) {
+    extends JsonBenchmark[org.msgpack.value.Value](sjsonnew.support.msgpack.Converter) {
   import org.msgpack.core.MessagePack
   import org.msgpack.value.Value
+
   lazy val testFile: File = file("target") / "test-msgpack.bin"
+
   def saveToFile(js: Value, f: File): Unit = {
     val packer = MessagePack.newDefaultPacker(new FileOutputStream(f))
     packer.packValue(js)
     packer.flush()
   }
+
   def loadFromFile(f: File): Value = {
     val unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(f))
     val value = unpacker.unpackValue()

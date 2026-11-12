@@ -19,10 +19,12 @@ package support.spray
 
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
-import LList._
+import LList.*
+
 
 object BuilderSpec extends BasicJsonProtocol with verify.BasicTestSuite {
   case class Person(name: String, value: Int)
+
   implicit object PersonFormat extends JsonFormat[Person] {
     def write[J](x: Person, builder: Builder[J]): Unit = {
       builder.beginObject()
@@ -30,6 +32,7 @@ object BuilderSpec extends BasicJsonProtocol with verify.BasicTestSuite {
       builder.addField("value", x.value)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Person =
       jsOpt match {
         case Some(js) =>

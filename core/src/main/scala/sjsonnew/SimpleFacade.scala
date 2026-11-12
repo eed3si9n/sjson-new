@@ -23,12 +23,12 @@ package sjsonnew
 
 import scala.collection.mutable
 
-/**
- * SimpleBuilderFacade is a type class that describes how Jawn should construct
- * JSON AST elements of type J.
+
+/** SimpleBuilderFacade is a type class that describes how Jawn should construct
+ *  JSON AST elements of type J.
  *
- * SimpleBuilderFacade[J] also uses FContext[J] instances, so implementors will
- * usually want to define both.
+ *  SimpleBuilderFacade[J] also uses FContext[J] instances, so implementors will
+ *  usually want to define both.
  */
 trait SimpleBuilderFacade[J] extends BuilderFacade[J] {
   def jarray(vs: List[J]): J
@@ -53,14 +53,18 @@ trait SimpleBuilderFacade[J] extends BuilderFacade[J] {
   def objectContext() = new FContext[J] {
     var key: String = null
     var vs = Map.empty[String, J]
+
     def addField(s: String): Unit =
       if (key == null) { key = s }
       else { vs = vs.updated(key, jstring(s)); key = null }
+
     def add(v: J): Unit =
       { vs = vs.updated(key, v); key = null }
+
     def finish = jobject(vs)
     def isObj = true
   }
 }
+
 
 trait SimpleFacade[J] extends Facade[J] with SimpleBuilderFacade[J]

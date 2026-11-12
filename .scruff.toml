@@ -1,0 +1,12 @@
+version = "0.4.2"
+
+dialect = "scala212source3"
+
+[lint]
+select = [
+  "untyped_implicit_val",
+  "no_return",
+  # "no_null",
+  "no_xml",
+  "procedure_syntax",
+]

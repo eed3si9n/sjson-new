@@ -19,6 +19,7 @@ package sjsonnew
 trait IsoStringLongFormats {
   implicit def isoStringLongFormat[A: IsoStringLong]: JsonFormat[A] = new JsonFormat[A] {
     val iso = implicitly[IsoStringLong[A]]
+
     def write[J](a: A, builder: Builder[J]): Unit = {
       val p = iso.to(a)
       builder.beginObject()
@@ -28,6 +29,7 @@ trait IsoStringLongFormats {
       builder.writeLong(p._2)
       builder.endObject()
     }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A =
       jsOpt match {
         case Some(js) =>

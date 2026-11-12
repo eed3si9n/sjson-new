@@ -18,8 +18,14 @@ import scala.reflect.ClassTag
 
 package object sjsonnew
   extends AdditionalFormats {
-  def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
+  def deserializationError(
+      msg: String,
+      cause: Throwable = null,
+      fieldNames: List[String] = Nil,
+  ) = throw new DeserializationException(msg, cause, fieldNames)
+
   def serializationError(msg: String) = throw new SerializationException(msg)
+
   def serializationError(msg: String, cause: Throwable, fieldNames: List[String] = Nil) =
     throw new SerializationException(msg, cause, fieldNames)
 
@@ -27,20 +33,32 @@ package object sjsonnew
   def jsonWriter[A](implicit writer: JsonWriter[A]): JsonWriter[A] = writer
 
   type LNil = LList.LNil0
+
   val LNil = LList.LNil0
   type :*:[A1, A2 <: LList] = LCons[A1, A2]
-  object :*: {
-    def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](name: String, head: A1, tail: A2): A1 :*: A2 =
-      LCons(name, head, tail)
 
-    def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] = Some((x.name -> x.head, x.tail))
+  object :*: {
+    def apply[A1: JsonFormat: ClassTag, A2 <: LList: JsonFormat](
+        name: String,
+        head: A1,
+        tail: A2,
+    ): A1 :*: A2 = LCons(name, head, tail)
+
+    def unapply[H, T <: LList](x: H :*: T): Some[((String, H), T)] =
+      Some((x.name -> x.head, x.tail))
   }
 }
 
 package sjsonnew {
   case class DeserializationException(
-    msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) extends RuntimeException(msg, cause)
+      msg: String,
+      cause: Throwable = null,
+      fieldNames: List[String] = Nil,
+  ) extends RuntimeException(msg, cause)
+
   case class SerializationException(
-    msg: String, cause: Throwable = null, fieldNames: List[String] = Nil
+      msg: String,
+      cause: Throwable = null,
+      fieldNames: List[String] = Nil,
   ) extends RuntimeException(msg, cause)
 }

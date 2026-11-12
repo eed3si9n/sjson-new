@@ -19,15 +19,20 @@ package support.spray
 
 import java.util.Arrays
 import spray.json.{ JsArray, JsNumber, JsString, JsObject }
-import LList._
+import LList.*
+
 
 object UnionFormatsSpec extends verify.BasicTestSuite {
   import sjsonnew.BasicJsonProtocol.{ *, given }
 
   sealed trait Fruit
+
   case class Apple() extends Fruit
+
   sealed trait Citrus extends Fruit
+
   case class Orange() extends Citrus
+
   implicit object AppleJsonFormat extends JsonFormat[Apple] {
     def write[J](x: Apple, builder: Builder[J]): Unit =
       {
@@ -35,6 +40,7 @@ object UnionFormatsSpec extends verify.BasicTestSuite {
         builder.addField("x", 0)
         builder.endObject()
       }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Apple =
       jsOpt match {
         case Some(js) =>
@@ -50,6 +56,7 @@ object UnionFormatsSpec extends verify.BasicTestSuite {
         case None => deserializationError("Expected JsNumber but found None")
       }
   }
+
   implicit object OrangeJsonFormat extends JsonFormat[Orange] {
     def write[J](x: Orange, builder: Builder[J]): Unit =
       {
@@ -57,6 +64,7 @@ object UnionFormatsSpec extends verify.BasicTestSuite {
         builder.addField("x", 1)
         builder.endObject()
       }
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Orange =
       jsOpt match {
         case Some(js) =>
@@ -77,7 +85,7 @@ object UnionFormatsSpec extends verify.BasicTestSuite {
 
   test("The unionFormat") {
     implicit val FruitFormat: JsonFormat[Fruit] = unionFormat2[Fruit, Apple, Orange]
-    val fruitJson = JsObject("value" ->  JsObject("x" -> JsNumber(0)), "type" -> JsString("Apple"))
+    val fruitJson = JsObject("value" -> JsObject("x" -> JsNumber(0)), "type" -> JsString("Apple"))
     // "convert a value of ADT to JObject"
     Predef.assert(Converter.toJsonUnsafe(fruit) == fruitJson)
 

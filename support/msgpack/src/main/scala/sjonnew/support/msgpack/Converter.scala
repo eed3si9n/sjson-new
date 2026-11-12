@@ -19,36 +19,44 @@ package support.msgpack
 
 import scala.util.Try
 import org.msgpack.core.MessagePack
-import org.msgpack.value._
+import org.msgpack.value.*
 import java.io.{ InputStream, OutputStream }
+
 
 object Converter extends SupportConverter[Value] {
   def toBinary[A](obj: A)(implicit writer: JsonWriter[A]): Try[Array[Byte]] =
     Try(toBinaryUnsafe(obj))
+
   def toBinary[A](obj: A, out: OutputStream)(implicit writer: JsonWriter[A]): Try[Unit] =
     Try(toBinaryUnsafe(obj, out))
+
   def toBinaryUnsafe[A](obj: A)(implicit writer: JsonWriter[A]): Array[Byte] =
     {
       val packer = MessagePack.newDefaultBufferPacker
       packer.packValue(toJsonUnsafe[A](obj))
       packer.toByteArray
     }
+
   def toBinaryUnsafe[A](obj: A, out: OutputStream)(implicit writer: JsonWriter[A]): Unit =
     {
       val packer = MessagePack.newDefaultPacker(out)
       packer.packValue(toJsonUnsafe[A](obj))
       packer.flush
     }
+
   def fromBinary[A](ary: Array[Byte])(implicit reader: JsonReader[A]): Try[A] =
     Try(fromBinaryUnsafe[A](ary))
+
   def fromBinary[A](in: InputStream)(implicit reader: JsonReader[A]): Try[A] =
     Try(fromBinaryUnsafe[A](in))
+
   def fromBinaryUnsafe[A](ary: Array[Byte])(implicit reader: JsonReader[A]): A =
     {
       val unpacker = MessagePack.newDefaultUnpacker(ary)
       val v = unpacker.unpackValue
       fromJsonUnsafe[A](v)
     }
+
   def fromBinaryUnsafe[A](in: InputStream)(implicit reader: JsonReader[A]): A =
     {
       val unpacker = MessagePack.newDefaultUnpacker(in)
@@ -57,20 +65,23 @@ object Converter extends SupportConverter[Value] {
     }
 
   implicit val facade: Facade[Value] = FacadeImpl
+
   private object FacadeImpl extends SimpleFacade[Value] {
     def jnull(): ImmutableNilValue = ValueFactory.newNil
     def jfalse(): ImmutableBooleanValue = ValueFactory.newBoolean(false)
     def jtrue(): ImmutableBooleanValue = ValueFactory.newBoolean(true)
     def jnumstring(s: String): ImmutableStringValue = ValueFactory.newString(s)
-    def jintstring(s: String): ImmutableIntegerValue = ValueFactory.newInteger(new java.math.BigInteger(s))
+
+    def jintstring(s: String): ImmutableIntegerValue =
+      ValueFactory.newInteger(new java.math.BigInteger(s))
+
     def jint(i: Int): ImmutableIntegerValue = ValueFactory.newInteger(i)
     def jlong(l: Long): ImmutableIntegerValue = ValueFactory.newInteger(l)
     def jdouble(d: Double): ImmutableFloatValue = ValueFactory.newFloat(d)
     def jbigdecimal(d: BigDecimal): ImmutableStringValue = ValueFactory.newString(d.toString)
     def jstring(s: String): ImmutableStringValue = ValueFactory.newString(s)
 
-    def jarray(vs: List[Value]): Value =
-      ValueFactory.newArray(vs.toArray[Value], true)
+    def jarray(vs: List[Value]): Value = ValueFactory.newArray(vs.toArray[Value], true)
 
     def jobject(vs: Map[String, Value]): Value = {
       val expectedSize = vs.size * 2
@@ -91,35 +102,41 @@ object Converter extends SupportConverter[Value] {
         case ValueType.NIL => true
         case _             => false
       }
+
     def isObject(value: Value): Boolean =
       value.getValueType match {
         case ValueType.MAP => true
         case _             => false
       }
+
     def extractInt(value: Value): Int =
       value.getValueType match {
         case ValueType.INTEGER => value.asIntegerValue.asInt
-        case _ => deserializationError("Expected Int as Integer, but got " + value)
+        case _                 => deserializationError("Expected Int as Integer, but got " + value)
       }
+
     def extractLong(value: Value): Long =
       value.getValueType match {
         case ValueType.INTEGER => value.asIntegerValue.asLong
-        case _ => deserializationError("Expected Long as Integer, but got " + value)
+        case _                 => deserializationError("Expected Long as Integer, but got " + value)
       }
+
     def extractFloat(value: Value): Float =
       value.getValueType match {
         case ValueType.INTEGER => value.asIntegerValue.toFloat
         case ValueType.FLOAT   => value.asFloatValue.toFloat
         case ValueType.NIL     => Float.NaN
-        case _ => deserializationError("Expected Float as Float, but got " + value)
+        case _                 => deserializationError("Expected Float as Float, but got " + value)
       }
+
     def extractDouble(value: Value): Double =
       value.getValueType match {
         case ValueType.INTEGER => value.asIntegerValue.toDouble
         case ValueType.FLOAT   => value.asFloatValue.toDouble
         case ValueType.NIL     => Double.NaN
-        case _ => deserializationError("Expected Double as Float, but got " + value)
+        case _                 => deserializationError("Expected Double as Float, but got " + value)
       }
+
     def extractBigDecimal(value: Value): BigDecimal =
       value.getValueType match {
         case ValueType.STRING  => BigDecimal(value.asStringValue.asString)
@@ -127,16 +144,19 @@ object Converter extends SupportConverter[Value] {
         case ValueType.FLOAT   => BigDecimal(value.asFloatValue.toDouble)
         case _ => deserializationError("Expected BigDecimal as String, but got " + value)
       }
+
     def extractBoolean(value: Value): Boolean =
       value.getValueType match {
         case ValueType.BOOLEAN => value.asBooleanValue.getBoolean
-        case _ => deserializationError("Expected Boolean, but got " + value)
+        case _                 => deserializationError("Expected Boolean, but got " + value)
       }
+
     def extractString(value: Value): String =
       value.getValueType match {
         case ValueType.STRING => value.asStringValue.asString
-        case _ => deserializationError("Expected String as String, but got " + value)
+        case _                => deserializationError("Expected String as String, but got " + value)
       }
+
     def extractArray(value: Value): Vector[Value] =
       value.getValueType match {
         case ValueType.ARRAY =>
@@ -150,6 +170,7 @@ object Converter extends SupportConverter[Value] {
           Vector()
         case _ => deserializationError("Expected List as Array, but got " + value)
       }
+
     def extractObject(value: Value): (Map[String, Value], Vector[String]) =
       value.getValueType match {
         case ValueType.MAP =>
@@ -165,7 +186,7 @@ object Converter extends SupportConverter[Value] {
           }
           (mapBuilder.result(), vectorBuilder.result())
         case ValueType.NIL => (Map.empty, Vector.empty)
-        case _ => deserializationError("Expected Map as MMap, but got " + value)
+        case _             => deserializationError("Expected Map as MMap, but got " + value)
       }
   }
 }

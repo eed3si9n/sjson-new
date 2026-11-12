@@ -24,12 +24,11 @@ package sjsonnew
 
 // https://github.com/typelevel/jawn/blob/5f03ff5d9bccb483f6fd87d8e79cdb697f8794b6/parser/src/main/scala/jawn/Facade.scala
 
-/**
- * BuilderFacade is a type class that describes how JSON AST elements of
- * type J can be constructed.
+/** BuilderFacade is a type class that describes how JSON AST elements of
+ *  type J can be constructed.
  *
- * BuilderFacade[J] also uses FContext[J] instances, so implementors will
- * usually want to define both.
+ *  BuilderFacade[J] also uses FContext[J] instances, so implementors will
+ *  usually want to define both.
  */
 trait BuilderFacade[J] {
   def singleContext(): FContext[J]
@@ -49,12 +48,11 @@ trait BuilderFacade[J] {
 }
 
 
-/**
- * FContext is used to construct nested JSON values.
+/** FContext is used to construct nested JSON values.
  *
- * The most common cases are to build objects and arrays. However,
- * this type is also used to build a single top-level JSON element, in
- * cases where the entire JSON document consists of "333.33".
+ *  The most common cases are to build objects and arrays. However,
+ *  this type is also used to build a single top-level JSON element, in
+ *  cases where the entire JSON document consists of "333.33".
  */
 trait FContext[J] {
   def addField(s: String): Unit
@@ -63,9 +61,9 @@ trait FContext[J] {
   def isObj: Boolean
 }
 
-/**
- * ExtractorFacade is a type class that describes how JSON AST elements of
- * type J can be extracted.
+
+/** ExtractorFacade is a type class that describes how JSON AST elements of
+ *  type J can be extracted.
  */
 trait ExtractorFacade[J] {
   def isJnull(value: J): Boolean
@@ -81,11 +79,11 @@ trait ExtractorFacade[J] {
   def extractObject(value: J): (Map[String, J], Vector[String])
 }
 
-/**
- * Facade is a type class that describes how JSON AST elements of
- * type J can be constructed, and how value can be extracted.
+
+/** Facade is a type class that describes how JSON AST elements of
+ *  type J can be constructed, and how value can be extracted.
  *
- * Facade[J] also uses FContext[J] instances, so implementors will
- * usually want to define both.
+ *  Facade[J] also uses FContext[J] instances, so implementors will
+ *  usually want to define both.
  */
 trait Facade[J] extends BuilderFacade[J] with ExtractorFacade[J]

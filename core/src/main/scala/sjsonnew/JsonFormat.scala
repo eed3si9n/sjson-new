@@ -20,10 +20,11 @@ package sjsonnew
 
 import annotation.implicitNotFound
 
-/**
-  * Provides the JSON deserialization for type A.
- */
-@implicitNotFound(msg = "Cannot find JsonReader or JsonFormat type class for ${A}")
+
+/** Provides the JSON deserialization for type A. */
+@implicitNotFound(
+  msg = "Cannot find JsonReader or JsonFormat type class for ${A}"
+)
 trait JsonReader[A] {
   def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): A
 }
@@ -33,12 +34,14 @@ object JsonReader {
     jf
 }
 
-/**
-  * Provides the JSON serialization for type A.
- */
-@implicitNotFound(msg = "Cannot find JsonWriter or JsonFormat type class for ${A}")
+
+/** Provides the JSON serialization for type A. */
+@implicitNotFound(
+  msg = "Cannot find JsonWriter or JsonFormat type class for ${A}"
+)
 trait JsonWriter[A] {
   def write[J](obj: A, builder: Builder[J]): Unit
+
   def addField[J](name: String, obj: A, builder: Builder[J]): Unit =
     {
       builder.addFieldName(name)
@@ -51,9 +54,8 @@ object JsonWriter {
     jf
 }
 
-/**
-  * Provides the JSON deserialization and serialization for type A.
- */
+
+/** Provides the JSON deserialization and serialization for type A. */
 trait JsonFormat[A] extends JsonReader[A] with JsonWriter[A]
 
 object JsonFormat extends PrimitiveFormats
@@ -69,20 +71,24 @@ object JsonFormat extends PrimitiveFormats
   with ThrowableFormats {
 }
 
-/**
- * A special JsonReader capable of reading a legal JSON root object, i.e. either a JSON array or a JSON object.
+
+/** A special JsonReader capable of reading a legal JSON root object, i.e. either a JSON array or a JSON object.
  */
-@implicitNotFound(msg = "Cannot find RootJsonReader or RootJsonFormat type class for ${A}")
+@implicitNotFound(
+  msg = "Cannot find RootJsonReader or RootJsonFormat type class for ${A}"
+)
 trait RootJsonReader[A] extends JsonReader[A]
 
-/**
- * A special JsonWriter capable of writing a legal JSON root object, i.e. either a JSON array or a JSON object.
+
+/** A special JsonWriter capable of writing a legal JSON root object, i.e. either a JSON array or a JSON object.
  */
-@implicitNotFound(msg = "Cannot find RootJsonWriter or RootJsonFormat type class for ${A}")
+@implicitNotFound(
+  msg = "Cannot find RootJsonWriter or RootJsonFormat type class for ${A}"
+)
 trait RootJsonWriter[A] extends JsonWriter[A]
 
-/**
- * A special JsonFormat signaling that the format produces a legal JSON root object, i.e. either a JSON array
- * or a JSON object.
+
+/** A special JsonFormat signaling that the format produces a legal JSON root object, i.e. either a JSON array
+ *  or a JSON object.
  */
 trait RootJsonFormat[A] extends JsonFormat[A] with RootJsonReader[A] with RootJsonWriter[A]

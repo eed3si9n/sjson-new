@@ -20,13 +20,17 @@ import java.io.File
 import java.net.{ URI, URL }
 import java.util.Locale
 
+
 trait IsoStringLong[A] {
   def to(a: A): (String, Long)
   def from(p: (String, Long)): A
 }
 
 object IsoStringLong extends FileIsoStringLongs {
-  def iso[A](to0: A => (String, Long), from0: ((String, Long)) => A): IsoStringLong[A] = new IsoStringLong[A] {
+  def iso[A](
+      to0: A => (String, Long),
+      from0: ((String, Long)) => A,
+  ): IsoStringLong[A] = new IsoStringLong[A] {
     def to(a: A): (String, Long) = to0(a)
     def from(p: (String, Long)): A = from0(p)
   }
@@ -50,16 +54,22 @@ object IsoStringLong extends FileIsoStringLongs {
     } else if (file.isAbsolute) {
       //not using f.toURI to avoid filesystem syscalls
       //we use empty string as host to force file:// instead of just file:
-      new URI(FileScheme, "", normalizeName(ensureHeadSlash(file.getAbsolutePath)), null).toASCIIString
+      new URI(
+        FileScheme,
+        "",
+        normalizeName(ensureHeadSlash(file.getAbsolutePath)),
+        null,
+      ).toASCIIString
     } else {
       new URI(null, normalizeName(file.getPath), null).toASCIIString
     }
   }
 
   private[this] def ensureHeadSlash(name: String) = {
-    if(name.nonEmpty && name.head != File.separatorChar) s"${File.separatorChar}$name"
+    if (name.nonEmpty && name.head != File.separatorChar) s"${File.separatorChar}$name"
     else name
   }
+
   private[this] def normalizeName(name: String) = {
     val sep = File.separatorChar
     if (sep == '/') name else name.replace(sep, '/')

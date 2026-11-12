@@ -20,10 +20,12 @@ import java.io.File
 import java.net.URI
 import java.nio.file.{ Path, Paths }
 
+
 trait PathOnlyFormats {
   implicit val pathOnlyFileFormat: JsonFormat[File] = new JsonFormat[File] {
     def write[J](file: File, builder: Builder[J]): Unit =
       builder.writeString(IsoStringLong.fileToString(file))
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): File =
       jsOpt match {
         case Some(js) => IsoStringLong.uriToFile(new URI(unbuilder.readString(js)))
@@ -32,8 +34,8 @@ trait PathOnlyFormats {
   }
 
   implicit val pathOnlyPathFormat: JsonFormat[Path] = new JsonFormat[Path] {
-    def write[J](file: Path, builder: Builder[J]): Unit =
-      builder.writeString(file.toString)
+    def write[J](file: Path, builder: Builder[J]): Unit = builder.writeString(file.toString)
+
     def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Path =
       jsOpt match {
         case Some(js) => Paths.get(unbuilder.readString(js))
